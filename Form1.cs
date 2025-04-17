@@ -244,7 +244,7 @@ namespace WorkCloneCS
            
             Point mouseDownLocation = Point.Empty;
             bool isDragging = false;
-            FlowLayoutPanel rowPannel = (FlowLayoutPanel)label.Parent;
+            
             label.MouseDown += (s, e) =>
             {
                 if (e.Button == MouseButtons.Left)
@@ -266,24 +266,29 @@ namespace WorkCloneCS
 
             label.MouseUp += (s, e) =>
             {
+                FlowLayoutPanel rowPannel = (FlowLayoutPanel)label.Parent;
                 if (!isDragging) return;
                 isDragging = false;
 
                 int deltaX = e.X - mouseDownLocation.X;
-
-                if (deltaX < -100 && rowPannel != null) // Swipe left threshold
+                if (rowPannel != null)
                 {
-                    swipeToTheLeftLogic(label, rowPannel);
-                }
-                else if (deltaX > 100 && rowPannel != null)
-                {
-                    swipeToTheRightLogic(label, rowPannel);
+                    if (deltaX < -100 && rowPannel != null) // Swipe left threshold
+                    {
+                        swipeToTheLeftLogic(label, rowPannel);
+                    }
+                    else if (deltaX > 100 && rowPannel != null)
+                    {
+                        swipeToTheRightLogic(label, rowPannel);
+                    }
+                    
+                    label.BackColor = SystemColors.Control;
                 }
                 else
                 {
                     MessageBox.Show($"it is null here is the thing innit: {rowPannel.Controls}");
                 }
-                label.BackColor = SystemColors.Control;
+
             };
 
         }
