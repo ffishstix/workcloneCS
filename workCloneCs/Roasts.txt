@@ -1,0 +1,30 @@
+bar misc, 000
+food misc, 000
+roast small pork, 1095
+roast small Türkiye, 1095
+roast small beef, 1095
+roast small gammon, 1095
+roast standard, 1595
+roast pork bap, 1195
+roast beef bap, 1195
+roast Türkiye bap, 1195
+roast gammon bap, 1195
+stuffing, 50
+fodder bowl large, 1095
+cauli cheese, 350
+roast gurt, 1795
+fodder bowl small, 650
+pigs in blankets, 450
+roast small no meat, 995
+dairy free, 000
+vegetable wellington, 1595
+roast potatoes, 400
+roast std no meat, 1495
+gluten free, 000
+nut roast, 1595
+Yorkshire pudding, 100
+allergy / intolerance, 000
+sides takeaway, 000
+NO!!, 000
+END OF ORDER, 000
+TO BE CONT., 000

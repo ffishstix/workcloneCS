@@ -1,0 +1,12 @@
+bar misc, 000
+food misc, 000
+with cheese, 100
+fish fingers & chips, 795
+chicken bites, 795
+Courtney's cheese roll, 450
+mini naan pizza, 895
+child's sausages, 895
+mac 'n' cheese kids, 895
+allergy / intolerance, 000
+sides takeaway, 000
+NO!!, 000

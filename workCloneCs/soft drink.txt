@@ -1,0 +1,25 @@
+bar misc, 000
+food misc, 000
+cordial, 000
+fruit juices, 000
+j20, 340
+fruitshoots, 220
+Luscombe, 420
+appletizer, 380
+bottled water, 280
+tonic, 240
+glass of milk, 300
+jug of water, 000
+pepsi max can, 170
+redbull, 370
+glass tap water, 000
+OJ + Lemonade pint, 370
+no ice, 000
+slices, 000
+lime & soda pint, 270
+lemonade+, 370
+soda+, 270
+soda, 200
+coke, 380
+diet coke, 380
+lemonade, 370

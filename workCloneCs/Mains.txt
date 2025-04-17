@@ -1,0 +1,30 @@
+bar misc, 000
+food misc, 000
+Build Your Own Burger, 1495
+rump steak 8oz, 2195
+ham eggs & chips, 1450
+Garden Burger *VG, 1495
+Rump steak 160z, 2795
+small ham egg & chips, 1050
+pork loin, 1895
+sirloin steak 8oz, 2295
+beef chilli (GF), 1495
+tandoori flatbread, 1795
+sirloin steak 16oz, 2995
+Sweet & sour chicken, 1450
+Foot-long chilli dog, 1695
+scampi large, 1495
+Chinese chicken curry, 1695
+hunters chicken, 1695
+scampi small, 1095
+noodle bowl, 1695
+LS gammon steak, 1895
+Cod & chips, 1695
+Tortilla bean chilli, 1695
+sm gammon steak, 1295
+brisket pot-pie, 1795
+allergy / intolerance, 000
+END OF ORDER, 000
+TO BE CONT., 000
+sides takeaway, 000
+NO!!, 000

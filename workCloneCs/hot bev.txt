@@ -1,0 +1,20 @@
+bar misc, 000
+food misc, 000
+floater coffee, 330
+hot chocolate, 350
+chai latte, 350
+clays shot chocolate, 400
+flat white, 350
+oat milk, 50
+latte, 350
+soya milk, 50
+espresso, 250
+vanilla, 50
+caramel, 50
+americano, 300
+speciality tea, 280
+cappuccino, 350
+decaff, 000
+mocha, 350
+separate milk, 000
+irish coffee, 700
