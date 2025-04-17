@@ -164,18 +164,17 @@ namespace WorkCloneCS
                         countLabel.BackColor = Color.White;
                         try
                         {
-                            int itemCount = tag.ItemCount;
                             if (tag.ItemCount > 1)
                             {
-                                tag.ItemCount--;
+                                tag.ItemCount = -1;
                                 countLabel.Text = (tag.ItemCount).ToString();
                                 tag.TotalPrice = -tag.Price;
 
                             }
                             else
                             {
-                                parent.Controls.Remove(label);
-                                label.Dispose();
+                                parent.Controls.Clear();
+                                parent.Dispose();
                             }
                             break;
                         }
@@ -212,7 +211,7 @@ namespace WorkCloneCS
                         {
 
                             
-                            tag.ItemCount++;
+                            tag.ItemCount = 1;
                             tag.TotalPrice = tag.Price;
                             countLabel.Text = $"{tag.ItemCount}";
                             MessageBox.Show($"count: {tag.ItemCount}, price {tag.Price} so should be: {tag.TotalPrice}");
@@ -229,7 +228,15 @@ namespace WorkCloneCS
                         break;
                     }
                 }
-                updateTotalItems(1);
+                foreach (Control ctrl in parent.Controls)
+                {
+                    if (ctrl is Label priceLabel && priceLabel.Name == $"priceLabel{tag.Count}") // or check Name, Tag, etc.
+                    { 
+                        //not implemented but had to push
+
+                    }
+                }
+                        updateTotalItems(1);
                 updateTotalPrice(tag.Price);
                 
 
@@ -369,6 +376,10 @@ namespace WorkCloneCS
         private void deleteAllItemsOrdered()
         {
             scrollPanel.Controls.Clear();
+            leftLabel.Tag = 0;
+            leftLabel.Text = "Items: 0";
+            rightLabel.Tag = 0m;
+            rightLabel.Text = "Price: £0.00";
         }
 
         //
@@ -406,6 +417,7 @@ namespace WorkCloneCS
         private void backBtn_Click(object sender, EventArgs e)
         {
             deleteChildbox();
+            
             addCatagory(catagories);
             allPannelsBlank();
         }
