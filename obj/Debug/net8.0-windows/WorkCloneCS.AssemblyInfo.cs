@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorkCloneCS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8985a51fbe84124492f42751623355a3d09aabb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1bcbdb0489875026e01d3987089cc62acc867d25")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorkCloneCS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorkCloneCS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

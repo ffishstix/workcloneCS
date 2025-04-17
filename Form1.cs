@@ -189,11 +189,28 @@ namespace WorkCloneCS
                         }
                     }
                 }
+                changeRight(tag, parent);
                 updateTotalPrice(-tag.Price);
                 updateTotalItems(-1);
             }
             
         }
+        private void changeRight(rowPanelTag tag, FlowLayoutPanel parent)
+        {
+            foreach (Control ctrl in parent.Controls)
+            {
+                if (ctrl is Label priceLabel && priceLabel.Name == $"priceLabel{tag.Count}") // or check Name, Tag, etc.
+                {
+                    //not implemented but had to push
+                    decimal t = tag.ItemCount * tag.Price;
+                    priceLabel.Text = $"{(t).ToString("c")}";
+                    priceLabel.Tag = t;
+
+
+                }
+            }
+        }
+
 
         private void swipeToTheRightLogic(Label label, FlowLayoutPanel parent)
         {
@@ -214,7 +231,7 @@ namespace WorkCloneCS
                             tag.ItemCount = 1;
                             tag.TotalPrice = tag.Price;
                             countLabel.Text = $"{tag.ItemCount}";
-                            MessageBox.Show($"count: {tag.ItemCount}, price {tag.Price} so should be: {tag.TotalPrice}");
+                           
                         }
                         catch (Exception ex)
                         {
@@ -228,15 +245,8 @@ namespace WorkCloneCS
                         break;
                     }
                 }
-                foreach (Control ctrl in parent.Controls)
-                {
-                    if (ctrl is Label priceLabel && priceLabel.Name == $"priceLabel{tag.Count}") // or check Name, Tag, etc.
-                    { 
-                        //not implemented but had to push
-
-                    }
-                }
-                        updateTotalItems(1);
+                changeRight(tag, parent);
+                updateTotalItems(1);
                 updateTotalPrice(tag.Price);
                 
 
