@@ -44,7 +44,7 @@
               "RelativeDocumentMoniker": "foodloader.cs",
               "ToolTip": "C:\\WorkCloneCS\\foodloader.cs",
               "RelativeToolTip": "foodloader.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACwAAABXAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAACwAAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-16T22:27:22.748Z",
               "EditorCaption": ""
@@ -57,7 +57,7 @@
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\WorkCloneCS\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AgIAALsAAAAAAAAAAAAswNUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAcCAAAAAAAAAAAAAAcCAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-14T12:41:35.496Z",
               "EditorCaption": ""
@@ -70,11 +70,32 @@
               "RelativeDocumentMoniker": "Form1.Designer.cs",
               "ToolTip": "C:\\WorkCloneCS\\Form1.Designer.cs",
               "RelativeToolTip": "Form1.Designer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0BAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAA4BAAAAAAAAAAAkwCgBAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-16T17:54:49.368Z",
               "EditorCaption": ""
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "4e60578b-a03f-49a7-af72-50decaa24dcd",
+        "Display": 2,
+        "X": 480,
+        "Y": 46,
+        "Width": 1106,
+        "Height": 957,
+        "WindowState": 0
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 3,
@@ -84,7 +105,8 @@
               "ToolTip": "C:\\WorkCloneCS\\Form1.cs [Design]",
               "RelativeToolTip": "Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T21:33:41.72Z"
+              "WhenOpened": "2025-04-14T21:33:41.72Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }

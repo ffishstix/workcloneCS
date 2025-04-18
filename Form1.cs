@@ -3,29 +3,12 @@ using System.Diagnostics;
 using System.DirectoryServices;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 namespace WorkCloneCS
 {
 
-    class rowPanelTag
-    {
-        private string name = "changeMe";
-        private int count = 1;
-        private decimal price = 0;
-        private int itemCount = 1;
-        private decimal totalPrice = 0;
 
-        public string Name { get { return name; } set { name = value; } }
-        public int Count { get { return count; } set { count = value; } }
-        public decimal Price { get { return price; } set { price = value; } }
-        public int ItemCount { get { return itemCount; } set { itemCount += value; } }
-        public decimal TotalPrice 
-        {
-            get { return totalPrice; }
-            set { totalPrice += value; } 
-        }
-
-    }
     public partial class Form1 : Form
     {
         int globalCount = 0;
@@ -77,20 +60,21 @@ namespace WorkCloneCS
             globalCount++;
             int countLabelWidth = 30;
             int priceLabelWidth = 60;
-            rowPanelTag tag = new rowPanelTag { 
+            rowPanelTag tag = new rowPanelTag
+            {
                 Name = Name,
                 Price = Price,
                 Count = globalCount,
                 TotalPrice = Price
             };
-            
+
             FlowLayoutPanel rowPannel = new()
             {
                 Height = rowHeight,
                 Tag = tag,
                 Padding = new Padding(0),
                 Margin = new Padding(0),
-                Name = $"rowPannel{globalCount}",
+                Name = $"{tag.Name}{globalCount}",
                 Width = scrollPanel.Width - SystemInformation.VerticalScrollBarWidth,
                 AutoSize = false,
                 AutoScroll = false,
@@ -193,7 +177,7 @@ namespace WorkCloneCS
                 updateTotalPrice(-tag.Price);
                 updateTotalItems(-1);
             }
-            
+
         }
         private void changeRight(rowPanelTag tag, FlowLayoutPanel parent)
         {
@@ -216,7 +200,7 @@ namespace WorkCloneCS
         {
             if (parent.Tag is rowPanelTag tag)
             {
-            label.BackColor = Color.Blue;
+                label.BackColor = Color.Blue;
 
                 // Search for the countLabel inside the same rowPanel
                 foreach (Control ctrl in parent.Controls)
@@ -227,11 +211,11 @@ namespace WorkCloneCS
                         try
                         {
 
-                            
+
                             tag.ItemCount = 1;
                             tag.TotalPrice = tag.Price;
                             countLabel.Text = $"{tag.ItemCount}";
-                           
+
                         }
                         catch (Exception ex)
                         {
@@ -248,7 +232,7 @@ namespace WorkCloneCS
                 changeRight(tag, parent);
                 updateTotalItems(1);
                 updateTotalPrice(tag.Price);
-                
+
 
                 //CURENTLY BROKEN,
                 //must add fix for having multiple of the same products and then swiping right
@@ -258,10 +242,10 @@ namespace WorkCloneCS
         }
         private void EnableSwipeToDelete(Label label)
         {
-           
+
             Point mouseDownLocation = Point.Empty;
             bool isDragging = false;
-            
+
             label.MouseDown += (s, e) =>
             {
                 if (e.Button == MouseButtons.Left)
@@ -298,7 +282,7 @@ namespace WorkCloneCS
                     {
                         swipeToTheRightLogic(label, rowPannel);
                     }
-                    
+
                     label.BackColor = SystemColors.Control;
                 }
                 else
@@ -427,7 +411,7 @@ namespace WorkCloneCS
         private void backBtn_Click(object sender, EventArgs e)
         {
             deleteChildbox();
-            
+
             addCatagory(catagories);
             allPannelsBlank();
         }
@@ -490,6 +474,10 @@ namespace WorkCloneCS
         private void allPannelsBlank()
         {
             ConfigPannel.Visible = false;
+            finalPanel.Visible = false;
+            tablePanel.Visible = false;
+            orderPanel.Visible = false;
+            miscPanel.Visible = false;
         }
 
         //this is the bottom right button to bring up the right menu ;)
@@ -498,6 +486,7 @@ namespace WorkCloneCS
             bool temp = !ConfigPannel.Visible;
             allPannelsBlank();
             ConfigPannel.Visible = temp;
+            ConfigPannel.BringToFront();
 
         }
 
@@ -505,5 +494,106 @@ namespace WorkCloneCS
         {
             deleteAllItemsOrdered();
         }
+
+        private void FinalBtn_Click(object sender, EventArgs e)
+        {
+            bool temp = !finalPanel.Visible;
+            allPannelsBlank();
+            finalPanel.Visible = temp;
+            finalPanel.BringToFront();
+        }
+
+        private void tableBottomBtn_Click(object sender, EventArgs e)
+        {
+            bool temp = !tablePanel.Visible;
+            allPannelsBlank();
+            tablePanel.Visible = temp;
+            tablePanel.BringToFront();
+        }
+
+        private void OrderBtn_Click(object sender, EventArgs e)
+        {
+            bool temp = !orderPanel.Visible;
+            allPannelsBlank();
+            orderPanel.Visible = temp;
+            orderPanel.BringToFront();
+            int totalHeight = flowLayoutPanel1.Height;
+            int panel1Height;
+            if (!temp)
+            {
+                panel1Height = 190;
+                foreach (Control ctrl in scrollPanel.Controls)
+                {
+                    if (ctrl is FlowLayoutPanel panel && panel.Tag is rowPanelTag t && t != null) // or check Name, Tag, etc.
+                    {
+                        foreach (Control ctrl2 in panel.Controls)
+                        {
+                            if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.Count}")
+                            {
+                                lbl.Width += 92;
+                            }
+                        }
+                    }
+                }
+            }
+           
+
+                else
+                {
+                    panel1Height = 0;
+                    foreach (Control ctrl in scrollPanel.Controls)
+                    {
+                        if (ctrl is FlowLayoutPanel panel && panel.Tag is rowPanelTag t && t != null) // or check Name, Tag, etc.
+                        {
+                            foreach (Control ctrl2 in panel.Controls)
+                            {
+                                if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.Count}")
+                                {
+                                    lbl.Width += 92;
+                                }
+                            }
+                        }
+                    }
+            }
+           
+            int panel2Height = 33;
+            int catpanHeight = totalHeight - panel2Height - panel1Height - 20;
+            panel1.Height = catpanHeight;
+            catPan.Height = panel1Height;
+            
+            
+            
+            
+        }
+
+        private void miscBtn_Click(object sender, EventArgs e)
+        {
+            bool temp = !miscPanel.Visible;
+            allPannelsBlank();
+            miscPanel.Visible = temp;
+            miscPanel.BringToFront();
+            
+        }
+    }
+
+
+    class rowPanelTag
+    {
+        private string name = "changeMe";
+        private int count = 1;
+        private decimal price = 0;
+        private int itemCount = 1;
+        private decimal totalPrice = 0;
+
+        public string Name { get { return name; } set { name = value; } }
+        public int Count { get { return count; } set { count = value; } }
+        public decimal Price { get { return price; } set { price = value; } }
+        public int ItemCount { get { return itemCount; } set { itemCount += value; } }
+        public decimal TotalPrice
+        {
+            get { return totalPrice; }
+            set { totalPrice += value; }
+        }
+
     }
 }
