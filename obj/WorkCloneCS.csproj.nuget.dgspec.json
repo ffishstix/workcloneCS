@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\WorkCloneCS\\WorkCloneCS.csproj": {}
+    "C:\\Users\\finla\\Source\\Repos\\workcloneCS\\WorkCloneCS.csproj": {}
   },
   "projects": {
-    "C:\\WorkCloneCS\\WorkCloneCS.csproj": {
+    "C:\\Users\\finla\\Source\\Repos\\workcloneCS\\WorkCloneCS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\WorkCloneCS\\WorkCloneCS.csproj",
+        "projectUniqueName": "C:\\Users\\finla\\Source\\Repos\\workcloneCS\\WorkCloneCS.csproj",
         "projectName": "WorkCloneCS",
-        "projectPath": "C:\\WorkCloneCS\\WorkCloneCS.csproj",
+        "projectPath": "C:\\Users\\finla\\Source\\Repos\\workcloneCS\\WorkCloneCS.csproj",
         "packagesPath": "C:\\Users\\finla\\.nuget\\packages\\",
-        "outputPath": "C:\\WorkCloneCS\\obj\\",
+        "outputPath": "C:\\Users\\finla\\Source\\Repos\\workcloneCS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
