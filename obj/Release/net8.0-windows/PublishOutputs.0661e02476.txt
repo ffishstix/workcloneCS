@@ -1,5 +1,0 @@
-C:\WorkCloneCS\bin\Release\net8.0-windows\publish\WorkCloneCS.exe
-C:\WorkCloneCS\bin\Release\net8.0-windows\publish\WorkCloneCS.dll
-C:\WorkCloneCS\bin\Release\net8.0-windows\publish\WorkCloneCS.deps.json
-C:\WorkCloneCS\bin\Release\net8.0-windows\publish\WorkCloneCS.runtimeconfig.json
-C:\WorkCloneCS\bin\Release\net8.0-windows\publish\WorkCloneCS.pdb
