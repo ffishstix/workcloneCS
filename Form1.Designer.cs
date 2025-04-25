@@ -48,6 +48,7 @@
             tableBottomBtn = new Button();
             FinalBtn = new Button();
             ConfigBtn = new Button();
+            rightLabel = new Label();
             finalPanel = new FlowLayoutPanel();
             CancelBtn = new Button();
             SendToTableBtnFinalPanel = new Button();
@@ -63,6 +64,7 @@
             addItemBtn = new Button();
             subtractItemBtn = new Button();
             lineCorrectBtn = new Button();
+            leftLabel = new Label();
             toggleBtn = new Button();
             multiplyBtn = new Button();
             miscPanel = new FlowLayoutPanel();

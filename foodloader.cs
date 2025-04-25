@@ -8,7 +8,7 @@ namespace WorkCloneCS
 
         private static string filePathReturn(string filename)
         {
-            return @$"C:\Users\finwest\\WorkCloneCs\{filename}.txt";
+            return @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\{filename}.txt";
         }
         public static string[] LoadCatagorys(string c)
         {

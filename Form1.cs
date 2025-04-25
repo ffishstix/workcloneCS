@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms.Design;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
@@ -10,6 +11,9 @@ namespace WorkCloneCS
 
     public partial class Form1 : Form
     {
+
+
+
         int globalCount = 0;
         private string[] catagories = FoodLoader.LoadCatagorys("catagories");
         public Form1()
@@ -59,6 +63,14 @@ namespace WorkCloneCS
             globalCount++;
             int countLabelWidth = 30;
             int priceLabelWidth = 60;
+            rowOfItem row = new rowOfItem()
+            {
+                FoodName = Name,
+                Price = Price, 
+            };
+            row.SetHeight(rowHeight);
+            scrollPanel.Controls.Add(row.rowPannel);
+            /*
             rowPanelTag tag = new rowPanelTag()
             {
                 Name = Name,
@@ -129,7 +141,7 @@ namespace WorkCloneCS
             rowPannel.Controls.Add(foodLabel);
             rowPannel.Controls.Add(priceLabel);
             scrollPanel.Controls.Add(rowPannel);
-
+            */
             scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
             scrollPanel.PerformLayout();
         }
@@ -236,7 +248,7 @@ namespace WorkCloneCS
 
             }
         }
-        private void EnableSwipeToDelete(Label label)
+        public void EnableSwipeToDelete(Label label)
         {
 
             Point mouseDownLocation = Point.Empty;
@@ -324,40 +336,10 @@ namespace WorkCloneCS
         private void InitFoodList()
         {
             createScrollPanel();
+            
             // Sample data - to be changed
-            List<(string Name, decimal Price)> foodItems = null;
-            int rowHeight = 40;
-            int padding = 5;
-            priceTotal = 0m;
-            int count = 0;
-            if (foodItems != null)
-            {
-                foreach (var item in foodItems) addItem(item.Price, item.Name, rowHeight);
-                count = foodItems.Count;
-            }
-            leftLabel = new Label
-            {
-                Text = $"Items: {count}",
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Dock = DockStyle.Left,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Width = scrollPanel.Width / 2 - SystemInformation.VerticalScrollBarWidth / 2,
-                Padding = new Padding(10, 0, 0, 0),
-                Tag = (int)(count)
-
-            };
-            rightLabel = new Label
-            {
-                Text = $"Price: {priceTotal.ToString("c")}",
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Right,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Width = scrollPanel.Width / 2 - SystemInformation.VerticalScrollBarWidth / 2,
-                Padding = new Padding(10, 0, 0, 0),
-                Tag = priceTotal
-            };
+            leftLabel.Tag = 0;
+            rightLabel.Tag = 0m;
             panel2.Controls.Add(leftLabel);
             panel2.Controls.Add(rightLabel);
         }
@@ -573,89 +555,7 @@ namespace WorkCloneCS
         }
     }
 
-    /*
-    class rowPanel
-    {
-        priceTotal += Price;
-        globalCount++;
-        int countLabelWidth = 30;
-        int priceLabelWidth = 60;
-        rowPanelTag tag = new rowPanelTag()
-        {
-            Name = Name,
-            Price = Price,
-            Count = globalCount,
-        };
-
-        FlowLayoutPanel rowPannel = new()
-        {
-            Height = rowHeight,
-            Tag = tag,
-            Padding = new Padding(0),
-            Margin = new Padding(0),
-            Name = $"{tag.Name}{globalCount}",
-            Width = scrollPanel.Width - SystemInformation.VerticalScrollBarWidth,
-            AutoSize = false,
-            AutoScroll = false,
-            WrapContents = false,
-            FlowDirection = FlowDirection.LeftToRight,
-            BackColor = Color.Green
-        };
-
-        Label countLabel = new Label
-        {
-            Text = "1",
-            Name = $"countLabel{globalCount}",
-            Width = countLabelWidth,
-            Height = rowHeight,
-            AutoSize = false,
-            Padding = new Padding(0),
-            Margin = new Padding(0),
-            Font = new Font("Segoe UI", 12, FontStyle.Regular),
-            TextAlign = ContentAlignment.MiddleLeft,
-            BackColor = Color.Yellow
-
-        };
-
-        Label foodLabel = new Label
-        {
-            Text = Name,
-            Height = rowHeight,
-            AutoSize = false,
-            Name = $"foodLabel{globalCount}",
-            TextAlign = ContentAlignment.MiddleLeft,
-            Font = new Font("Segoe UI", 12, FontStyle.Regular),
-            Padding = new Padding(10, 0, 0, 0),
-            Tag = (Name, Price),
-            Width = scrollPanel.Width - countLabelWidth - priceLabelWidth - SystemInformation.VerticalScrollBarWidth - 9
-        };
-        EnableSwipeToDelete(foodLabel);
-
-        Label priceLabel = new Label
-        {
-            Text = Price.ToString("c"),
-            Name = $"priceLabel{globalCount}",
-            Tag = Price.ToString(),
-            Width = priceLabelWidth,
-            Height = rowHeight,
-            AutoSize = false,
-            TextAlign = ContentAlignment.MiddleLeft,
-            Font = new Font("Segoe UI", 12, FontStyle.Regular),
-            Padding = new Padding(0),
-            BackColor = Color.Red,
-
-        };
-
-        rowPannel.Controls.Add(countLabel);
-            rowPannel.Controls.Add(foodLabel);
-            rowPannel.Controls.Add(priceLabel);
-            scrollPanel.Controls.Add(rowPannel);
-
-            scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
-            scrollPanel.PerformLayout();
-    }
-
-    */
+ 
     class rowPanelTag
     {
         private string name;
@@ -679,4 +579,117 @@ namespace WorkCloneCS
         }
 
     }
+
+
+    class rowOfItem
+    {
+        private string foodName;
+        private decimal price = 0;
+        private int itemCount = 0;
+        private int indexCount = 0;
+        private int rowHeight = 40;
+        public int maxWidth = 850;
+        private Label left;
+        private Label middle;
+        private Label right;
+        public FlowLayoutPanel rowPannel;
+        private rowPanelTag Tag;
+        
+
+
+        public string FoodName { get { return foodName; } set { foodName = value; } }
+        public decimal Price { get { return price; } set { price = value; } }
+        public int ItemCount { get {return itemCount; } set {itemCount = value; } }
+        public int IndexCount { get { return indexCount; } }
+        public decimal TotalPrice { get { return itemCount * price; } }
+        public void IncreaseCount()
+        {
+            indexCount++;
+        }
+        public rowOfItem()
+        {
+            foodName = "litterallly anythingelse";
+            int countLabelWidth = 30;
+            int priceLabelWidth = 60;
+            Tag = new rowPanelTag()
+            {
+                ItemCount = itemCount,
+                Name = FoodName,
+                Count = indexCount,
+                Price = price
+
+            };
+
+
+            rowPannel = new()
+            {
+                Height = rowHeight,
+                Tag = Tag,
+                Padding = new Padding(0),
+                Margin = new Padding(0),
+                Width = maxWidth - SystemInformation.VerticalScrollBarWidth,
+                AutoSize = false,
+                AutoScroll = false,
+                WrapContents = false,
+                FlowDirection = FlowDirection.LeftToRight,
+                BackColor = Color.Green
+            };
+
+            left = new Label
+            {
+                Text = itemCount.ToString(),
+                Width = countLabelWidth,
+                Height = rowHeight,
+                AutoSize = false,
+                Padding = new Padding(0),
+                Margin = new Padding(0),
+                Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleLeft,
+                BackColor = Color.Yellow
+
+            };
+
+            middle = new Label
+            {
+                Text = foodName,
+                Height = rowHeight,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                Padding = new Padding(10, 0, 0, 0),
+                Tag = Tag,
+                Width = maxWidth - countLabelWidth - priceLabelWidth - SystemInformation.VerticalScrollBarWidth - 9
+            };
+
+            right = new Label
+            {
+                Text = price.ToString("c"),
+                Tag = Tag,
+                Width = priceLabelWidth,
+                Height = rowHeight,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                Padding = new Padding(0),
+                BackColor = Color.Red,
+
+            };
+            
+            rowPannel.Controls.Add(left);
+            rowPannel.Controls.Add(middle);
+            rowPannel.Controls.Add(right);
+            
+        }
+        public void SetHeight(int height) {
+            rowHeight = height;
+            left.Height = height;
+            middle.Height = height;
+            right.Height = height;
+            rowPannel.Height = height;
+            
+        }
+
+
+    }
+
 }
