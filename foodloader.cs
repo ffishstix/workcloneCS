@@ -19,41 +19,43 @@ namespace WorkCloneCS
             return File.ReadAllLines(filePath);
             
         }
-        public static List<(string Name, decimal Price, string extra)> LoadFoodItems(string c)
+        public static List<rowPanelTag> LoadFoodItems(string c)
         {
             string filePath = filePathReturn(c);
 
-            List<(string, decimal, string)> foodItems = [];
-
             if (!File.Exists(filePath)) return null;
 
-
             string[] lines = File.ReadAllLines(filePath);
+            List<rowPanelTag> temp = new List<rowPanelTag>();
 
-            foreach (string line in lines)
+            for (int i = 0; i < lines.Length; i++)
             {
-                string trimmed = line.Trim();
+                string trimmed = lines[i].Trim();
                 if (string.IsNullOrEmpty(trimmed)) continue;
 
                 string[] parts = trimmed.Split(',');
+                rowPanelTag item = new rowPanelTag();
+
                 switch (parts.Length)
                 {
                     case 1:
-                        foodItems.Add((parts[0], 0, ""));
+                        item.Name = parts[0];
+                        item.Price = 0;
                         break;
                     case 2:
-                        foodItems.Add((parts[0].Trim(), Convert.ToDecimal(parts[1])/100, ""));
-                        break;
-                    case 3:
-                        foodItems.Add((parts[0].Trim(), Convert.ToDecimal(parts[1])/100, parts[2].Trim()));
+                        item.Name = parts[0];
+                        item.Price = (decimal)Convert.ToInt32(parts[1]) / 100;
                         break;
                     default:
                         continue;
                 }
+
+                temp.Add(item);
             }
 
-            return foodItems;
+            return temp;
         }
+
     }
 
 }

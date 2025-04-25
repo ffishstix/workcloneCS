@@ -68,6 +68,7 @@ namespace WorkCloneCS
                 FoodName = Name,
                 Price = Price, 
             };
+            EnableSwipeToDelete(row);
             row.SetHeight(rowHeight);
             scrollPanel.Controls.Add(row.rowPannel);
             /*
@@ -145,116 +146,13 @@ namespace WorkCloneCS
             scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
             scrollPanel.PerformLayout();
         }
-
-
-        private void swipeToTheLeftLogic(Label label, FlowLayoutPanel parent)
+ 
+        public void EnableSwipeToDelete(rowOfItem row)
         {
-            if (parent.Tag is rowPanelTag tag && tag != null)
-            {
-                foreach (Control ctrl in parent.Controls)
-                {
-                    if (ctrl is Label countLabel && countLabel.Name == $"countLabel{tag.Count}") // or check Name, Tag, etc.
-                    {
-                        countLabel.BackColor = Color.White;
-                        try
-                        {
-                            if (tag.ItemCount > 1)
-                            {
-                                tag.ItemCount = -1;
-                                countLabel.Text = (tag.ItemCount).ToString();
-
-                            }
-                            else
-                            {
-                                parent.Controls.Clear();
-                                parent.Dispose();
-                            }
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(
-                            $"An error occurred:\n{ex.Message}",
-                            "Error",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error
-                            );
-                        }
-                    }
-                }
-                changeRight(tag, parent);
-                updateTotalPrice(-tag.Price);
-                updateTotalItems(-1);
-            }
-
-        }
-        private void changeRight(rowPanelTag tag, FlowLayoutPanel parent)
-        {
-            foreach (Control ctrl in parent.Controls)
-            {
-                if (ctrl is Label priceLabel && priceLabel.Name == $"priceLabel{tag.Count}") // or check Name, Tag, etc.
-                {
-                    //not implemented but had to push
-                    decimal t = tag.ItemCount * tag.Price;
-                    priceLabel.Text = $"{(t).ToString("c")}";
-                    priceLabel.Tag = t;
-
-
-                }
-            }
-        }
-
-
-        private void swipeToTheRightLogic(Label label, FlowLayoutPanel parent)
-        {
-            if (parent.Tag is rowPanelTag tag)
-            {
-                label.BackColor = Color.Blue;
-
-                // Search for the countLabel inside the same rowPanel
-                foreach (Control ctrl in parent.Controls)
-                {
-                    if (ctrl is Label countLabel && countLabel.Name == $"countLabel{tag.Count}") // or check Name, Tag, etc.
-                    {
-                        countLabel.BackColor = Color.White;
-                        try
-                        {
-
-
-                            tag.ItemCount = 1;
-                            countLabel.Text = $"{tag.ItemCount}";
-
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(
-                                $"An error occurred:\n{ex.Message}",
-                                "Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-                        }
-                        break;
-                    }
-                }
-                changeRight(tag, parent);
-                updateTotalItems(1);
-                updateTotalPrice(tag.Price);
-
-
-                //CURENTLY BROKEN,
-                //must add fix for having multiple of the same products and then swiping right
-                // also remove one from the price on the left
-
-            }
-        }
-        public void EnableSwipeToDelete(Label label)
-        {
-
             Point mouseDownLocation = Point.Empty;
             bool isDragging = false;
 
-            label.MouseDown += (s, e) =>
+            row.Middle.MouseDown += (s, e) =>
             {
                 if (e.Button == MouseButtons.Left)
                 {
@@ -263,19 +161,19 @@ namespace WorkCloneCS
                 }
             };
 
-            label.MouseMove += (s, e) =>
+            row.Middle.MouseMove += (s, e) =>
             {
                 if (!isDragging) return;
 
                 int deltaX = e.X - mouseDownLocation.X;
 
                 if (Math.Abs(deltaX) > 5)
-                    label.BackColor = Color.LightCoral;
+                    row.Middle.BackColor = Color.LightCoral;
             };
 
-            label.MouseUp += (s, e) =>
+            row.Middle.MouseUp += (s, e) =>
             {
-                FlowLayoutPanel rowPannel = (FlowLayoutPanel)label.Parent;
+                FlowLayoutPanel rowPannel = (FlowLayoutPanel)row.Middle.Parent;
                 if (!isDragging) return;
                 isDragging = false;
 
@@ -284,14 +182,31 @@ namespace WorkCloneCS
                 {
                     if (deltaX < -100 && rowPannel != null) // Swipe left threshold
                     {
-                        swipeToTheLeftLogic(label, rowPannel);
+                        Label left = row.Left;
+                        if (row.ItemCount > 1)
+                        {
+                            row.ItemCount--;
+                            row.updateText();
+
+
+                        }
+                        else
+                        {
+                            row.Dispose();
+                        }
+                        updateTotalPrice(-row.Price);
+                        updateTotalItems(-row.ItemCount);
                     }
                     else if (deltaX > 100 && rowPannel != null)
                     {
-                        swipeToTheRightLogic(label, rowPannel);
+                        row.ItemCount++;
+                        row.updateText();
+                        updateTotalItems(1);
+                        updateTotalPrice(row.Price);
+
                     }
 
-                    label.BackColor = SystemColors.Control;
+                    row.Middle.BackColor = SystemColors.Control;
                 }
                 else
                 {
@@ -344,7 +259,6 @@ namespace WorkCloneCS
             panel2.Controls.Add(rightLabel);
         }
 
-
         private void deleteAllItemsOrdered()
         {
             scrollPanel.Controls.Clear();
@@ -357,9 +271,9 @@ namespace WorkCloneCS
         //
         private void generalItem_Click(object sender, EventArgs e)
         {
-            var item = (Tuple<string, decimal>)((Control)sender).Tag;
-            string name = item.Item1;
-            decimal price = item.Item2;
+            rowPanelTag item = (rowPanelTag)((Control)sender).Tag;
+            string name = item.Name;
+            decimal price = item.Price;
 
             addItem(price, name, 40);
             leftLabel.Tag = (int)leftLabel.Tag + 1;
@@ -408,30 +322,24 @@ namespace WorkCloneCS
         // then just goes through each and adds each value and what not
         private void InitItemList(string e)
         {
-            List<(string Name, decimal Price, string extra)> foodItems = FoodLoader.LoadFoodItems(e);
+            List<rowPanelTag> foodItems = FoodLoader.LoadFoodItems(e);
             if (foodItems != null)
             {
-                foreach (var foodItem in foodItems)
+                for (int i = 0; i < foodItems.Count; i++)
                 {
-                    addLabel(foodItem.Name, foodItem.Price, foodItem.extra);
+                    addLabel(foodItems[i]);
                 }
-            }
-            else
-            {
-                addLabel("In Development", 0m, "");
             }
         }
 
 
         //add all of the items made clickeable that all take them to the gereralItem_Click()
-        private void addLabel(string name, decimal price, string extra)
+        private void addLabel(rowPanelTag tag)
         {
-            List<(string name, decimal Price, string extra)> slice = new List<(string name, decimal Price, string extra)>();
-            slice.Insert(0, (name, price, extra));
             Label item = new Label
             {
-                Text = name,
-                Tag = Tuple.Create(name, price),
+                Text = tag.Name,
+                Tag = tag,
                 AutoSize = false,
                 BackColor = Color.Gray,
                 Width = (catPan.Width / 8) - 2,
@@ -556,7 +464,7 @@ namespace WorkCloneCS
     }
 
  
-    class rowPanelTag
+    public class rowPanelTag
     {
         private string name;
         private int count;
@@ -581,7 +489,7 @@ namespace WorkCloneCS
     }
 
 
-    class rowOfItem
+    public class rowOfItem
     {
         private string foodName;
         private decimal price = 0;
@@ -589,20 +497,22 @@ namespace WorkCloneCS
         private int indexCount = 0;
         private int rowHeight = 40;
         public int maxWidth = 850;
-        private Label left;
-        private Label middle;
-        private Label right;
+        private Label left, middle, right;
         public FlowLayoutPanel rowPannel;
         private rowPanelTag Tag;
-        
+
 
 
         public string FoodName { get { return foodName; } set { foodName = value; } }
         public decimal Price { get { return price; } set { price = value; } }
-        public int ItemCount { get {return itemCount; } set {itemCount = value; } }
+        public int ItemCount { get { return itemCount; } set { itemCount = value; } }
         public int IndexCount { get { return indexCount; } }
         public decimal TotalPrice { get { return itemCount * price; } }
-        public void IncreaseCount()
+
+        public Label Left { get { return left; } set { left = value; } }
+        public Label Right { get { return right; } set { right = value; } }
+        public Label Middle { get { return middle; } set { middle = value; } }
+        public void IncreaseIndexCount()
         {
             indexCount++;
         }
@@ -674,11 +584,11 @@ namespace WorkCloneCS
                 BackColor = Color.Red,
 
             };
-            
+
             rowPannel.Controls.Add(left);
             rowPannel.Controls.Add(middle);
             rowPannel.Controls.Add(right);
-            
+
         }
         public void SetHeight(int height) {
             rowHeight = height;
@@ -686,9 +596,23 @@ namespace WorkCloneCS
             middle.Height = height;
             right.Height = height;
             rowPannel.Height = height;
-            
+
+
+           
+        }
+        
+
+        public void updateText()
+        {
+            left.Text = ItemCount.ToString();
+            middle.Text = foodName;
+            right.Text = TotalPrice.ToString("c");
         }
 
+        public void Dispose()
+        {
+            this.Dispose();
+        }
 
     }
 
