@@ -67,82 +67,12 @@ namespace WorkCloneCS
             {
                 FoodName = Name,
                 Price = Price, 
+                ItemCount = 1
             };
+            row.updateText();
             EnableSwipeToDelete(row);
             row.SetHeight(rowHeight);
             scrollPanel.Controls.Add(row.rowPannel);
-            /*
-            rowPanelTag tag = new rowPanelTag()
-            {
-                Name = Name,
-                Price = Price,
-                Count = globalCount,
-            };
-
-            FlowLayoutPanel rowPannel = new()
-            {
-                Height = rowHeight,
-                Tag = tag,
-                Padding = new Padding(0),
-                Margin = new Padding(0),
-                Name = $"{tag.Name}{globalCount}",
-                Width = scrollPanel.Width - SystemInformation.VerticalScrollBarWidth,
-                AutoSize = false,
-                AutoScroll = false,
-                WrapContents = false,
-                FlowDirection = FlowDirection.LeftToRight,
-                BackColor = Color.Green
-            };
-
-            Label countLabel = new Label
-            {
-                Text = "1",
-                Name = $"countLabel{globalCount}",
-                Width = countLabelWidth,
-                Height = rowHeight,
-                AutoSize = false,
-                Padding = new Padding(0),
-                Margin = new Padding(0),
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                TextAlign = ContentAlignment.MiddleLeft,
-                BackColor = Color.Yellow
-
-            };
-
-            Label foodLabel = new Label
-            {
-                Text = Name,
-                Height = rowHeight,
-                AutoSize = false,
-                Name = $"foodLabel{globalCount}",
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Padding = new Padding(10, 0, 0, 0),
-                Tag = (Name, Price),
-                Width = scrollPanel.Width - countLabelWidth - priceLabelWidth - SystemInformation.VerticalScrollBarWidth - 9
-            };
-            EnableSwipeToDelete(foodLabel);
-
-            Label priceLabel = new Label
-            {
-                Text = Price.ToString("c"),
-                Name = $"priceLabel{globalCount}",
-                Tag = Price.ToString(),
-                Width = priceLabelWidth,
-                Height = rowHeight,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Padding = new Padding(0),
-                BackColor = Color.Red,
-
-            };
-
-            rowPannel.Controls.Add(countLabel);
-            rowPannel.Controls.Add(foodLabel);
-            rowPannel.Controls.Add(priceLabel);
-            scrollPanel.Controls.Add(rowPannel);
-            */
             scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
             scrollPanel.PerformLayout();
         }
