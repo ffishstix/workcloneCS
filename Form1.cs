@@ -66,7 +66,7 @@ namespace WorkCloneCS
             rowOfItem row = new rowOfItem()
             {
                 FoodName = Name,
-                Price = Price, 
+                Price = Price,
                 ItemCount = 1
             };
             row.updateText();
@@ -76,7 +76,7 @@ namespace WorkCloneCS
             scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
             scrollPanel.PerformLayout();
         }
- 
+
         public void EnableSwipeToDelete(rowOfItem row)
         {
             Point mouseDownLocation = Point.Empty;
@@ -181,10 +181,12 @@ namespace WorkCloneCS
         private void InitFoodList()
         {
             createScrollPanel();
-            
+
             // Sample data - to be changed
             leftLabel.Tag = 0;
             rightLabel.Tag = 0m;
+            leftLabel.Dock = DockStyle.Left;
+            rightLabel.Dock = DockStyle.Right;
             panel2.Controls.Add(leftLabel);
             panel2.Controls.Add(rightLabel);
         }
@@ -198,7 +200,6 @@ namespace WorkCloneCS
             rightLabel.Text = "Price: £0.00";
         }
 
-        //
         private void generalItem_Click(object sender, EventArgs e)
         {
             rowPanelTag item = (rowPanelTag)((Control)sender).Tag;
@@ -209,23 +210,6 @@ namespace WorkCloneCS
             leftLabel.Tag = (int)leftLabel.Tag + 1;
             leftLabel.Text = $"Items: {leftLabel.Tag}";
             updateTotalPrice(price);
-        }
-
-
-        //top layer btn's currently unused icl
-        private void tableBtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void nameBtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void PricingBtn_Click(object sender, EventArgs e)
-        {
-
         }
 
 
@@ -297,7 +281,7 @@ namespace WorkCloneCS
             miscPanel.Visible = false;
         }
 
-        //this is the bottom right button to bring up the right menu ;)
+        //the following 5 functions are to bring up user specific panels
         private void ConfigBtn_Click(object sender, EventArgs e)
         {
             bool temp = !ConfigPannel.Visible;
@@ -307,10 +291,6 @@ namespace WorkCloneCS
 
         }
 
-        private void SignOnBtnConfigPanel_Click(object sender, EventArgs e)
-        {
-            deleteAllItemsOrdered();
-        }
 
         private void FinalBtn_Click(object sender, EventArgs e)
         {
@@ -338,7 +318,7 @@ namespace WorkCloneCS
             int panel1Height;
             if (!temp)
             {
-                panel1Height = 372;
+                panel1Height = 279;
                 foreach (Control ctrl in scrollPanel.Controls)
                 {
                     if (ctrl is FlowLayoutPanel panel && panel.Tag is rowPanelTag t && t != null) // or check Name, Tag, etc.
@@ -353,7 +333,7 @@ namespace WorkCloneCS
                     }
                 }
             }
-           
+
 
             else
             {
@@ -372,15 +352,15 @@ namespace WorkCloneCS
                     }
                 }
             }
-           
+
             int panel2Height = 33;
             int catpanHeight = totalHeight - panel2Height - panel1Height - 20;
             panel1.Height = catpanHeight;
             catPan.Height = panel1Height;
-            
-            
-            
-            
+
+
+
+
         }
 
         private void miscBtn_Click(object sender, EventArgs e)
@@ -389,11 +369,40 @@ namespace WorkCloneCS
             allPannelsBlank();
             miscPanel.Visible = temp;
             miscPanel.BringToFront();
-            
+
+        }
+
+        //yet to be implemented
+        private void SignOnBtnConfigPanel_Click(object sender, EventArgs e)
+        {
+            deleteAllItemsOrdered();
+        }
+
+        //top layer btn's currently unused icl
+        private void tableBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nameBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PricingBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CancelBtn_Click(object sender, EventArgs e)
+        {
+            deleteAllItemsOrdered();
+            allPannelsBlank();
+            addCatagory(catagories);
         }
     }
 
- 
+
     public class rowPanelTag
     {
         private string name;
@@ -423,7 +432,7 @@ namespace WorkCloneCS
     {
         private string foodName;
         private decimal price = 0;
-        private int itemCount = 0;
+        private int itemCount = 1;
         private int indexCount = 0;
         private int rowHeight = 40;
         public int maxWidth = 850;
@@ -541,7 +550,7 @@ namespace WorkCloneCS
 
         public void Dispose()
         {
-            this.Dispose();
+            this.Dispose(); 
         }
 
     }

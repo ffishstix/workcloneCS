@@ -316,6 +316,7 @@
             CancelBtn.Size = new Size(86, 64);
             CancelBtn.TabIndex = 0;
             CancelBtn.Text = "Cancel";
+            CancelBtn.Click += CancelBtn_Click;
             CancelBtn.UseVisualStyleBackColor = true;
             // 
             // SendToTableBtnFinalPanel
