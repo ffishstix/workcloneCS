@@ -76,7 +76,7 @@ namespace WorkCloneCS
                             try
                             {
                                 string jsonString = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
-                                string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/sql.txt";
+                                string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
                                 File.WriteAllText(dir, jsonString);
                             } catch (Exception ex) { 
                                 Console.WriteLine(ex.Message);

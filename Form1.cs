@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -12,7 +13,8 @@ namespace WorkCloneCS
     public partial class Form1 : Form
     {
 
-
+        private staff currentStaff;
+        
 
         int globalCount = 0;
         private string[] catagories = FoodLoader.LoadCatagorys("catagories");
@@ -122,7 +124,16 @@ namespace WorkCloneCS
                         }
                         else
                         {
-                            row.Dispose();
+                            foreach (Control control in panel1.Controls)
+                            {
+                                if (control is FlowLayoutPanel && control.Tag is rowPanelTag 
+                                && ((rowPanelTag)control.Tag).Name == row.FoodName)
+                                {
+                                    panel1.Controls.Remove(control);
+                                    control.Dispose();
+                                    break;
+                                }
+                            }
                         }
                         updateTotalPrice(-row.Price);
                         updateTotalItems(-row.ItemCount);
@@ -387,13 +398,21 @@ namespace WorkCloneCS
         private void nameBtn_Click(object sender, EventArgs e)
         {
             NameForm nameForm = new NameForm();
-            nameForm.Show();
-
+            nameForm.ShowDialog();
+            if (nameForm.staffSelected == null) nameBtn.Text = "name";
+            else
+            {
+                currentStaff = nameForm.staffSelected;
+                nameBtn.Text = currentStaff.Name.ToUpper();
+            }
         }
 
         private void PricingBtn_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("basically this is a thing but is honestly never used" +
+                "\n in practice i have never ever pressed this button" +
+                "\n and it is something you would only ever change on the tills anyways sooo" +
+                "\n return not implemented lol");
         }
 
         private void CancelBtn_Click(object sender, EventArgs e)
@@ -552,7 +571,19 @@ namespace WorkCloneCS
 
         public void Dispose()
         {
-            this.Dispose(); 
+            foreach (Control control in rowPannel.Controls)
+            {
+                if (control == Left || control == Right || control == middle)
+                {
+                    foreach (Control control2 in control.Controls)
+                    {
+                        control.Controls.Remove(control2);
+                        control2.Dispose();
+                    }
+                }
+                rowPannel.Controls.Remove(control);
+                control.Dispose();
+            }
         }
 
     }

@@ -7,18 +7,40 @@ using System.Drawing.Design;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace WorkCloneCS
 {
     public partial class NameForm : Form
     {
         private int currentID = 0;
+        private List<staff> x;
+        public staff staffSelected;
         public NameForm()
         {
             InitializeComponent();
+            x = getStaff($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt");
+            if (x == null) { this.Close(); }
             displayBtn.Text = "";
+        }
+
+
+        private List<staff> getStaff(string filePath)
+        {
+            try
+            {
+                string jsonString = File.ReadAllText(filePath);
+
+                // Deserialize the JSON string into a List of User objects
+                List<staff> staff = JsonSerializer.Deserialize<List<staff>>(jsonString);
+                return staff;
+            } catch (Exception ex) {
+                Logger.Log(ex.Message);
+            }
+            return null;
         }
         public int returnUserID()
         {
@@ -48,9 +70,25 @@ namespace WorkCloneCS
             updateDisplayBtnText();
         }
 
+
+
         private void btnOK_Click(object sender, EventArgs e)
         {
+            staffSelected = null;
+            foreach(staff staff in x)
+            {
+                if (staff.Id == currentID)
+                {
+                    staffSelected = staff;
+                    this.Close();
+                    break;
+                } 
 
+            }
+            if (staffSelected == null)
+            {
+                MessageBox.Show("invalid id");
+            }
         }
     }
 }
