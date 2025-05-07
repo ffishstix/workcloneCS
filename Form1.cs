@@ -77,7 +77,7 @@ namespace WorkCloneCS
             scrollPanel.PerformLayout();
         }
 
-        public void EnableSwipeToDelete(rowOfItem row)
+        private void EnableSwipeToDelete(rowOfItem row)
         {
             Point mouseDownLocation = Point.Empty;
             bool isDragging = false;
@@ -386,6 +386,8 @@ namespace WorkCloneCS
 
         private void nameBtn_Click(object sender, EventArgs e)
         {
+            NameForm nameForm = new NameForm();
+            nameForm.Show();
 
         }
 
@@ -435,13 +437,13 @@ namespace WorkCloneCS
         private int itemCount = 1;
         private int indexCount = 0;
         private int rowHeight = 40;
-        public int maxWidth = 850;
+        
         private Label left, middle, right;
-        public FlowLayoutPanel rowPannel;
+        
         private rowPanelTag Tag;
 
-
-
+        public int maxWidth = 850;
+        public FlowLayoutPanel rowPannel;
         public string FoodName { get { return foodName; } set { foodName = value; } }
         public decimal Price { get { return price; } set { price = value; } }
         public int ItemCount { get { return itemCount; } set { itemCount = value; } }

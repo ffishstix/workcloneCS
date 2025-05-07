@@ -6,7 +6,7 @@ namespace WorkCloneCS
     public class FoodLoader
     {
 
-        private static string filePathReturn(string filename)
+        public static string filePathReturn(string filename)
         {
             return @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\{filename}.txt";
         }
