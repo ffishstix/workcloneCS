@@ -22,7 +22,11 @@ namespace WorkCloneCS
         public NameForm()
         {
             InitializeComponent();
-            x = getStaff($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt");
+            x = SQL.getStaffData();
+            if (x == null) x = getStaff($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt");
+            else File.WriteAllText($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt", 
+            JsonSerializer.Serialize(x, new JsonSerializerOptions { WriteIndented = true }));
+            
             if (x == null) { this.Close(); }
             displayBtn.Text = "";
         }

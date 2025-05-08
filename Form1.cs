@@ -13,9 +13,7 @@ namespace WorkCloneCS
     public partial class Form1 : Form
     {
 
-        private staff currentStaff;
-        
-
+        private staff currentStaff;        
         int globalCount = 0;
         private string[] catagories = FoodLoader.LoadCatagorys("catagories");
         public Form1()
@@ -208,7 +206,7 @@ namespace WorkCloneCS
             leftLabel.Tag = 0;
             leftLabel.Text = "Items: 0";
             rightLabel.Tag = 0m;
-            rightLabel.Text = "Price: £0.00";
+            rightLabel.Text = "Price: ï¿½0.00";
         }
 
         private void generalItem_Click(object sender, EventArgs e)

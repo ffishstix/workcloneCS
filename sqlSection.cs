@@ -38,7 +38,7 @@ namespace WorkCloneCS
             System.Diagnostics.Debug.WriteLine("\n\nmsg: {0}\n", a);
         }
 
-        public static void tmep()
+        public static List<staff> getStaffData()
         {
             Logger logger = new Logger();
             print("here");
@@ -72,6 +72,8 @@ namespace WorkCloneCS
                                     Name = name 
                                 });
                                 Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}");
+                                
+                                
                             }
                             try
                             {
@@ -82,6 +84,7 @@ namespace WorkCloneCS
                                 Console.WriteLine(ex.Message);
                                 Logger.Log(ex.Message);                            
                             }
+                            return values;
                             
                         }
                     }
@@ -97,7 +100,7 @@ namespace WorkCloneCS
                 Logger.Log(ex.Message);
                 print("SQL Exception: " + ex.Message);
             }
-            
+            return null;
 
 
         }
