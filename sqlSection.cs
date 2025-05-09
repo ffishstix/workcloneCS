@@ -25,6 +25,26 @@ namespace WorkCloneCS
         }
     }
 
+
+    class sync
+    {
+        public (int, int) catagoryIdRange { get; set; }
+        public List<staff> allStaff;
+        public List<catagory> catagories;
+
+
+        public void syncAll()
+        {
+            catagoryIdRange = SQL.getRangeOfCatagoryID();
+            allStaff = SQL.getStaffData();
+            
+            //catagories section
+            for (int i = catagoryIdRange.Item1; i <= catagoryIdRange.Item2; i++)
+            {
+                catagories.Add((SQL.getCatagory(i)));
+            }
+        }
+    }
     public class staff
     {
         public int Id { get; set; }
@@ -32,14 +52,21 @@ namespace WorkCloneCS
         public int Access {  get; set; }
     }
 
-    public class item
+     class catagory
+    {
+        public string catName { get; set; }
+        public int catagoryId { get; set; }
+        public string catagoryExtraInfo { get; set; }
+
+        public List<item> items;
+    }
+
+     class item
     {
         public int itemId { get; set; }
         public string itemName { get; set; }
         public string extraInfo { get; set; }
-        public string catName { get; set; }
-        public int catagoryId { get; set; }
-        public string catagoryExtraInfo { get; set; }
+        
         public decimal price { get; set; }
 
     }
@@ -53,6 +80,12 @@ namespace WorkCloneCS
         private static void print(string a)
         {
             System.Diagnostics.Debug.WriteLine("\n\nmsg: {0}\n", a);
+        }
+
+        public static (int, int) getRangeOfCatagoryID()
+        {
+
+            return (0, 0);
         }
 
         public static List<staff> getStaffData()
@@ -87,6 +120,7 @@ namespace WorkCloneCS
                             }
                             try
                             {
+                                // logging it just incase it cannot pull it next time
                                 string jsonString = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
                                 string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
                                 File.WriteAllText(dir, jsonString);
@@ -121,8 +155,9 @@ namespace WorkCloneCS
 
         }
     
-        public static List<item> getItemsFromCatagory(int catagoryChosen)
+        public static catagory getCatagory(int catagoryChosen)
         {
+            catagory currentCatagory = new catagory();
             List<item> values = new List<item>();
             string query = 
     "SELECT cat.catagoryId, catName, itemName, price, " +
@@ -135,7 +170,7 @@ namespace WorkCloneCS
     "AND catName IS NOT NULL " +
     "AND itemName IS NOT NULL " +
     "AND price IS NOT NULL " +
-    "ORDER BY ai.itemId";
+    "ORDER BY ai.itemId ";
             try
             {
                 //main method
@@ -152,18 +187,52 @@ namespace WorkCloneCS
                         {
                             while (reader.Read())
                             {
+                                currentCatagory.catagoryId = reader.GetInt32(0);
+                                currentCatagory.catName = reader.GetString(1);
+                                currentCatagory.catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5);
                                 values.Add(new item()
                                 {
-                                    catagoryId = reader.GetInt32(0),
-                                    catName = reader.GetString(1),
                                     itemName = reader.GetString(2),
                                     price = (decimal)reader.GetInt32(3)/100,
                                     extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
-                                    catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5)
                                 });
                                 Logger.Log($"got: item: {reader.GetString(2)}");
                             }
-                            return values;
+                            currentCatagory.items = values;
+                            try
+                            {
+                                List<catagory> fileJson;
+                                // logging it just incase it cannot pull it next time
+                                string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/catagoryJson.txt";
+                                if (File.Exists(dir))
+                                {
+                                    fileJson = JsonSerializer.Deserialize<List<catagory>>(dir);
+                                    if (fileJson != null) fileJson.Add(currentCatagory);
+                                    
+                                }
+                                else
+                                {
+
+                                }
+                                    fileJson = JsonSerializer.Deserialize<List<catagory>>(dir);
+                                if (fileJson == null)
+                                {
+                                    string jsonStrings = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
+                                    File.WriteAllText(dir, jsonStrings);
+                                }
+                                else
+                                {
+                                    fileJson.Add(currentCatagory);
+                                }
+                                    string jsonString = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
+                                File.WriteAllText(dir, jsonString);
+
+
+                            } catch (Exception ex)
+                            {
+                                Logger.Log($"error while logging items {ex.Message}");
+                            }
+                            return currentCatagory;
                         }
                     }
                     catch (Exception ex) {
@@ -178,11 +247,13 @@ namespace WorkCloneCS
                                 values.Add(new item()
                                 {
                                     itemName = f.Name,
-                                    price = f.Price,
-                                    catagoryId = catagoryChosen
+                                    price = f.Price
+                                    
                                 });
                             }
-                            return values;
+                            currentCatagory.catagoryId = catagoryChosen;
+                            currentCatagory.items = values;
+                            return currentCatagory;
                         }
 
 

@@ -245,8 +245,8 @@ namespace WorkCloneCS
         // then just goes through each and adds each value and what not
         private void InitItemList(int e)
         {
-            List<item> foodItems = SQL.getItemsFromCatagory(e);
-
+            catagory cat = SQL.getCatagory(e);
+            List<item> foodItems = cat.items;
             if (foodItems != null)
             {
                 for (int i = 0; i < foodItems.Count; i++)
