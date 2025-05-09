@@ -1,0 +1,9 @@
+@startuml
+class sync {
+    + {static} syncAll() : void
+}
+class "List`1"<T> {
+}
+sync --> "allStaff<staff>" "List`1"
+sync --> "catagories<catagory>" "List`1"
+@enduml

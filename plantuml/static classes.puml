@@ -1,0 +1,67 @@
+@startuml
+class Logger {
+    - {static} <<readonly>> logFilePath : string = @"C:\workclonecs\log.txt"
+    - {static} logCount : int = 0
+    + {static} Here() : void
+    + {static} Log(message:string) : void
+}
+class staff {
+    + Id : int <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+    + Access : int <<get>> <<set>>
+}
+class catagory {
+    + connected : bool <<get>> <<set>>
+    + catName : string <<get>> <<set>>
+    + catagoryId : int <<get>> <<set>>
+    + catagoryExtraInfo : string <<get>> <<set>>
+}
+class item {
+    + itemId : int <<get>> <<set>>
+    + itemName : string <<get>> <<set>>
+    + extraInfo : string <<get>> <<set>>
+    + price : decimal <<get>> <<set>>
+    + chosenColour : string <<get>> <<set>>
+}
+class rowPanelTag {
+    - name : string
+    - count : int
+    - price : decimal
+    - itemCount : int
+    + rowPanelTag()
+    + Name : string <<get>> <<set>>
+    + Count : int <<get>> <<set>>
+    + Price : decimal <<get>> <<set>>
+    + ItemCount : int <<get>> <<set>>
+    + TotalPrice : decimal <<get>>
+}
+class rowOfItem {
+    - foodName : string
+    - price : decimal = 0
+    - itemCount : int = 1
+    - indexCount : int = 0
+    - rowHeight : int = 40
+    + maxWidth : int = 850
+    + FoodName : string <<get>> <<set>>
+    + Price : decimal <<get>> <<set>>
+    + ItemCount : int <<get>> <<set>>
+    + IndexCount : int <<get>>
+    + TotalPrice : decimal <<get>>
+    + IncreaseIndexCount() : void
+    + rowOfItem()
+    + SetHeight(height:int) : void
+    + updateText() : void
+    + Dispose() : void
+}
+class "List`1"<T> {
+}
+catagory --> "items<item>" "List`1"
+rowOfItem --> "left" Label
+rowOfItem --> "middle" Label
+rowOfItem --> "right" Label
+rowOfItem --> "Tag" rowPanelTag
+rowOfItem --> "rowPannel" FlowLayoutPanel
+rowOfItem --> "Left" Label
+rowOfItem --> "Right" Label
+rowOfItem --> "Middle" Label
+@enduml

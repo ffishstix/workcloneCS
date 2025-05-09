@@ -1,0 +1,55 @@
+@startuml
+class Form1 <<partial>> {
+    # <<override>> Dispose(disposing:bool) : void
+    - InitializeComponent() : void
+    - priceTotal : decimal
+}
+Form1 --> "nameBtn" Button
+Form1 --> "PricingBtn" Button
+Form1 --> "tableBtn" Button
+Form1 --> "BackBtn" Button
+Form1 --> "panel1" Panel
+Form1 --> "panel2" Panel
+Form1 --> "leftLabel" Label
+Form1 --> "rightLabel" Label
+Form1 --> "scrollPanel" FlowLayoutPanel
+Form1 --> "catPan" FlowLayoutPanel
+Form1 --> "ConfigPannel" FlowLayoutPanel
+Form1 --> "flowLayoutPanel2" FlowLayoutPanel
+Form1 --> "miscBtn" Button
+Form1 --> "OrderBtn" Button
+Form1 --> "tableBottomBtn" Button
+Form1 --> "FinalBtn" Button
+Form1 --> "ConfigBtn" Button
+Form1 --> "SignOnBtnConfigPanel" Button
+Form1 --> "SignOffBtnControlPanel" Button
+Form1 --> "ConfigBtnControlPanel" Button
+Form1 --> "syncTillBtnConfigPanel" Button
+Form1 --> "ReciptToggleBtnConfigPanel" Button
+Form1 --> "InfoBtnControlPanel" Button
+Form1 --> "basePanel" FlowLayoutPanel
+Form1 --> "finalPanel" FlowLayoutPanel
+Form1 --> "CancelBtn" Button
+Form1 --> "SendToTableBtnFinalPanel" Button
+Form1 --> "CardBtn" Button
+Form1 --> "CashBtn" Button
+Form1 --> "tablePanel" FlowLayoutPanel
+Form1 --> "openTableBtn" Button
+Form1 --> "blankBtn" Button
+Form1 --> "sendToTableBtnTablePanel" Button
+Form1 --> "printBillBtn" Button
+Form1 --> "orderPanel" FlowLayoutPanel
+Form1 --> "setSeatBtn" Button
+Form1 --> "addItemBtn" Button
+Form1 --> "subtractItemBtn" Button
+Form1 --> "lineCorrectBtn" Button
+Form1 --> "toggleBtn" Button
+Form1 --> "multiplyBtn" Button
+Form1 --> "miscPanel" FlowLayoutPanel
+Form1 --> "currentSeatBtn" Button
+Form1 --> "textMsgBtn" Button
+Form1 --> "presetMsgBtn" Button
+Form1 --> "categoryShiftBtn" Button
+Form1 --> "discountAmountBtn" Button
+Form1 --> "flowLayoutPanel1" FlowLayoutPanel
+@enduml

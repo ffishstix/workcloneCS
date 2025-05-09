@@ -6,80 +6,13 @@ using System.Text.Json;
 namespace WorkCloneCS
 {
     // logger function completely made by ai i take no responsibility
-    class Logger
-    {
-        private static readonly string logFilePath = @"C:\workclonecs\log.txt";
-
-        public static void Log(string message)
-        {
-            try
-            {
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                string logEntry = $"{timestamp}: {message}";
-                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Logging failed: " + ex.Message);
-            }
-        }
-    }
-
-
-    class sync
-    {
-        public static (int, int) catagoryIdRange { get; set; }
-        public static List<staff> allStaff;
-        public static List<catagory> catagories;
-
-
-        public static void syncAll()
-        {
-            catagoryIdRange = SQL.getRangeOfCatagoryID();
-            Logger.Log(catagoryIdRange.Item1.ToString());
-            allStaff = SQL.getStaffData();
-            Logger.Log($"max? {catagoryIdRange.Item1}, min? {catagoryIdRange.Item2}");
-            //catagories section
-            for (int i = catagoryIdRange.Item1; i <= catagoryIdRange.Item2; i++)
-            {
-                catagories.Add((SQL.getCatagory(i)));
-                Logger.Log($"currently going through: {i}");
-            }
-            foreach (catagory cat in catagories)
-            {
-                Logger.Log($"{cat.catName}");
-            }
-        }
-    }
-    public class staff
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Access {  get; set; }
-    }
-
-    class catagory
-    {
-        public string catName { get; set; }
-        public int catagoryId { get; set; }
-        public string catagoryExtraInfo { get; set; }
-
-        public List<item> items { get; set; }
-    }
-
-     class item
-    {
-        public int itemId { get; set; }
-        public string itemName { get; set; }
-        public string extraInfo { get; set; }
-        
-        public decimal price { get; set; }
-
-    }
+    
 
     class SQL
     {
-        private const string connectionString = "Server=localhost\\SQLEXPRESS;" +
+        private static string jsonDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}" +
+                "/workclonecs/sql/catagoryJson.txt";
+        private const string connectionString = "Server=localdhost\\SQLEXPRESS;" +
                 "Database=testDatabase;" +
                 "Trusted_Connection=True;" +
                 "Encrypt=False;";
@@ -111,7 +44,7 @@ namespace WorkCloneCS
                         {
                             while (reader.Read())
                             {
-                                min = reader.GetInt32(0);
+                                max = reader.GetInt32(0);
                                 Logger.Log($"max: {min}");
                             }
                         }
@@ -120,7 +53,7 @@ namespace WorkCloneCS
                         {
                             while (reader.Read())
                             {
-                                max = reader.GetInt32(0);
+                                min = reader.GetInt32(0);
                                 Logger.Log($"max: {max}");
                             }
                         }
@@ -201,25 +134,47 @@ namespace WorkCloneCS
 
 
         }
-    
+
+        private static List<catagory> pullCatFile()
+        {
+            if (File.Exists(jsonDir))
+            {
+                try
+                {
+                    string json = File.ReadAllText(jsonDir); // Read file contents
+                    List<catagory> fileJson = JsonSerializer.Deserialize<List<catagory>>(json); // Deserialize JSON text
+                    return fileJson;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"pullCatFile() failed: {ex.Message}");
+                    return null;
+                }
+            }
+            else return null;
+        }
+
         public static catagory getCatagory(int catagoryChosen)
         {
             catagory currentCatagory = new catagory();
             List<item> values = new List<item>();
             string query = 
-    "SELECT cat.catagoryId, catName, itemName, price, " +
-    "ISNULL(ai.extraInfo, '') AS extraInfo, ISNULL(cat.extraInfo, '') AS catExtraInfo " +
-    "FROM allItems ai " +
-    "JOIN [foodCatagory] foo ON ai.itemID = foo.itemId " +
-    "JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId " +
-    "WHERE cat.catagoryId = @catagoryId " +
-    "AND cat.catagoryId IS NOT NULL " +
-    "AND catName IS NOT NULL " +
-    "AND itemName IS NOT NULL " +
-    "AND price IS NOT NULL " +
-    "ORDER BY ai.itemId ";
+            "SELECT cat.catagoryId, catName, itemName, price, " +
+            "ISNULL(ai.extraInfo, '') AS extraInfo, ISNULL(cat.extraInfo, '') AS catExtraInfo, " +
+            "isnull(ai.chosenColour, 'grey') as chosenColour " +
+            "FROM allItems ai " +
+            "JOIN [foodCatagory] foo ON ai.itemID = foo.itemId " +
+            "JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId " +
+            "WHERE cat.catagoryId = @catagoryId " +
+            "AND cat.catagoryId IS NOT NULL " +
+            "AND catName IS NOT NULL " +
+            "AND itemName IS NOT NULL " +
+            "AND price IS NOT NULL " +
+            "ORDER BY cat.catagoryId ";
+            
             try
             {
+                
                 //main method
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
@@ -242,66 +197,74 @@ namespace WorkCloneCS
                                     itemName = reader.GetString(2),
                                     price = (decimal)reader.GetInt32(3)/100,
                                     extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                    chosenColour = reader.GetString(6),
                                 });
                                 Logger.Log($"got: item: {reader.GetString(2)}");
                             }
                             currentCatagory.items = values;
+                            currentCatagory.connected = false;
                             try
                             {
-                                List<catagory> fileJson;
-                                // logging it just incase it cannot pull it next time
-                                string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/catagoryJson.txt";
-                                if (File.Exists(dir))
+                                List<catagory> fileJson = new List<catagory>();
+                                Logger.Log("\ncouldn't connect so am resorting to backup\n");
+
+                                if (File.Exists(jsonDir))
                                 {
-                                    fileJson = JsonSerializer.Deserialize<List<catagory>>(dir);
-                                    if (fileJson != null) fileJson.Add(currentCatagory);
+                                    Logger.Here();
+                                    fileJson = pullCatFile();
+
+                                    if (fileJson == null)
+                                    {
+                                        Logger.Log("file was null or weird so I'm starting again");
+                                        fileJson = new List<catagory>();
+                                    }
+                                }
+                                else
+                                {
+                                    Logger.Log("file doesn't exist, creating a new one");
+                                    fileJson = new List<catagory>();
+                                }
+                                bool ah = false;
+                                foreach (catagory cat in fileJson)
+                                {
+                                    if (cat != null)
+                                    {
+                                        if ((cat.catName == currentCatagory.catName || cat.catagoryId == currentCatagory.catagoryId))
+                                        {
+                                            ah = true;
+                                        }
+                                    }
                                     
                                 }
-                                else
-                                {
-
-                                }
-                                    fileJson = JsonSerializer.Deserialize<List<catagory>>(dir);
-                                if (fileJson == null)
-                                {
-                                    string jsonStrings = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
-                                    File.WriteAllText(dir, jsonStrings);
-                                }
-                                else
-                                {
-                                    fileJson.Add(currentCatagory);
-                                }
-                                    string jsonString = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
-                                File.WriteAllText(dir, jsonString);
-
-
-                            } catch (Exception ex)
+                                if (!ah) fileJson.Add(currentCatagory);
+                                string jsonStrings = JsonSerializer.Serialize(fileJson, new JsonSerializerOptions { WriteIndented = true });
+                                File.WriteAllText(jsonDir, jsonStrings);
+                            }
+                            catch (Exception ex)
                             {
                                 Logger.Log($"error while logging items {ex.Message}");
                             }
+                            currentCatagory.connected = true;
                             return currentCatagory;
+
                         }
                     }
                     catch (Exception ex) {
                         //backup method just incase server down
                         Logger.Log(ex.Message);
-                        values = null;
-                        List<rowPanelTag> file = FoodLoader.LoadFoodItems($"catagories{catagoryChosen}");
-                        if (file != null)
-                        {
-                            foreach (rowPanelTag f in file)
-                            {
-                                values.Add(new item()
-                                {
-                                    itemName = f.Name,
-                                    price = f.Price
-                                    
-                                });
+                        Logger.Here();
+                        List<catagory> x = pullCatFile();
+                        if (x == null) return null;
+                        else {
+                            Logger.Log("tbf i think it worked just have a quick look tbf");
+                            foreach (catagory cat in x) {
+                                Logger.Log($"catID {cat.catagoryId}, chosen cat: {catagoryChosen}");
+                                if (cat.catagoryId == catagoryChosen) return cat;
                             }
-                            currentCatagory.catagoryId = catagoryChosen;
-                            currentCatagory.items = values;
-                            return currentCatagory;
+                            return x[catagoryChosen]; 
                         }
+                        
+
 
 
 
@@ -311,9 +274,12 @@ namespace WorkCloneCS
             }
             catch (Exception ex) {
                 Logger.Log($"exception occured with item connection: {ex.Message}");
+                Logger.Log("gonna try and return local files");
+                return pullCatFile()[catagoryChosen];
+
+                
             }
 
-            return null;
         }
     
     }

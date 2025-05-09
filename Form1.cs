@@ -24,7 +24,7 @@ namespace WorkCloneCS
             InitFoodList();
             addCatagory();
         }
-
+        
         private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
 
         private void addCatagory()
@@ -32,7 +32,7 @@ namespace WorkCloneCS
             deleteChildbox();
 
             int count = 1;
-            for (int i = 0; i < catagories.Length; i++)
+            for (int i = 0; i < cat.Count; i++)
             {
                 Label item = new Label
                 {
@@ -44,7 +44,7 @@ namespace WorkCloneCS
                     TextAlign = ContentAlignment.MiddleCenter,
                     Font = new Font("Segoe UI", 12, FontStyle.Regular),
                     Margin = new Padding(1),
-                    Tag = i+1
+                    Tag = i
                 };
                 count++;
                 item.Click += catClick;
@@ -213,9 +213,9 @@ namespace WorkCloneCS
 
         private void generalItem_Click(object sender, EventArgs e)
         {
-            rowPanelTag item = (rowPanelTag)((Control)sender).Tag;
-            string name = item.Name;
-            decimal price = item.Price;
+            item item = (item)((Control)sender).Tag;
+            string name = item.itemName;
+            decimal price = item.price;
 
             addItem(price, name, 40);
             leftLabel.Tag = (int)leftLabel.Tag + 1;
@@ -247,7 +247,7 @@ namespace WorkCloneCS
         // then just goes through each and adds each value and what not
         private void InitItemList(int e)
         {
-            catagory cat = SQL.getCatagory(e);
+            catagory cat = sync.catagories[e];
             List<item> foodItems = cat.items;
             if (foodItems != null)
             {
@@ -257,7 +257,6 @@ namespace WorkCloneCS
                     {
                         
                         addLabel(foodItems[i]);
-                        Logger.Log(e.ToString() + " " + foodItems[i].itemName);
                     } catch (Exception ex)
                     {
                         Logger.Log($"{ex.Message}    {e}");
@@ -271,18 +270,23 @@ namespace WorkCloneCS
         //add all of the items made clickeable that all take them to the gereralItem_Click()
         private void addLabel(item tag)
         {
-            Label item = new Label
-            {
-                Text = tag.itemName,
-                Tag = tag,
-                AutoSize = false,
-                BackColor = Color.Gray,
-                Width = (catPan.Width / 8) - 2,
-                Height = 50,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Margin = new Padding(1)
-            };
+            Color colour = Color.Gray;
+            if (tag.chosenColour == "grey") colour = Color.Gray;
+            else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
+
+
+                Label item = new Label
+                {
+                    Text = tag.itemName,
+                    Tag = tag,
+                    AutoSize = false,
+                    BackColor = colour,
+                    Width = (catPan.Width / 8) - 2,
+                    Height = 50,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                    Margin = new Padding(1)
+                };
 
             item.Click += generalItem_Click;
 
@@ -434,168 +438,6 @@ namespace WorkCloneCS
     }
 
 
-    public class rowPanelTag
-    {
-        private string name;
-        private int count;
-        private decimal price;
-        private int itemCount;
-        public rowPanelTag()
-        {
-            name = "changeMe";
-            count = 1;
-            price = 0;
-            itemCount = 1;
-        }
-        public string Name { get { return name; } set { name = value; } }
-        public int Count { get { return count; } set { count = value; } }
-        public decimal Price { get { return price; } set { price = value; } }
-        public int ItemCount { get { return itemCount; } set { itemCount += value; } }
-        public decimal TotalPrice
-        {
-            get { return itemCount*Price; }
-        }
-
-    }
-
-
-    public class rowOfItem
-    {
-        private string foodName;
-        private decimal price = 0;
-        private int itemCount = 1;
-        private int indexCount = 0;
-        private int rowHeight = 40;
-        
-        private Label left, middle, right;
-        
-        private rowPanelTag Tag;
-
-        public int maxWidth = 850;
-        public FlowLayoutPanel rowPannel;
-        public string FoodName { get { return foodName; } set { foodName = value; } }
-        public decimal Price { get { return price; } set { price = value; } }
-        public int ItemCount { get { return itemCount; } set { itemCount = value; } }
-        public int IndexCount { get { return indexCount; } }
-        public decimal TotalPrice { get { return itemCount * price; } }
-
-        public Label Left { get { return left; } set { left = value; } }
-        public Label Right { get { return right; } set { right = value; } }
-        public Label Middle { get { return middle; } set { middle = value; } }
-        public void IncreaseIndexCount()
-        {
-            indexCount++;
-        }
-        public rowOfItem()
-        {
-            foodName = "litterallly anythingelse";
-            int countLabelWidth = 30;
-            int priceLabelWidth = 60;
-            Tag = new rowPanelTag()
-            {
-                ItemCount = itemCount,
-                Name = FoodName,
-                Count = indexCount,
-                Price = price
-
-            };
-
-
-            rowPannel = new()
-            {
-                Height = rowHeight,
-                Tag = Tag,
-                Padding = new Padding(0),
-                Margin = new Padding(0),
-                Width = maxWidth - SystemInformation.VerticalScrollBarWidth,
-                AutoSize = false,
-                AutoScroll = false,
-                WrapContents = false,
-                FlowDirection = FlowDirection.LeftToRight,
-                BackColor = Color.Green
-            };
-
-            left = new Label
-            {
-                Text = itemCount.ToString(),
-                Width = countLabelWidth,
-                Height = rowHeight,
-                AutoSize = false,
-                Padding = new Padding(0),
-                Margin = new Padding(0),
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                TextAlign = ContentAlignment.MiddleLeft,
-                BackColor = Color.Yellow
-
-            };
-
-            middle = new Label
-            {
-                Text = foodName,
-                Height = rowHeight,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Padding = new Padding(10, 0, 0, 0),
-                Tag = Tag,
-                Width = maxWidth - countLabelWidth - priceLabelWidth - SystemInformation.VerticalScrollBarWidth - 9
-            };
-
-            right = new Label
-            {
-                Text = price.ToString("c"),
-                Tag = Tag,
-                Width = priceLabelWidth,
-                Height = rowHeight,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                Padding = new Padding(0),
-                BackColor = Color.Red,
-
-            };
-
-            rowPannel.Controls.Add(left);
-            rowPannel.Controls.Add(middle);
-            rowPannel.Controls.Add(right);
-
-        }
-        public void SetHeight(int height) {
-            rowHeight = height;
-            left.Height = height;
-            middle.Height = height;
-            right.Height = height;
-            rowPannel.Height = height;
-
-
-           
-        }
-        
-
-        public void updateText()
-        {
-            left.Text = ItemCount.ToString();
-            middle.Text = foodName;
-            right.Text = TotalPrice.ToString("c");
-        }
-
-        public void Dispose()
-        {
-            foreach (Control control in rowPannel.Controls)
-            {
-                if (control == Left || control == Right || control == middle)
-                {
-                    foreach (Control control2 in control.Controls)
-                    {
-                        control.Controls.Remove(control2);
-                        control2.Dispose();
-                    }
-                }
-                rowPannel.Controls.Remove(control);
-                control.Dispose();
-            }
-        }
-
-    }
+    
 
 }

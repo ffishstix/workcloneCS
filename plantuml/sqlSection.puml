@@ -1,0 +1,11 @@
+@startuml
+class SQL {
+    - {static} jsonDir : string
+    - <<const>> connectionString : string
+    - {static} print(a:string) : void
+    + {static} getRangeOfCatagoryID() : (int, int)
+    + {static} getStaffData() : List<staff>
+    - {static} pullCatFile() : List<catagory>
+    + {static} getCatagory(catagoryChosen:int) : catagory
+}
+@enduml

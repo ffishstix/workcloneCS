@@ -12,12 +12,18 @@ namespace WorkCloneCS
         static void Main()
         {
             sync.syncAll();
-            
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
-            Console.ReadLine();
+            if (sync.catagories != null)
+            {
+                // To customize application configuration such as set high DPI settings or default font,
+                // see https://aka.ms/applicationconfiguration.
+                ApplicationConfiguration.Initialize();
+                Application.Run(new Form1());
+                Console.ReadLine();
+            }
+            else
+            {
+                Logger.Log("i have absolutely no idea why but the fucker wont work");
+            }
         }
     }
 }
