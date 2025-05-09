@@ -15,26 +15,28 @@ namespace WorkCloneCS
 
         private staff currentStaff;        
         int globalCount = 0;
+        private List<catagory> cat = sync.catagories;
+
         private string[] catagories = FoodLoader.LoadCatagorys("catagories");
         public Form1()
         {
             InitializeComponent();
             InitFoodList();
-            addCatagory(catagories);
+            addCatagory();
         }
 
         private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
 
-        private void addCatagory(string[] lis)
+        private void addCatagory()
         {
             deleteChildbox();
 
             int count = 1;
-            foreach (string catagory in lis)
+            for (int i = 0; i < catagories.Length; i++)
             {
                 Label item = new Label
                 {
-                    Text = catagory,
+                    Text = sync.catagories[i].catName,
                     AutoSize = false,
                     BackColor = Color.Gray,
                     Width = (catPan.Width / 8) - 2,
@@ -42,7 +44,7 @@ namespace WorkCloneCS
                     TextAlign = ContentAlignment.MiddleCenter,
                     Font = new Font("Segoe UI", 12, FontStyle.Regular),
                     Margin = new Padding(1),
-                    Tag = count
+                    Tag = i+1
                 };
                 count++;
                 item.Click += catClick;
@@ -228,7 +230,7 @@ namespace WorkCloneCS
             deleteChildbox();
 
 
-            addCatagory(catagories);
+            addCatagory();
             allPannelsBlank();
         }
 
@@ -427,7 +429,7 @@ namespace WorkCloneCS
         {
             deleteAllItemsOrdered();
             allPannelsBlank();
-            addCatagory(catagories);
+            addCatagory();
         }
     }
 

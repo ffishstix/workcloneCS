@@ -28,20 +28,26 @@ namespace WorkCloneCS
 
     class sync
     {
-        public (int, int) catagoryIdRange { get; set; }
-        public List<staff> allStaff;
-        public List<catagory> catagories;
+        public static (int, int) catagoryIdRange { get; set; }
+        public static List<staff> allStaff;
+        public static List<catagory> catagories;
 
 
-        public void syncAll()
+        public static void syncAll()
         {
             catagoryIdRange = SQL.getRangeOfCatagoryID();
+            Logger.Log(catagoryIdRange.Item1.ToString());
             allStaff = SQL.getStaffData();
-            
+            Logger.Log($"max? {catagoryIdRange.Item1}, min? {catagoryIdRange.Item2}");
             //catagories section
             for (int i = catagoryIdRange.Item1; i <= catagoryIdRange.Item2; i++)
             {
                 catagories.Add((SQL.getCatagory(i)));
+                Logger.Log($"currently going through: {i}");
+            }
+            foreach (catagory cat in catagories)
+            {
+                Logger.Log($"{cat.catName}");
             }
         }
     }
@@ -52,13 +58,13 @@ namespace WorkCloneCS
         public int Access {  get; set; }
     }
 
-     class catagory
+    class catagory
     {
         public string catName { get; set; }
         public int catagoryId { get; set; }
         public string catagoryExtraInfo { get; set; }
 
-        public List<item> items;
+        public List<item> items { get; set; }
     }
 
      class item
@@ -84,8 +90,49 @@ namespace WorkCloneCS
 
         public static (int, int) getRangeOfCatagoryID()
         {
-
-            return (0, 0);
+            string query = "SELECT catagoryId " +
+                "from catagories " +
+                "order by catagoryId ";
+            string fetch = "offset 0 rows fetch next 1 rows only";
+            int min = 0;
+            int max = 0;
+            try
+            {
+                
+                //main method
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    try
+                    {
+                        connection.Open();
+                        SqlCommand command = new SqlCommand(query + "desc " + fetch, connection);
+                        Logger.Log(command.Parameters.ToString());
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                min = reader.GetInt32(0);
+                                Logger.Log($"max: {min}");
+                            }
+                        }
+                        command = new SqlCommand(query + "asc " + fetch, connection);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                max = reader.GetInt32(0);
+                                Logger.Log($"max: {max}");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(ex.Message);
+                    }
+                }
+                
+            } catch (Exception ex) { Logger.Log(ex.Message); }
+            return (min, max);
         }
 
         public static List<staff> getStaffData()
