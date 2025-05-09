@@ -12,7 +12,7 @@ namespace WorkCloneCS
     {
         private static string jsonDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}" +
                 "/workclonecs/sql/catagoryJson.txt";
-        private const string connectionString = "Server=localdhost\\SQLEXPRESS;" +
+        private const string connectionString = "Server=localhost\\SQLEXPRESS;" +
                 "Database=testDatabase;" +
                 "Trusted_Connection=True;" +
                 "Encrypt=False;";
