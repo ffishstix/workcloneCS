@@ -29,7 +29,7 @@ namespace WorkCloneCS
         {
             deleteChildbox();
 
-
+            int count = 1;
             foreach (string catagory in lis)
             {
                 Label item = new Label
@@ -42,9 +42,9 @@ namespace WorkCloneCS
                     TextAlign = ContentAlignment.MiddleCenter,
                     Font = new Font("Segoe UI", 12, FontStyle.Regular),
                     Margin = new Padding(1),
-                    Tag = catagory
+                    Tag = count
                 };
-
+                count++;
                 item.Click += catClick;
 
                 catPan.Controls.Add(item);
@@ -54,7 +54,7 @@ namespace WorkCloneCS
         private void catClick(object sender, EventArgs e)
         {
             deleteChildbox();
-            InitItemList((string)((Control)sender).Tag);
+            InitItemList((int)((Control)sender).Tag);
         }
 
         private void addItem(decimal Price, string Name, int rowHeight)
@@ -243,25 +243,35 @@ namespace WorkCloneCS
         //called when catagory clicked on, gets items from file called "{catagoryName}".txt -
         //should probs change for an api call icl but you never know yk 
         // then just goes through each and adds each value and what not
-        private void InitItemList(string e)
+        private void InitItemList(int e)
         {
-            List<rowPanelTag> foodItems = FoodLoader.LoadFoodItems(e);
+            List<item> foodItems = SQL.getItemsFromCatagory(e);
+
             if (foodItems != null)
             {
                 for (int i = 0; i < foodItems.Count; i++)
                 {
-                    addLabel(foodItems[i]);
+                    try
+                    {
+                        
+                        addLabel(foodItems[i]);
+                        Logger.Log(e.ToString() + " " + foodItems[i].itemName);
+                    } catch (Exception ex)
+                    {
+                        Logger.Log($"{ex.Message}    {e}");
+                    }
+                    
                 }
             }
         }
 
 
         //add all of the items made clickeable that all take them to the gereralItem_Click()
-        private void addLabel(rowPanelTag tag)
+        private void addLabel(item tag)
         {
             Label item = new Label
             {
-                Text = tag.Name,
+                Text = tag.itemName,
                 Tag = tag,
                 AutoSize = false,
                 BackColor = Color.Gray,

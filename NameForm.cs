@@ -46,6 +46,7 @@ namespace WorkCloneCS
             }
             return null;
         }
+        
         public int returnUserID()
         {
             this.Show();
@@ -73,8 +74,6 @@ namespace WorkCloneCS
             currentID = 0;
             updateDisplayBtnText();
         }
-
-
 
         private void btnOK_Click(object sender, EventArgs e)
         {
