@@ -1,85 +1,193 @@
 <mxfile host="65bd71144e">
     <diagram id="GlpVuSdsc0ZG-4vUOY9V" name="Page-1">
-        <mxGraphModel dx="1137" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1737" dy="649" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="2" value="start of program" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
-                    <mxGeometry x="370" y="70" width="110" height="50" as="geometry"/>
+                <mxCell id="2" value="start of program" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="-190" y="70" width="110" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="Form (built-in)" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="460" y="210" width="110" height="20" as="geometry"/>
-                </mxCell>
-                <mxCell id="12" value="Form1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="410" y="270" width="160" height="114" as="geometry"/>
-                </mxCell>
-                <mxCell id="13" value="- currentStaff : staff&lt;div&gt;- globalCount: int&lt;/div&gt;&lt;div&gt;- catagories : string[]&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="12">
-                    <mxGeometry y="26" width="160" height="54" as="geometry"/>
-                </mxCell>
-                <mxCell id="14" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="12">
-                    <mxGeometry y="80" width="160" height="8" as="geometry"/>
-                </mxCell>
-                <mxCell id="15" value="+ method(type): type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="12">
-                    <mxGeometry y="88" width="160" height="26" as="geometry"/>
-                </mxCell>
-                <mxCell id="22" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="16" target="2">
+                <mxCell id="23" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="1" source="17" target="2" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="235" y="140"/>
-                            <mxPoint x="425" y="140"/>
+                            <mxPoint x="115" y="150"/>
+                            <mxPoint x="-135" y="150"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="16" value="SQL section" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
-                    <mxGeometry x="180" y="200" width="110" height="50" as="geometry"/>
+                <mxCell id="77" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="10" y="170" width="370" height="780" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="17" target="2">
+                <mxCell id="7" value="Form (built-in)" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="77" vertex="1">
+                    <mxGeometry x="50" y="50" width="110" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Form1" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="77" vertex="1">
+                    <mxGeometry y="110" width="370" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- globalCount : int = 0&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Form1()&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- deleteChildbox() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- addCatagory() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- catClick(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- addItem(Price:decimal, Name:string, rowHeight:int) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- EnableSwipeToDelete(row:rowOfItem) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- updateTotalItems(number:int) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- updateTotalPrice(change:decimal) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- createScrollPanel() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- InitFoodList() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- deleteAllItemsOrdered() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- generalItem_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- backBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- Form1_Load(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- InitItemList(e:int) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- addLabel(tag:item) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- allPannelsBlank() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- ConfigBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- FinalBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- tableBottomBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- OrderBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- miscBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- SignOnBtnConfigPanel_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- tableBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- nameBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- PricingBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- CancelBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="12" vertex="1">
+                    <mxGeometry y="26" width="370" height="424" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="display section" style="html=1;whiteSpace=wrap;" parent="77" vertex="1">
+                    <mxGeometry x="50" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.564;entryY=0.873;entryDx=0;entryDy=0;entryPerimeter=0;" parent="77" source="12" target="7" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="17" value="display section" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
-                    <mxGeometry x="460" y="160" width="110" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="18" target="16">
+                <mxCell id="76" style="edgeStyle=none;html=1;" edge="1" parent="77" source="64" target="12">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="18" value="staff" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="100" y="280" width="140" height="104" as="geometry"/>
+                <mxCell id="64" value="NameForm" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="77">
+                    <mxGeometry x="35" y="620" width="300" height="160" as="geometry"/>
                 </mxCell>
-                <mxCell id="19" value="+ ID : int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="18">
-                    <mxGeometry y="26" width="140" height="26" as="geometry"/>
+                <mxCell id="65" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- currentID : int = 0&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ NameForm()&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- getStaff(filePath:string) : List&amp;lt;staff&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ returnUserID() : int&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- updateDisplayBtnText() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- numberBtn_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- btnEsc_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- btnOK_Click(sender:object, e:EventArgs) : void&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="64">
+                    <mxGeometry y="26" width="300" height="134" as="geometry"/>
                 </mxCell>
-                <mxCell id="20" value="+ Name : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="18">
-                    <mxGeometry y="52" width="140" height="26" as="geometry"/>
+                <mxCell id="79" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="-640" y="290" width="640" height="390" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" value="+ Access : int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="18">
-                    <mxGeometry y="78" width="140" height="26" as="geometry"/>
+                <mxCell id="74" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="79" source="32" target="58">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="150" y="130"/>
+                            <mxPoint x="335" y="130"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.564;entryY=0.873;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="12" target="7">
+                <mxCell id="32" value="SQL" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="79" vertex="1">
+                    <mxGeometry x="180" y="240" width="310" height="142" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- {static} jsonDir : string&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- &amp;lt;&amp;lt;const&amp;gt;&amp;gt; connectionString : string&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- {static} print(a:string) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} getRangeOfCatagoryID() : (int, int)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} getStaffData() : List&amp;lt;staff&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- {static} pullCatFile() : List&amp;lt;catagory&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} getCatagory(catagoryChosen:int) : catagory&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="32" vertex="1">
+                    <mxGeometry y="26" width="310" height="116" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" value="sync" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="79">
+                    <mxGeometry x="180" width="310" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="+ {static}&amp;nbsp; catagoryIODRange:&amp;nbsp;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;(int, int)&lt;/span&gt;&amp;nbsp;&amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;div&gt;+ static allstaff :&amp;nbsp;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;List&amp;lt;staff&amp;gt;&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;&amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;+ static catagories : List&amp;lt;catagory&amp;gt; &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;+ static syncAll() : void&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="57">
+                    <mxGeometry y="26" width="310" height="74" as="geometry"/>
+                </mxCell>
+                <mxCell id="75" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="79" source="68" target="58">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="335" y="150"/>
+                            <mxPoint x="335" y="150"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="foodLoader" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="79">
+                    <mxGeometry x="180" y="150" width="310" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} filePathReturn(filename:string) : string&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} LoadCatagorys(c:string) : string[]&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} LoadFoodItems(c:string) : List&amp;lt;rowPanelTag&amp;gt;&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="68">
+                    <mxGeometry y="26" width="310" height="64" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="-760" y="170" width="745" height="870" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="static classes" style="html=1;whiteSpace=wrap;" parent="89" vertex="1">
+                    <mxGeometry x="280" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="85" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="89" source="18" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="335" y="210" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="625" y="590"/>
+                            <mxPoint x="250" y="590"/>
+                            <mxPoint x="250" y="70"/>
+                            <mxPoint x="335" y="70"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="staff" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="89" vertex="1">
+                    <mxGeometry x="520" y="600" width="210" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Id : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Name : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Access : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="18" vertex="1">
+                    <mxGeometry y="26" width="210" height="54" as="geometry"/>
+                </mxCell>
+                <mxCell id="86" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=default;rounded=1;curved=0;" edge="1" parent="89" source="36" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="335" y="210" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="625" y="690"/>
+                            <mxPoint x="510" y="690"/>
+                            <mxPoint x="510" y="590"/>
+                            <mxPoint x="250" y="590"/>
+                            <mxPoint x="250" y="70"/>
+                            <mxPoint x="335" y="70"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="Logger" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="89">
+                    <mxGeometry x="505" y="700" width="240" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- {static} &amp;lt;&amp;lt;readonly&amp;gt;&amp;gt; logFilePath : string&amp;nbsp;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- {static} logCount : int = 0&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} Here() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ {static} Log(message:string) : void&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="36">
+                    <mxGeometry y="26" width="240" height="64" as="geometry"/>
+                </mxCell>
+                <mxCell id="78" value="" style="group" vertex="1" connectable="0" parent="89">
+                    <mxGeometry x="240" y="600" width="250" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="catagory" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="78">
+                    <mxGeometry width="250" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ connected : bool &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ catName : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ catagoryId : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ catagoryExtraInfo : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="41">
+                    <mxGeometry y="26" width="250" height="74" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="78" source="45" target="41">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="31" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="27" target="16">
+                <mxCell id="45" value="item" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="78">
+                    <mxGeometry x="10" y="160" width="230" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ itemId : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ itemName : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ extraInfo : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ price : decimal &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ chosenColour : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="45">
+                    <mxGeometry y="26" width="230" height="84" as="geometry"/>
+                </mxCell>
+                <mxCell id="80" value="" style="group" vertex="1" connectable="0" parent="89">
+                    <mxGeometry y="100" width="220" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="80" source="49" target="53">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="27" value="Logger" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="240" y="280" width="160" height="86" as="geometry"/>
+                <mxCell id="49" value="rowPanelTag" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="80">
+                    <mxGeometry y="340" width="220" height="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="28" value="- logFilePath : readonly str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="27">
-                    <mxGeometry y="26" width="160" height="26" as="geometry"/>
+                <mxCell id="52" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- name : string&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; - count : int&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; - price : decimal&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; - itemCount : int&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + rowPanelTag()&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + Name : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + Count : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + Price : decimal &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + ItemCount : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp; &amp;nbsp; + TotalPrice : decimal &amp;lt;&amp;lt;get&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="49">
+                    <mxGeometry y="26" width="220" height="154" as="geometry"/>
                 </mxCell>
-                <mxCell id="29" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="27">
-                    <mxGeometry y="52" width="160" height="8" as="geometry"/>
+                <mxCell id="53" value="rowOfItem" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="80">
+                    <mxGeometry width="220" height="270" as="geometry"/>
                 </mxCell>
-                <mxCell id="30" value="+ Log(string)&amp;nbsp;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="27">
-                    <mxGeometry y="60" width="160" height="26" as="geometry"/>
+                <mxCell id="54" value="&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- foodName : string&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- price : decimal = 0&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- itemCount : int = 1&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- indexCount : int = 0&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;- rowHeight : int = 40&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ maxWidth : int = 850&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ FoodName : string &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Price : decimal &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ ItemCount : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt; &amp;lt;&amp;lt;set&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ IndexCount : int &amp;lt;&amp;lt;get&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ TotalPrice : decimal &amp;lt;&amp;lt;get&amp;gt;&amp;gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ IncreaseIndexCount() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ rowOfItem()&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ SetHeight(height:int) : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ updateText() : void&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;+ Dispose() : void&lt;/font&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="53">
+                    <mxGeometry y="26" width="220" height="244" as="geometry"/>
                 </mxCell>
-                <mxCell id="32" value="SQL" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="-60" y="280" width="160" height="80" as="geometry"/>
+                <mxCell id="82" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="89" source="57" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="455" y="70"/>
+                            <mxPoint x="335" y="70"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="34" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="32">
-                    <mxGeometry y="26" width="160" height="8" as="geometry"/>
+                <mxCell id="83" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="89" source="53" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="110" y="70"/>
+                            <mxPoint x="335" y="70"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="35" value="- Print() : void&lt;div&gt;+ getStaffData : List&amp;lt;staff&amp;gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="32">
-                    <mxGeometry y="34" width="160" height="46" as="geometry"/>
+                <mxCell id="84" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="89" source="41" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="250" y="70"/>
+                            <mxPoint x="335" y="70"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="92" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="16" target="2">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="-425" y="150"/>
+                            <mxPoint x="-135" y="150"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
             </root>
         </mxGraphModel>

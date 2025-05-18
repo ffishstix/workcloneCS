@@ -5,13 +5,15 @@ namespace WorkCloneCS
 {
     class Logger
     {
-        private static readonly string logFilePath = @"C:\workclonecs\log.txt";
+        private static readonly string logFilePath = @"C:\workclonecs\log.html";
         private static int logCount = 0;
         public static void Here()
         {
             Log($"here{logCount}");
         }
 
+
+        /*
         public static void Log(string message)
         {
             try
@@ -28,9 +30,83 @@ namespace WorkCloneCS
                 Console.WriteLine("Logging failed: " + ex.Message);
             }
         }
+        // Log function with severity handling
+        
+        */
+        public static void Log(string message, int severity = 0)
+        {
+            try
+            {
+                logCount++;
+                string number = logCount.ToString();
+                string formattedCount = number.PadLeft(4, '-');
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff");
+
+                // Default to normal (no color)
+                string color = "black"; // Black color for severity 0 (normal)
+
+                // Apply colors based on severity level
+                switch (severity)
+                {
+                    case 1:
+                        color = "blue"; // Blue for info
+                        break;
+                    case 2:
+                        color = "green"; // Green for success
+                        break;
+                    case 3:
+                        color = "orange"; // Orange for warning
+                        break;
+                    case 4:
+                        color = "red"; // Red for error
+                        break;
+                    default:
+                        color = "black"; // Black (normal) for severity 0
+                        break;
+                }
+
+                // Build the HTML log entry
+                string logEntry = $"<p style='color:{color};'><b>{formattedCount}</b>: {timestamp}: {message}</p>";
+
+                // Check if the log file exists
+                if (!File.Exists(logFilePath))
+                {
+                    // If the file doesn't exist, write the HTML header
+                    string htmlHeader = @"<!DOCTYPE html><html><head><title>Log File</title></head><body>";
+                    File.WriteAllText(logFilePath, htmlHeader);
+                }
+
+                // Append the log entry to the file
+                File.AppendAllText(logFilePath, logEntry);
+
+                // Optionally close the HTML body and document if it's the last log entry
+                // This could be done when closing the application or after a certain condition is met
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Logging failed: " + ex.Message);
+            }
+        }
+
+        // Optional: Call this method when you're done logging to close the HTML document properly
+        public static void CloseLog()
+        {
+            try
+            {
+                string htmlFooter = "</body></html>";
+                if (File.Exists(logFilePath))
+                {
+                    File.AppendAllText(logFilePath, htmlFooter);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to close log file: " + ex.Message);
+            }
+        }
     }
 
-    public class staff
+        public class staff
     {
         public int Id { get; set; }
         public string Name { get; set; }

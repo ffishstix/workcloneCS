@@ -25,6 +25,11 @@ namespace WorkCloneCS
             addCatagory();
         }
         
+        private void formClosing(object sender, FormClosingEventArgs e)
+        {
+            Logger.CloseLog();
+        }
+        
         private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
 
         private void addCatagory()
@@ -259,7 +264,7 @@ namespace WorkCloneCS
                         addLabel(foodItems[i]);
                     } catch (Exception ex)
                     {
-                        Logger.Log($"{ex.Message}    {e}");
+                        Logger.Log($"{ex.Message}    {e}", 3);
                     }
                     
                 }

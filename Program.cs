@@ -11,6 +11,11 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
+            Logger.Log("This is a normal log.");  // Normal (black text)
+            Logger.Log("This is an informational log.", 1);  // Info (blue text)
+            Logger.Log("This is a success log.", 2);  // Success (green text)
+            Logger.Log("This is a warning log.", 3);  // Warning (orange text)
+            Logger.Log("This is an error log.", 4);  // Error (red text)
             sync.syncAll();
             if (sync.catagories != null)
             {

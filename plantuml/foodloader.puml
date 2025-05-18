@@ -1,7 +1,7 @@
 @startuml
 class FoodLoader {
-    + {static} filePathReturn(filename:string) : string
-    + {static} LoadCatagorys(c:string) : string[]
-    + {static} LoadFoodItems(c:string) : List<rowPanelTag>
++ {static} filePathReturn(filename:string) : string
++ {static} LoadCatagorys(c:string) : string[]
++ {static} LoadFoodItems(c:string) : List<rowPanelTag>
 }
 @enduml

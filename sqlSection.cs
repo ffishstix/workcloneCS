@@ -60,11 +60,11 @@ namespace WorkCloneCS
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(ex.Message);
+                        Logger.Log(ex.Message, 4);
                     }
                 }
                 
-            } catch (Exception ex) { Logger.Log(ex.Message); }
+            } catch (Exception ex) { Logger.Log(ex.Message, 4); }
             return (min, max);
         }
 
@@ -94,7 +94,7 @@ namespace WorkCloneCS
                                     Access = access, 
                                     Name = name 
                                 });
-                                Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}");
+                                Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}", 1);
                                 
                                 
                             }
@@ -103,10 +103,10 @@ namespace WorkCloneCS
                                 // logging it just incase it cannot pull it next time
                                 string jsonString = JsonSerializer.Serialize(values, new JsonSerializerOptions { WriteIndented = true });
                                 string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
-                                File.WriteAllText(dir, jsonString);
+                                File.AppendAllText(dir, jsonString);
                             } catch (Exception ex) { 
                                 Console.WriteLine(ex.Message);
-                                Logger.Log(ex.Message);                            
+                                Logger.Log(ex.Message, 3);                            
                             }
                             return values;
                             
@@ -114,7 +114,7 @@ namespace WorkCloneCS
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(ex.Message);
+                        Logger.Log(ex.Message, 4);
                         Console.WriteLine("Error: " + ex.Message);
                         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
                         if (File.Exists(file)) {
@@ -127,7 +127,7 @@ namespace WorkCloneCS
             } 
             catch (SqlException ex)
             {
-                Logger.Log(ex.Message);
+                Logger.Log(ex.Message, 4);
                 print("SQL Exception: " + ex.Message);
             }
             return null;
@@ -199,7 +199,7 @@ namespace WorkCloneCS
                                     extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
                                     chosenColour = reader.GetString(6),
                                 });
-                                Logger.Log($"got: item: {reader.GetString(2)}");
+                                Logger.Log($"got: item: {reader.GetString(2)}", 1);
                             }
                             currentCatagory.items = values;
                             currentCatagory.connected = false;
@@ -251,7 +251,7 @@ namespace WorkCloneCS
                     }
                     catch (Exception ex) {
                         //backup method just incase server down
-                        Logger.Log(ex.Message);
+                        Logger.Log(ex.Message, 4);
                         Logger.Here();
                         List<catagory> x = pullCatFile();
                         if (x == null) return null;

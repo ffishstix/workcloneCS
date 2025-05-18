@@ -42,7 +42,7 @@ namespace WorkCloneCS
                 List<staff> staff = JsonSerializer.Deserialize<List<staff>>(jsonString);
                 return staff;
             } catch (Exception ex) {
-                Logger.Log(ex.Message);
+                Logger.Log(ex.Message, 3);
             }
             return null;
         }

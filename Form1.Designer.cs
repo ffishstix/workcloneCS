@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            
+            this.FormClosing += formClosing;
             nameBtn = new Button();
             PricingBtn = new Button();
             tableBtn = new Button();
