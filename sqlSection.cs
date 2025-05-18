@@ -12,10 +12,12 @@ namespace WorkCloneCS
     {
         private static string jsonDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}" +
                 "/workclonecs/sql/catagoryJson.txt";
-        private const string connectionString = "Server=localhost\\SQLEXPRESS;" +
-                "Database=testDatabase;" +
-                "Trusted_Connection=True;" +
-                "Encrypt=False;";
+        private const string connectionString = "Server=bd.fishstix.uk,12346;" +
+            "Database=workclonecs;" +
+            "User Id=client;" +
+            "Password=MainClient1;" +
+            "Encrypt=False;";
+
         private static void print(string a)
         {
             System.Diagnostics.Debug.WriteLine("\n\nmsg: {0}\n", a);
