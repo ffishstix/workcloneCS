@@ -9,13 +9,20 @@ namespace WorkCloneCS
         public static List<staff> allStaff { get; set; }
         public static List<catagory> catagories { get; set; }
 
+        public static void syncStaff()
+        {
+            try
+            {
+                allStaff = SQL.getStaffData();
+            } catch(Exception ex) { Logger.Log(ex.Message); }
+        }
 
-        public static void syncAll()
+        public static void syncCatagory()
         {
             catagories = new List<catagory>();
             catagoryIdRange = SQL.getRangeOfCatagoryID();
             Logger.Log(catagoryIdRange.Item1.ToString());
-            allStaff = SQL.getStaffData();
+            
             Logger.Log($"max? {catagoryIdRange.min}, min? {catagoryIdRange.max}");
             //catagories section
             for (int i = 1; i <= catagoryIdRange.max; i++)
@@ -32,6 +39,13 @@ namespace WorkCloneCS
                 }
 
             }
+        }
+        
+        public static void syncAll()
+        {
+            SQL.initSQL();
+            syncStaff();
+            syncCatagory();
         }
     }
 }

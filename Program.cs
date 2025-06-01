@@ -11,11 +11,6 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
-            Logger.Log("This is a normal log.");  // Normal (black text)
-            Logger.Log("This is an informational log.", 1);  // Info (blue text)
-            Logger.Log("This is a success log.", 2);  // Success (green text)
-            Logger.Log("This is a warning log.", 3);  // Warning (orange text)
-            Logger.Log("This is an error log.", 4);  // Error (red text)
             sync.syncAll();
             if (sync.catagories != null)
             {
@@ -23,11 +18,11 @@ namespace WorkCloneCS
                 // see https://aka.ms/applicationconfiguration.
                 ApplicationConfiguration.Initialize();
                 Application.Run(new Form1());
-                Console.ReadLine();
+                Logger.Log("exiting program, last line of code\n\n\n");
             }
             else
             {
-                Logger.Log("i have absolutely no idea why but the fucker wont work");
+                Logger.Log("\n\n\n\ni have absolutely no idea why but the fucker wont work\n\n\n\n\n\n");
             }
         }
     }

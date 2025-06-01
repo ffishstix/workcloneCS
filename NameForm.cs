@@ -16,43 +16,27 @@ namespace WorkCloneCS
 {
     public partial class NameForm : Form
     {
-        private int currentID = 0;
+        private int currentID;
         private List<staff> x;
         public staff staffSelected;
+        private DateTime timeSinceLastClick;
         public NameForm()
         {
+            currentID = 0;
             InitializeComponent();
-            x = SQL.getStaffData();
-            if (x == null) x = getStaff($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt");
-            else File.WriteAllText($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt", 
-            JsonSerializer.Serialize(x, new JsonSerializerOptions { WriteIndented = true }));
-            
-            if (x == null) { this.Close(); }
+            timeSinceLastClick = DateTime.MinValue;
+            x = sync.allStaff;
+
+            if (x == null)
+            {
+                this.Close();
+                Logger.Log("staff was null so closing window");
+            }
             displayBtn.Text = "";
         }
 
 
-        private List<staff> getStaff(string filePath)
-        {
-            try
-            {
-                string jsonString = File.ReadAllText(filePath);
-
-                // Deserialize the JSON string into a List of User objects
-                List<staff> staff = JsonSerializer.Deserialize<List<staff>>(jsonString);
-                return staff;
-            } catch (Exception ex) {
-                Logger.Log(ex.Message, 3);
-            }
-            return null;
-        }
         
-        public int returnUserID()
-        {
-            this.Show();
-
-            return 0;
-        }
 
         private void updateDisplayBtnText()
         {
@@ -71,6 +55,13 @@ namespace WorkCloneCS
 
         private void btnEsc_Click(object sender, EventArgs e)
         {
+            if (timeSinceLastClick >= (DateTime.Now) - TimeSpan.FromSeconds(0.2))
+            {
+                staffSelected = null;
+                this.Close();
+                
+            }
+            timeSinceLastClick = DateTime.Now;
             currentID = 0;
             updateDisplayBtnText();
         }

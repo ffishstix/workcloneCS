@@ -16,8 +16,7 @@ namespace WorkCloneCS
         private staff currentStaff;        
         int globalCount = 0;
         private List<catagory> cat = sync.catagories;
-
-        private string[] catagories = FoodLoader.LoadCatagorys("catagories");
+        
         public Form1()
         {
             InitializeComponent();
@@ -27,7 +26,6 @@ namespace WorkCloneCS
         
         private void formClosing(object sender, FormClosingEventArgs e)
         {
-            Logger.CloseLog();
         }
         
         private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
@@ -264,7 +262,7 @@ namespace WorkCloneCS
                         addLabel(foodItems[i]);
                     } catch (Exception ex)
                     {
-                        Logger.Log($"{ex.Message}    {e}", 3);
+                        Logger.Log($"{ex.Message}    {e}");
                     }
                     
                 }
@@ -418,12 +416,22 @@ namespace WorkCloneCS
         {
             NameForm nameForm = new NameForm();
             nameForm.ShowDialog();
-            if (nameForm.staffSelected == null) nameBtn.Text = "name";
+            if (nameForm.staffSelected == null)
+            {
+                currentStaff = new staff()
+                {
+                    Id = 0,
+                    Name = "name",
+                    Access = 0
+                };
+                
+            }
             else
             {
                 currentStaff = nameForm.staffSelected;
-                nameBtn.Text = currentStaff.Name.ToUpper();
             }
+            nameBtn.Tag = currentStaff;
+            nameBtn.Text = currentStaff.Name.ToUpper();
         }
 
         private void PricingBtn_Click(object sender, EventArgs e)
