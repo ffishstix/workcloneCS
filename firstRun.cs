@@ -369,8 +369,7 @@ namespace WorkCloneCS
                 databaseTextBox.Text = "*workclonecs";
             }
         }
-
-       
+        
 
         private void RemoveTempTextPassword(object sender, EventArgs e)
         {

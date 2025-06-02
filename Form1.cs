@@ -329,6 +329,11 @@ namespace WorkCloneCS
         private void SignOffBtn_Click(object sender, EventArgs e)
         {
             currentStaff = null;
+            nameBtn.Text = "name";
+            nameBtn.Tag = currentStaff;
+            deleteAllItemsOrdered();
+            allPannelsBlank();
+            addCatagory();
             
         }
         private void FinalBtn_Click(object sender, EventArgs e)
