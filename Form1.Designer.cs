@@ -588,6 +588,7 @@
             miscPanel.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
+            
         }
 
         #endregion

@@ -11,19 +11,23 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
-            sync.syncAll();
-            if (sync.catagories != null)
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            
+            if (!firstRun.ranBefore())
             {
-                // To customize application configuration such as set high DPI settings or default font,
-                // see https://aka.ms/applicationconfiguration.
                 ApplicationConfiguration.Initialize();
-                Application.Run(new Form1());
-                Logger.Log("exiting program, last line of code\n\n\n");
+                FirstRunWindow firstRunWindow = new FirstRunWindow();
+                Application.Run(firstRunWindow);
             }
             else
             {
-                Logger.Log("\n\n\n\ni have absolutely no idea why but the fucker wont work\n\n\n\n\n\n");
+                ApplicationConfiguration.Initialize();
+                sync.syncAll();
+                Application.Run(new Form1());
             }
+            Logger.Log("exiting program, last line of code\n\n\n");
+        
         }
     }
 }

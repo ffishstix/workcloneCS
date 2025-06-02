@@ -239,6 +239,8 @@ namespace WorkCloneCS
         private static string jsonstaffDir;
         private static string connectionString;
         
+        public static string ConnectionString { set{  connectionString = value; } }
+        
         public static void initSQL()
         {
             
@@ -246,7 +248,7 @@ namespace WorkCloneCS
             jsonDir = sql + "catagoryJson.txt";
             jsonstaffDir = sql + "staff.txt";
             catagoriesFromFile = pullCatFile();
-            if (!testFiles)
+            if (!testFiles && connectionString == null)
             {
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
@@ -254,7 +256,7 @@ namespace WorkCloneCS
                     .Build();
                 connectionString = configuration.GetConnectionString("DefaultConnection");
             }
-            else connectionString = "Data Source=localhost;Initial Catalog=workclonecs;Integrated Security=True";
+            
         }
         
         public static void print(string a)

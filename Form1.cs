@@ -19,9 +19,12 @@ namespace WorkCloneCS
         
         public Form1()
         {
+            Logger.Log("inside the Form1 constructor");
             InitializeComponent();
             InitFoodList();
             addCatagory();
+            
+            Console.ReadLine();
         }
         
         private void formClosing(object sender, FormClosingEventArgs e)
