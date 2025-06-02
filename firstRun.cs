@@ -10,6 +10,14 @@ namespace WorkCloneCS
         public FirstRunWindow()
         {
             InitializeComponent();
+            progressBar = new ProgressBar
+            {
+                Location = new Point(95, 157), // Adjust location as needed
+                Name = "progressBar",
+                Size = new Size(177, 23),
+                Style = ProgressBarStyle.Continuous
+            };
+
             Logger.Log("first run window created");
             IPTextBox.GotFocus += RemoveTempTextIP;
             IPTextBox.LostFocus += AddTempTextIP;
@@ -54,6 +62,7 @@ namespace WorkCloneCS
             ApplyBtn = new System.Windows.Forms.Button();
             databaseTextBox = new System.Windows.Forms.TextBox();
             label6 = new System.Windows.Forms.Label();
+            InfoLabel = new System.Windows.Forms.Label();
             SuspendLayout();
             // 
             // IPTextBox
@@ -162,10 +171,18 @@ namespace WorkCloneCS
             label6.TabIndex = 13;
             label6.Text = "password";
             // 
+            // InfoLabel
+            // 
+            InfoLabel.Location = new System.Drawing.Point(7, 157);
+            InfoLabel.Name = "InfoLabel";
+            InfoLabel.Size = new System.Drawing.Size(248, 36);
+            InfoLabel.TabIndex = 14;
+            // 
             // FirstRunWindow
             // 
             BackColor = System.Drawing.SystemColors.Control;
             ClientSize = new System.Drawing.Size(284, 261);
+            Controls.Add(InfoLabel);
             Controls.Add(label6);
             Controls.Add(databaseTextBox);
             Controls.Add(ApplyBtn);
@@ -185,6 +202,8 @@ namespace WorkCloneCS
             PerformLayout();
         }
 
+        private System.Windows.Forms.Label InfoLabel;
+
         private System.Windows.Forms.Label label6;
 
         private System.Windows.Forms.TextBox databaseTextBox;
@@ -201,6 +220,7 @@ namespace WorkCloneCS
         private System.Windows.Forms.TextBox UserNameTextBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox PasswordTextBox;
+        private ProgressBar progressBar;
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
@@ -234,11 +254,13 @@ namespace WorkCloneCS
             sync.syncAll();
             Form1 form1 = new Form1();
             form1.Show();
-            this.Close();
+            this.Hide();
         }
 
-        private void CheckBtn_Click(object sender, EventArgs e)
+        private async void CheckBtn_Click(object sender, EventArgs e)
         {
+            InfoLabel.Text = "Checking connection string";
+            progressBar.Value = 0;
             bool valid = true;
             connectionString = $"Server={IPTextBox.Text},{PortTextBox.Text};" +
                                       $"Database={databaseTextBox.Text};" +
@@ -248,18 +270,31 @@ namespace WorkCloneCS
             //now we try the connection
             try
             {
+                progressBar.Show();
+                progressBar.Value = 10;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();
+                    progressBar.Value = 20;
+                    await conn.OpenAsync();
+                    progressBar.Value = 40;
+                    InfoLabel.Text = "connection successful";
+                    Logger.Log("connection successful");
+                    progressBar.Value = 100;
                 }
             }
             catch (Exception ex)
             {
+                InfoLabel.Text = "failed to connect to database";
+                progressBar.Value = 100;
                 Logger.Log($"user inputted invalid string {ex.Message}, {connectionString}");
                 valid = false;
                 connectionString = "";
+                
             }
 
+            progressBar.Value = 0;
+            CheckBtn.Visible = true;
+            CancelBtn.Visible = true;
             ApplyBtn.Visible = valid;
         }
 

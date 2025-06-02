@@ -172,7 +172,7 @@
             SignOnBtnConfigPanel.TabIndex = 0;
             SignOnBtnConfigPanel.Text = "SignOn";
             SignOnBtnConfigPanel.UseVisualStyleBackColor = true;
-            SignOnBtnConfigPanel.Click += SignOnBtnConfigPanel_Click;
+            SignOnBtnConfigPanel.Click += nameBtn_Click;
             // 
             // SignOffBtnControlPanel
             // 
@@ -183,6 +183,7 @@
             SignOffBtnControlPanel.TabIndex = 1;
             SignOffBtnControlPanel.Text = "SignOff";
             SignOffBtnControlPanel.UseVisualStyleBackColor = true;
+            SignOffBtnControlPanel.Click += SignOffBtn_Click;
             // 
             // ConfigBtnControlPanel
             // 

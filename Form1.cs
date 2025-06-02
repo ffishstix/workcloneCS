@@ -21,14 +21,18 @@ namespace WorkCloneCS
         {
             Logger.Log("inside the Form1 constructor");
             InitializeComponent();
+            Logger.Log("initialized components");
             InitFoodList();
+            Logger.Log("initialized food list");
             addCatagory();
-            
-            Console.ReadLine();
+            Logger.Log("added catagories");
+            Visible = true;
+            Show();
         }
         
         private void formClosing(object sender, FormClosingEventArgs e)
         {
+            Application.Exit();
         }
         
         private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
@@ -322,7 +326,11 @@ namespace WorkCloneCS
 
         }
 
-
+        private void SignOffBtn_Click(object sender, EventArgs e)
+        {
+            currentStaff = null;
+            
+        }
         private void FinalBtn_Click(object sender, EventArgs e)
         {
             bool temp = !finalPanel.Visible;
@@ -404,10 +412,6 @@ namespace WorkCloneCS
         }
 
         //yet to be implemented
-        private void SignOnBtnConfigPanel_Click(object sender, EventArgs e)
-        {
-            deleteAllItemsOrdered();
-        }
 
         //top layer btn's currently unused icl
         private void tableBtn_Click(object sender, EventArgs e)
@@ -451,6 +455,11 @@ namespace WorkCloneCS
             allPannelsBlank();
             addCatagory();
         }
+        
+
+        
+        
+        
     }
 
 

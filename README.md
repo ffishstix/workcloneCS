@@ -25,6 +25,8 @@ put simply a clone of a very popular pos system, named workcloneCS as it is a cl
     - [ ] items displayed properly 
     - [ ] reformat how items are stored in variables when clicked on (food items)
     - [x] give functionality for sign on and sign off buttons
+    - [x] add first run form to initialize database connections
+    - [ ] add responsive errors to the first run form so the user knows what to change
 
 ---
 please help me with this page i am absolutely useless at markdown and if you have absolutely any ideas or help for it i would appreciate it so much i dont think you understand but yeah contact me with a quick dm i am open for any ideas ;)
