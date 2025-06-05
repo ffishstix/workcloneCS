@@ -20,9 +20,4 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="foodloader.cs" />
-    <Compile Remove="sqlSection.cs" />
-  </ItemGroup>
-
 </Project>

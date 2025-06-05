@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Text.Json;
 using FluentValidation;
 using Microsoft.Data.SqlClient;
@@ -344,45 +345,24 @@ class Program
             }
         }
 
+        private static bool created = false;
+
         private static void ErrorCallIS(Exception ex)
         {
             Program.localOnly = true;
             Logger.Log(ex.Message);
-            ShowTimedMessageBox(
-                "it is recomened for you to go through the config settings," +
-                "\n you are currently using the backup database on your local device," +
-                "\n you will not be able to send an order through in this state");
-        }
-        private static async void ShowTimedMessageBox(string message)
-        {
-            var form = new Form()
+            if (!created)
             {
-                Size = new Size(400, 150),
-                StartPosition = FormStartPosition.CenterScreen,
-                TopMost = true
-            };
-
-            var label = new Label()
-            {
-                Text = message,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleCenter,
-                AutoSize = false
-            };
-
-            form.Controls.Add(label);
-
-            // Show the form without blocking
-            form.Show();
-
-            // Start a timer to close the form after 3 seconds
-            await Task.Delay(3000);
-            if (!form.IsDisposed)
-            {
-                form.Close();
-                form.Dispose();
+                created = true;
+                Task.Run(() => MessageBox.Show(
+                    "it is recomened for you to go through the config settings," +
+                    "\n you are currently using the backup database on your local device," +
+                    "\n you will not be able to send an order through in this state"));
             }
         }
+
+
+
 
 
         public static (int, int) getRangeOfCatagoryID()
