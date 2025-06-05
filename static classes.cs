@@ -319,27 +319,70 @@ class Program
                     .AddJsonFile(sql + "ConnectionStringsConfiguration.json")
                     .Build();
                 connectionString = configuration.GetConnectionString("DefaultConnection");
+                
             }
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            if (connectionString != null){
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    try
+                    {
+                        connection.Open();
+                        Program.localOnly = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorCallIS(ex);
+
+                    }
+                }
+
+            }
+            else
             {
-                try
-                {
-                    connection.Open();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex.Message);
-                    MessageBox.Show(
-                        "it is recomened for you to go through the config settings," +
-                        "\n you are currently using the backup database on your local device," +
-                        "\n you will not be able to send an order through in this state");
-
-                }
-
-            } 
+                ErrorCallIS(null);
+            }
         }
-        
+
+        private static void ErrorCallIS(Exception ex)
+        {
+            Program.localOnly = true;
+            Logger.Log(ex.Message);
+            ShowTimedMessageBox(
+                "it is recomened for you to go through the config settings," +
+                "\n you are currently using the backup database on your local device," +
+                "\n you will not be able to send an order through in this state");
+        }
+        private static async void ShowTimedMessageBox(string message)
+        {
+            var form = new Form()
+            {
+                Size = new Size(400, 150),
+                StartPosition = FormStartPosition.CenterScreen,
+                TopMost = true
+            };
+
+            var label = new Label()
+            {
+                Text = message,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                AutoSize = false
+            };
+
+            form.Controls.Add(label);
+
+            // Show the form without blocking
+            form.Show();
+
+            // Start a timer to close the form after 3 seconds
+            await Task.Delay(3000);
+            if (!form.IsDisposed)
+            {
+                form.Close();
+                form.Dispose();
+            }
+        }
 
 
         public static (int, int) getRangeOfCatagoryID()

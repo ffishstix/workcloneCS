@@ -14,22 +14,64 @@ namespace WorkCloneCS
     {
         
         private staff currentStaff;        
-        int globalCount = 0;
-        private List<catagory> cat = sync.catagories;
+        private List<catagory> cat = new();
+        
         
         public Form1()
         {
+            cat = sync.catagories;
             Logger.Log("inside the Form1 constructor");
             InitializeComponent();
             Logger.Log("initialized components");
             InitFoodList();
             Logger.Log("initialized food list");
-            addCatagory();
+            Task.Run(async () => {
+                await LoadCategories();
+        
+                // Use Invoke to update UI from background thread
+                if (IsHandleCreated)
+                {
+                    Invoke(new Action(() => {
+                        addCatagory();
+                        Logger.Log("added catagories");
+                        
+                    }));
+                }
+            });
+            
             Logger.Log("added catagories");
             Visible = true;
             Show();
         }
-        
+        private async Task LoadCategories()
+        {
+            // Create a TaskCompletionSource to wait for categories
+            var tcs = new TaskCompletionSource<bool>();
+    
+            sync.syncAll();
+    
+            // Wait until categories are loaded or timeout
+            int attempts = 0;
+            while (attempts < 10 && (sync.catagories == null || sync.catagories.Count < 10))
+            {
+                await Task.Delay(3000);
+                cat = sync.catagories;
+                attempts++;
+            }
+    
+            if (cat != null && cat.Count > 0)
+            {
+                tcs.SetResult(true);
+            }
+            else
+            {
+                Logger.Log("Failed to load categories after timeout");
+                tcs.SetResult(false);
+            }
+    
+            await tcs.Task;
+        }
+
         private void formClosing(object sender, FormClosingEventArgs e)
         {
             Application.Exit();
@@ -39,9 +81,15 @@ namespace WorkCloneCS
 
         private void addCatagory()
         {
+            if (!IsHandleCreated) return;
             deleteChildbox();
 
-            int count = 1;
+            if (cat == null || cat.Count == 0)
+            {
+                Logger.Log("No categories available to display");
+                return;
+            }
+
             for (int i = 0; i < cat.Count; i++)
             {
                 Label item = new Label
@@ -54,15 +102,14 @@ namespace WorkCloneCS
                     TextAlign = ContentAlignment.MiddleCenter,
                     Font = new Font("Segoe UI", 12, FontStyle.Regular),
                     Margin = new Padding(1),
-                    Tag = i
+                    Tag = i,
+                    Visible = true
                 };
-                count++;
                 item.Click += catClick;
-
                 catPan.Controls.Add(item);
             }
         }
-
+        
         private void catClick(object sender, EventArgs e)
         {
             deleteChildbox();
@@ -72,7 +119,6 @@ namespace WorkCloneCS
         private void addItem(decimal Price, string Name, int rowHeight)
         {
             priceTotal += Price;
-            globalCount++;
             int countLabelWidth = 30;
             int priceLabelWidth = 60;
             rowOfItem row = new rowOfItem()
@@ -202,6 +248,7 @@ namespace WorkCloneCS
         private void InitFoodList()
         {
             createScrollPanel();
+            
 
             // Sample data - to be changed
             leftLabel.Tag = 0;

@@ -25,31 +25,41 @@ namespace WorkCloneCS
             Logger.Log(catagoryIdRange.Item1.ToString());
             
             Logger.Log($"max? {catagoryIdRange.min}, min? {catagoryIdRange.max}");
+            
+            // Create a temporary list to store categories
+            List<catagory> tempCategories = new List<catagory>();
+            
             //catagories section
             for (int i = 1; i <= catagoryIdRange.max; i++)
             {
                 var x = SQL.getCatagory(i);
-                if (x != null) catagories.Add((x));
+                if (x != null) tempCategories.Add(x);
                 Logger.Log($"currently going through: {i}");
             }
-            foreach (catagory cat in catagories)
+
+            // After collecting all categories, assign them to the main list
+            catagories = tempCategories;
+            
+            // Log the categories
+            if (catagories.Count > 1)
             {
-                if (catagories.Count > 1)
+                foreach (catagory cat in catagories)
                 {
                     Logger.Log($"{cat.catName}");
                 }
-
             }
         }
         
         public static void syncAll()
         {
-            DateTime start = DateTime.Now;
-            SQL.initSQL();
-            syncStaff();
-            syncCatagory();
-            Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
-
+            Task.Run(() =>
+            {
+                DateTime start = DateTime.Now;
+                SQL.initSQL();
+                syncStaff();
+                syncCatagory();
+                Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
+            });
         }
     }
 }
