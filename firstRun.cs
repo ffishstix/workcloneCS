@@ -182,14 +182,17 @@ namespace WorkCloneCS
             // 
             // LastBtn
             // 
-            LastBtn.Location = new System.Drawing.Point(198, 157);
+            LastBtn.Location = new System.Drawing.Point(198, 180);
             LastBtn.Name = "LastBtn";
-            LastBtn.Size = new System.Drawing.Size(77, 54);
+            LastBtn.Size = new System.Drawing.Size(77, 31);
             LastBtn.TabIndex = 14;
-            LastBtn.Text = "Last working connection";
+            LastBtn.Text = "Revert";
             LastBtn.UseVisualStyleBackColor = true;
             LastBtn.Visible = false;
             LastBtn.Click += LastBtn_Click;
+            var tooltip = new ToolTip();
+            tooltip.SetToolTip(LastBtn, "Changes all data fields to last known working connection");
+
             // 
             // FirstRunWindow
             // 
@@ -425,6 +428,9 @@ namespace WorkCloneCS
             Logger.Log("replaced last known shit");
             connectionString = lastWorkingConnection;
         }
+
+
+
     }
     
     public class firstRun
@@ -435,44 +441,42 @@ namespace WorkCloneCS
         public static bool ranBefore()
         {
             Logger.Here();
-            if (Directory.Exists(basestr))
+            if (!Directory.Exists(basestr+"/sql"))
             {
-                if (Directory.Exists(basestr + "/sql"))
+                Directory.CreateDirectory(Path.GetDirectoryName(basestr+"/sql"));
+            }
+            if (Directory.Exists(basestr + "/sql"))
+            {
+                try
                 {
-                    try
+                    if (File.Exists(basestr + "/ranbefore.txt") && File.Exists(basestr + "/sql/ConnectionStringsConfiguration.json"))
                     {
-                        if (File.Exists(basestr + "/ranbefore.txt") && File.Exists(basestr + "/sql/ConnectionStringsConfiguration.json"))
-                        {
-                            return true;
-                        }
-                        
+                        return true;
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.Log("error while creating / existing ranbefore.txt " + ex.Message);
-                    }
+                    
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        Directory.CreateDirectory(basestr + "/sql");
-                        Logger.Log("created sql folder");
-                        
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log("error while creating sql folder " + ex.Message);
-                    }
+                    Logger.Log("error while creating / existing ranbefore.txt " + ex.Message);
                 }
             }
             else
             {
-                Directory.CreateDirectory(basestr);
-                Logger.Log("no fucking documents folder what in the fuck do i do from here");
+                try
+                {
+                    Directory.CreateDirectory(basestr + "/sql");
+                    Logger.Log("created sql folder");
+                    
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("error while creating sql folder " + ex.Message);
+                }
             }
+                
             Logger.Log("program hasnt ran before");
             return false;
+
             
         }
     }
