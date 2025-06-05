@@ -21,9 +21,7 @@
 
   <ItemGroup>
     <Compile Remove="foodloader.cs" />
-    <None Include="foodloader.cs" />
     <Compile Remove="sqlSection.cs" />
-    <None Include="sqlSection.cs" />
   </ItemGroup>
 
 </Project>

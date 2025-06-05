@@ -6,6 +6,7 @@ namespace WorkCloneCS
 
     public partial class FirstRunWindow : Form
     {
+        private string lastWorkingConnection;
         public string connectionString;
         public FirstRunWindow()
         {
@@ -63,6 +64,7 @@ namespace WorkCloneCS
             databaseTextBox = new System.Windows.Forms.TextBox();
             label6 = new System.Windows.Forms.Label();
             InfoLabel = new System.Windows.Forms.Label();
+            LastBtn = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // IPTextBox
@@ -70,7 +72,7 @@ namespace WorkCloneCS
             IPTextBox.Location = new System.Drawing.Point(95, 12);
             IPTextBox.Name = "IPTextBox";
             IPTextBox.Size = new System.Drawing.Size(177, 23);
-            IPTextBox.TabIndex = 0;
+            IPTextBox.TabIndex = 2;
             // 
             // label1
             // 
@@ -93,7 +95,7 @@ namespace WorkCloneCS
             PortTextBox.Location = new System.Drawing.Point(95, 41);
             PortTextBox.Name = "PortTextBox";
             PortTextBox.Size = new System.Drawing.Size(177, 23);
-            PortTextBox.TabIndex = 2;
+            PortTextBox.TabIndex = 4;
             // 
             // label3
             // 
@@ -108,7 +110,7 @@ namespace WorkCloneCS
             UserNameTextBox.Location = new System.Drawing.Point(95, 99);
             UserNameTextBox.Name = "UserNameTextBox";
             UserNameTextBox.Size = new System.Drawing.Size(177, 23);
-            UserNameTextBox.TabIndex = 4;
+            UserNameTextBox.TabIndex = 8;
             // 
             // label4
             // 
@@ -123,14 +125,14 @@ namespace WorkCloneCS
             PasswordTextBox.Location = new System.Drawing.Point(95, 128);
             PasswordTextBox.Name = "PasswordTextBox";
             PasswordTextBox.Size = new System.Drawing.Size(177, 23);
-            PasswordTextBox.TabIndex = 6;
+            PasswordTextBox.TabIndex = 10;
             // 
             // CheckBtn
             // 
             CheckBtn.Location = new System.Drawing.Point(9, 217);
             CheckBtn.Name = "CheckBtn";
             CheckBtn.Size = new System.Drawing.Size(77, 32);
-            CheckBtn.TabIndex = 9;
+            CheckBtn.TabIndex = 11;
             CheckBtn.Text = "Check";
             CheckBtn.UseVisualStyleBackColor = true;
             CheckBtn.Click += CheckBtn_Click;
@@ -140,7 +142,7 @@ namespace WorkCloneCS
             CancelBtn.Location = new System.Drawing.Point(115, 217);
             CancelBtn.Name = "CancelBtn";
             CancelBtn.Size = new System.Drawing.Size(77, 32);
-            CancelBtn.TabIndex = 10;
+            CancelBtn.TabIndex = 12;
             CancelBtn.Text = "Cancel";
             CancelBtn.UseVisualStyleBackColor = true;
             CancelBtn.Click += CancelBtn_Click;
@@ -150,7 +152,7 @@ namespace WorkCloneCS
             ApplyBtn.Location = new System.Drawing.Point(198, 217);
             ApplyBtn.Name = "ApplyBtn";
             ApplyBtn.Size = new System.Drawing.Size(77, 32);
-            ApplyBtn.TabIndex = 11;
+            ApplyBtn.TabIndex = 13;
             ApplyBtn.Text = "Apply";
             ApplyBtn.UseVisualStyleBackColor = true;
             ApplyBtn.Visible = false;
@@ -161,14 +163,14 @@ namespace WorkCloneCS
             databaseTextBox.Location = new System.Drawing.Point(95, 70);
             databaseTextBox.Name = "databaseTextBox";
             databaseTextBox.Size = new System.Drawing.Size(177, 23);
-            databaseTextBox.TabIndex = 12;
+            databaseTextBox.TabIndex = 6;
             // 
             // label6
             // 
             label6.Location = new System.Drawing.Point(9, 128);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(77, 35);
-            label6.TabIndex = 13;
+            label6.TabIndex = 9;
             label6.Text = "password";
             // 
             // InfoLabel
@@ -178,10 +180,22 @@ namespace WorkCloneCS
             InfoLabel.Size = new System.Drawing.Size(248, 36);
             InfoLabel.TabIndex = 14;
             // 
+            // LastBtn
+            // 
+            LastBtn.Location = new System.Drawing.Point(198, 157);
+            LastBtn.Name = "LastBtn";
+            LastBtn.Size = new System.Drawing.Size(77, 54);
+            LastBtn.TabIndex = 14;
+            LastBtn.Text = "Last working connection";
+            LastBtn.UseVisualStyleBackColor = true;
+            LastBtn.Visible = false;
+            LastBtn.Click += LastBtn_Click;
+            // 
             // FirstRunWindow
             // 
             BackColor = System.Drawing.SystemColors.Control;
             ClientSize = new System.Drawing.Size(284, 261);
+            Controls.Add(LastBtn);
             Controls.Add(InfoLabel);
             Controls.Add(label6);
             Controls.Add(databaseTextBox);
@@ -201,6 +215,8 @@ namespace WorkCloneCS
             ResumeLayout(false);
             PerformLayout();
         }
+
+        private System.Windows.Forms.Button LastBtn;
 
         private System.Windows.Forms.Label InfoLabel;
 
@@ -237,7 +253,7 @@ namespace WorkCloneCS
                 {
                     ConnectionStrings = new
                     {
-                        DefaultConnection = connectionString
+                        DefaultConnection = lastWorkingConnection
                     }
                 };
 
@@ -248,9 +264,10 @@ namespace WorkCloneCS
             catch (Exception ex)
             {
                 Logger.Log($"error while writing connection string to file {ex.Message}");
+                
             }
             Logger.Log("applying settings");
-            SQL.ConnectionString = connectionString;
+            SQL.ConnectionString = lastWorkingConnection;
             sync.syncAll();
             Form1 form1 = new Form1();
             form1.Show();
@@ -280,7 +297,10 @@ namespace WorkCloneCS
                     InfoLabel.Text = "connection successful";
                     Logger.Log("connection successful");
                     progressBar.Value = 100;
+                    lastWorkingConnection = connectionString;
+                    LastBtn.Visible = false;
                 }
+                
             }
             catch (Exception ex)
             {
@@ -289,6 +309,11 @@ namespace WorkCloneCS
                 Logger.Log($"user inputted invalid string {ex.Message}, {connectionString}");
                 valid = false;
                 connectionString = "";
+                if (lastWorkingConnection != null)
+                {
+                    Logger.Log("last working connection string was: " + lastWorkingConnection + "so gonna give option to return");
+                    LastBtn.Visible = true;
+                }
                 
             }
 
@@ -312,10 +337,10 @@ namespace WorkCloneCS
             if (string.IsNullOrEmpty(UserNameTextBox.Text))
             {
                 UserNameTextBox.ForeColor = Color.Gray;
-                UserNameTextBox.Text = "*cient";
+                UserNameTextBox.Text = "*client";
             }
         }
-        
+
         private void RemoveTempTextIP(object sender, EventArgs e)
     {
         if (IPTextBox.Text == "*bd.fishstix.uk")
@@ -389,6 +414,17 @@ namespace WorkCloneCS
             }
         }
 
+
+        private void LastBtn_Click(object sender, EventArgs e)
+        {
+            IPTextBox.Text = lastWorkingConnection.Split(';')[0].Split('=')[1].Split(',')[0];
+            PortTextBox.Text = lastWorkingConnection.Split(';')[0].Split('=')[1].Split(',')[1];
+            databaseTextBox.Text = lastWorkingConnection.Split(';')[1].Split('=')[1];
+            UserNameTextBox.Text = lastWorkingConnection.Split(';')[2].Split('=')[1];
+            PasswordTextBox.Text = lastWorkingConnection.Split(';')[3].Split('=')[1];
+            Logger.Log("replaced last known shit");
+            connectionString = lastWorkingConnection;
+        }
     }
     
     public class firstRun

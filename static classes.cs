@@ -6,6 +6,69 @@ using Microsoft.Extensions.Configuration;
 
 namespace WorkCloneCS
 {
+    // this is what ai wrote i need to look at it and understand it and implement it as this should help with:
+    //Logging failed: The process cannot access the file 'C:\Users\finla\OneDrive\Documents\workclonecs\log.txt' because it is being used by another process.
+    /*
+    using System;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        string baseFileName = "log.txt";
+        string fileToUse = GetAvailableLogFile(baseFileName);
+        
+        // Example: write something to the available log file
+        File.WriteAllText(fileToUse, "Log entry at " + DateTime.Now);
+        Console.WriteLine("Using file: " + fileToUse);
+    }
+
+    static string GetAvailableLogFile(string baseFileName)
+    {
+        string directory = Path.GetDirectoryName(baseFileName) ?? "";
+        string nameWithoutExtension = Path.GetFileNameWithoutExtension(baseFileName);
+        string extension = Path.GetExtension(baseFileName);
+
+        int attempt = 0;
+        while (true)
+        {
+            string fileName = attempt == 0
+                ? baseFileName
+                : Path.Combine(directory, $"{nameWithoutExtension}Backup{attempt}{extension}");
+
+            try
+            {
+                // Try to open with exclusive write access
+                using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                {
+                    // Successfully opened the file exclusively
+                    return fileName;
+                }
+            }
+            catch (IOException ex)
+            {
+                // 0x20 = ERROR_SHARING_VIOLATION
+                // 0x21 = ERROR_LOCK_VIOLATION
+                const int ERROR_SHARING_VIOLATION = unchecked((int)0x80070020);
+                const int ERROR_LOCK_VIOLATION = unchecked((int)0x80070021);
+
+                if (ex.HResult == ERROR_SHARING_VIOLATION || ex.HResult == ERROR_LOCK_VIOLATION)
+                {
+                    attempt++;
+                    continue; // try next backup file
+                }
+                else
+                {
+                    throw; // rethrow if it's a different IOException
+                }
+            }
+        }
+    }
+}
+
+    
+    */
     class Logger
     {
         private static readonly string logFilePath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\log.txt";
