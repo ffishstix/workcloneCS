@@ -58,6 +58,7 @@ namespace WorkCloneCS
                 form1.Show();
                 Hide();
             }
+            
             else Close();
         }
 

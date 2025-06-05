@@ -84,29 +84,42 @@ namespace WorkCloneCS
             if (!IsHandleCreated) return;
             deleteChildbox();
 
+            // Make sure we have the latest categories
+            cat = sync.catagories;
+
             if (cat == null || cat.Count == 0)
             {
-                Logger.Log("No categories available to display");
+                Logger.Log("Categories list is null or empty");
                 return;
             }
 
-            for (int i = 0; i < cat.Count; i++)
+            try
             {
-                Label item = new Label
+                foreach (var category in cat)
                 {
-                    Text = sync.catagories[i].catName,
-                    AutoSize = false,
-                    BackColor = Color.Gray,
-                    Width = (catPan.Width / 8) - 2,
-                    Height = 50,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Font = new Font("Segoe UI", 12, FontStyle.Regular),
-                    Margin = new Padding(1),
-                    Tag = i,
-                    Visible = true
-                };
-                item.Click += catClick;
-                catPan.Controls.Add(item);
+                    if (category != null)
+                    {
+                        Label item = new Label
+                        {
+                            Text = category.catName,
+                            AutoSize = false,
+                            BackColor = Color.Gray,
+                            Width = (catPan.Width / 8) - 2,
+                            Height = 50,
+                            TextAlign = ContentAlignment.MiddleCenter,
+                            Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                            Margin = new Padding(1),
+                            Tag = cat.IndexOf(category),
+                            Visible = true
+                        };
+                        item.Click += catClick;
+                        catPan.Controls.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Error in addCatagory: {ex.Message}");
             }
         }
         
@@ -509,16 +522,56 @@ namespace WorkCloneCS
         }
 
 
-        private void ConfigSideBtn_Click(object sender, EventArgs e)
+        private async void ConfigSideBtn_Click(object sender, EventArgs e)
         {
             FirstRunWindow reLoad = new FirstRunWindow(true);
-            reLoad.FormClosed += (s, args) =>
+            reLoad.FormClosed += async (s, args) =>
             {
-                allPannelsBlank();
-                addCatagory();
-                deleteAllItemsOrdered();
-                
+                try
+                {
+                    allPannelsBlank();
+                    deleteChildbox();
+                    
+                    // Wait for sync to complete
+                    await Task.Run(async () =>
+                    {
+                        sync.catagories = null;
+                        sync.syncAll();
+                        
+                        // Wait for categories to be populated
+                        int attempts = 0;
+                        while (attempts < 10 && (sync.catagories == null || sync.catagories.Count == 0))
+                        {
+                            await Task.Delay(1000);
+                            attempts++;
+                            Logger.Log($"Waiting for categories, attempt {attempts}");
+                        }
+                    });
+                    
+
+                    // Update UI on the main thread
+                    if (IsHandleCreated)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            if (sync.catagories != null && sync.catagories.Count > 0)
+                            {
+                                addCatagory();
+                                deleteAllItemsOrdered();
+                            }
+                            else
+                            {
+                                Logger.Log("Failed to load categories after config update");
+                            }
+                        }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Error in ConfigSideBtn_Click: {ex.Message}");
+                }
             };
+            Logger.Log("showed catagories");
             reLoad.Show();
         }
 
