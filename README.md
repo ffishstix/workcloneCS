@@ -1,5 +1,10 @@
-# workcloneCS 
-put simply a clone of a very popular pos system, named workcloneCS as it is a clone of the soft ware my work uses and i try to write all of my code in C#
+# workclone(C#) 
+
+[![Last Commit](https://img.shields.io/github/last-commit/ffishstix/workcloneCS)](https://github.com/ffishstix/workcloneCS)
+[![Discord](https://img.shields.io/badge/Discord-fish__stix-7289DA?logo=discord&logoColor=white)](https://discord.gg/BgCp6FMxTN)
+
+
+put simply a clone of a very popular pos system...
 
 ---
 ## order of operations
@@ -19,10 +24,7 @@ put simply a clone of a very popular pos system, named workcloneCS as it is a cl
 - back, pretty easily explained = you click on a catagory you click back and it goes back wow who would have thought!!!
 ---
 ## todo
--  bit far out: 
-  - [ ] add the ordering system
-  - [ ] including the databases to go along with it
-  - [ ] add a quick website to view the ordering system
+
 - a lot more realistic:
     - [ ] items displayed properly 
     - [ ] reformat how items are stored in variables when clicked on (food items)
@@ -30,7 +32,18 @@ put simply a clone of a very popular pos system, named workcloneCS as it is a cl
     - [x] add first run form to initialize database connections
     - [x] add responsive errors to the first run form so the user knows what to change
     - [x] add tab so i can easily input data
-    - [ ] add ability for users to go back to last successsful login data
+    - [x] add ability for users to go back to last successsful login data
 
+
+- a couple packages that might be nice to integrate:
+  - [ ] MaterialSkin - recomended for nicer visuals
+  - [x] FluentValidation - sped up validation significantly (ai written)
+  - [ ] dependency injection - it was suggested and its probs a good idea tbf
+
+
+- bit far out:
+  - [ ] add the ordering system
+  - [ ] including the databases to go along with it
+  - [ ] add a quick website to view the ordering system
 ---
-please help me with this page i am absolutely useless at markdown and if you have absolutely any ideas or help for it i would appreciate it so much i dont think you understand but yeah contact me with a quick dm i am open for any ideas ;)
+please help me with this page i am absolutely useless at markdown (and everything else tbh) and if you have absolutely any ideas or help for it i would appreciate it so much i dont think you understand but yeah contact me with a quick dm i am open for any ideas ;)

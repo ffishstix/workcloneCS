@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using FluentValidation;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -89,7 +90,7 @@ class Program
                 string formattedCount = number.PadLeft(4, '-');
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff");
                 string logEntry = $"{formattedCount}:{timestamp}: {message}";
-                SQL.print(logEntry);
+                Console.WriteLine(logEntry);
                 File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
             }
             catch (Exception ex)
@@ -319,14 +320,27 @@ class Program
                     .Build();
                 connectionString = configuration.GetConnectionString("DefaultConnection");
             }
-            
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message);
+                    MessageBox.Show(
+                        "it is recomened for you to go through the config settings," +
+                        "\n you are currently using the backup database on your local device," +
+                        "\n you will not be able to send an order through in this state");
+
+                }
+
+            } 
         }
         
-        public static void print(string a)
-        {
-            Console.WriteLine(a);
-            System.Diagnostics.Debug.WriteLine("\n\nmsg: {0}\n", a);
-        }
+
 
         public static (int, int) getRangeOfCatagoryID()
         {
@@ -337,40 +351,44 @@ class Program
             int max = 0;
             try
             {
-
-                //main method
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                if (connectionString != null)
                 {
-                    try
-                    {
-                        connection.Open();
-                        SqlCommand command = new SqlCommand(query + " desc ", connection);
-                        Logger.Log(command.Parameters.ToString());
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                max = reader.GetInt32(0);
-                                Logger.Log($"max: {min}");
-                            }
-                        }
 
-                        command = new SqlCommand(query + "asc ", connection);
-                        using (SqlDataReader reader = command.ExecuteReader())
+                    //main method
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        try
                         {
-                            while (reader.Read())
+                            connection.Open();
+                            SqlCommand command = new SqlCommand(query + " desc ", connection);
+                            Logger.Log(command.Parameters.ToString());
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                min = reader.GetInt32(0);
-                                Logger.Log($"max: {max}");
+                                while (reader.Read())
+                                {
+                                    max = reader.GetInt32(0);
+                                    Logger.Log($"max: {min}");
+                                }
+                            }
+
+                            command = new SqlCommand(query + "asc ", connection);
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    min = reader.GetInt32(0);
+                                    Logger.Log($"max: {max}");
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        return errorCallCI(ex);
+                        catch (Exception ex)
+                        {
+                            return errorCallCI(ex);
+                        }
                     }
                 }
 
+                return errorCallCI(null);
             }
             catch (Exception ex)
             {
@@ -385,69 +403,72 @@ class Program
         {
             string query = "select * from staff order by id desc";
             List<staff> values= new List<staff>();
-            try
+            if (connectionString != null)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                try
                 {
-                    try
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        connection.Open();
-
-                        print("/n/n/n/nhere/n/n/n/n");
-                        using (SqlCommand command = new SqlCommand(query, connection))
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        try
                         {
-                            try
+                            connection.Open();
+
+                            using (SqlCommand command = new SqlCommand(query, connection))
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                while (reader.Read())
-                                {
-                                    int id = reader.GetInt32(0);
-                                    string name = reader.GetString(1);
-                                    int access = reader.GetInt32(2);
-                                    values.Add(new staff
-                                    {
-                                        Id = id,
-                                        Access = access,
-                                        Name = name
-                                    });
-                                    Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}");
-
-
-                                }
-
                                 try
                                 {
-                                    // logging it just incase it cannot pull it next time
-                                    string jsonString = JsonSerializer.Serialize(values,
-                                        new JsonSerializerOptions { WriteIndented = true });
-                                    
-                                    File.WriteAllText(jsonstaffDir, jsonString);
+                                    while (reader.Read())
+                                    {
+                                        int id = reader.GetInt32(0);
+                                        string name = reader.GetString(1);
+                                        int access = reader.GetInt32(2);
+                                        values.Add(new staff
+                                        {
+                                            Id = id,
+                                            Access = access,
+                                            Name = name
+                                        });
+                                        Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}");
+
+
+                                    }
+
+                                    try
+                                    {
+                                        // logging it just incase it cannot pull it next time
+                                        string jsonString = JsonSerializer.Serialize(values,
+                                            new JsonSerializerOptions { WriteIndented = true });
+
+                                        File.WriteAllText(jsonstaffDir, jsonString);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        Logger.Log(ex.Message);
+                                    }
+
+                                    return values;
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine(ex.Message);
-                                    Logger.Log(ex.Message);
+                                    return errorCallSD(ex);
                                 }
-
-                                return values;
-                            }
-                            catch (Exception ex)
-                            {
-                                return errorCallSD(ex);
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        return errorCallSD(ex);
+                        catch (Exception ex)
+                        {
+                            return errorCallSD(ex);
+                        }
                     }
                 }
-            } 
-            catch (SqlException ex)
-            {
-                return errorCallSD(ex);
+                catch (SqlException ex)
+                {
+                    return errorCallSD(ex);
+                }
             }
-            return null;
+
+            return errorCallSD(null);
 
 
         }
@@ -494,90 +515,100 @@ class Program
             
             try
             {
-                
-                //main method
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                if (connectionString != null)
                 {
-                    try
+
+                    //main method
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        connection.Open();
-                        SqlCommand command = new SqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@catagoryId", catagoryChosen);
-                        print("/n/n/n/nhere/n/n/n/n");
-                        using (command)
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        try
                         {
-                            while (reader.Read())
+                            connection.Open();
+                            SqlCommand command = new SqlCommand(query, connection);
+                            command.Parameters.AddWithValue("@catagoryId", catagoryChosen);
+                            using (command)
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                currentCatagory.catagoryId = reader.GetInt32(0);
-                                currentCatagory.catName = reader.GetString(1);
-                                currentCatagory.catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5);
-                                values.Add(new item()
+                                while (reader.Read())
                                 {
-                                    itemName = reader.GetString(2),
-                                    price = (decimal)reader.GetInt32(3)/100,
-                                    extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
-                                    chosenColour = reader.GetString(6),
-                                });
-                                Logger.Log($"got: item: {reader.GetString(2)}");
-                            }
-                            currentCatagory.items = values;
-                            currentCatagory.connected = false;
-                            try
-                            {
-                                List<catagory> fileJson = new List<catagory>();
-                                
-                                
-
-                                if (File.Exists(jsonDir))
-                                {
-                                    Logger.Here();
-                                    fileJson = pullCatFile();
-
-                                    if (fileJson == null)
+                                    currentCatagory.catagoryId = reader.GetInt32(0);
+                                    currentCatagory.catName = reader.GetString(1);
+                                    currentCatagory.catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5);
+                                    values.Add(new item()
                                     {
-                                        Logger.Log("file was null or weird so I'm starting again");
-                                        fileJson = new List<catagory>();
-                                    }
+                                        itemName = reader.GetString(2),
+                                        price = (decimal)reader.GetInt32(3) / 100,
+                                        extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                        chosenColour = reader.GetString(6),
+                                    });
+                                    Logger.Log($"got: item: {reader.GetString(2)}");
                                 }
-                                else
+
+                                currentCatagory.items = values;
+                                currentCatagory.connected = false;
+                                try
                                 {
-                                    Logger.Log($"{jsonDir} doesn't exist, creating a new one");
-                                    fileJson = new List<catagory>();
-                                }
-                                bool ah = false;
-                                foreach (catagory cat in fileJson)
-                                {
-                                    if (cat != null)
+                                    List<catagory> fileJson = new List<catagory>();
+
+
+
+                                    if (File.Exists(jsonDir))
                                     {
-                                        if ((cat.catName == currentCatagory.catName || cat.catagoryId == currentCatagory.catagoryId))
+                                        Logger.Here();
+                                        fileJson = pullCatFile();
+
+                                        if (fileJson == null)
                                         {
-                                            ah = true;
+                                            Logger.Log("file was null or weird so I'm starting again");
+                                            fileJson = new List<catagory>();
                                         }
                                     }
-                                    
+                                    else
+                                    {
+                                        Logger.Log($"{jsonDir} doesn't exist, creating a new one");
+                                        fileJson = new List<catagory>();
+                                    }
+
+                                    bool ah = false;
+                                    foreach (catagory cat in fileJson)
+                                    {
+                                        if (cat != null)
+                                        {
+                                            if ((cat.catName == currentCatagory.catName ||
+                                                 cat.catagoryId == currentCatagory.catagoryId))
+                                            {
+                                                ah = true;
+                                            }
+                                        }
+
+                                    }
+
+                                    if (!ah) fileJson.Add(currentCatagory);
+                                    string jsonStrings = JsonSerializer.Serialize(fileJson,
+                                        new JsonSerializerOptions { WriteIndented = true });
+                                    File.WriteAllText(jsonDir, jsonStrings);
                                 }
-                                if (!ah) fileJson.Add(currentCatagory);
-                                string jsonStrings = JsonSerializer.Serialize(fileJson, new JsonSerializerOptions { WriteIndented = true });
-                                File.WriteAllText(jsonDir, jsonStrings);
+                                catch (Exception ex)
+                                {
+                                    Logger.Log($"error while logging items {ex.Message}");
+                                }
+
+                                currentCatagory.connected = true;
+                                return currentCatagory;
+
                             }
-                            catch (Exception ex)
-                            {
-                                Logger.Log($"error while logging items {ex.Message}");
-                            }
-                            currentCatagory.connected = true;
-                            return currentCatagory;
+                        }
+                        catch (Exception ex)
+                        {
+                            //backup method just incase server down
+
+                            return errorCallGC(ex, catagoryChosen);
 
                         }
-                    }
-                    catch (Exception ex) {
-                        //backup method just incase server down
-                        
-                        return errorCallGC(ex, catagoryChosen);
 
                     }
-
                 }
+                return errorCallGC(null, catagoryChosen);
             }
             catch (Exception ex) {
                 return errorCallGC(ex, catagoryChosen);
@@ -649,5 +680,82 @@ class Program
             return null;
         }
     }
+    
+    public class ConnectionSettings
+    {
+        public string IP { get; set; }
+        public string Port { get; set; }
+        public string Database { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+    
+    public class ConnectionSettingsValidator : AbstractValidator<ConnectionSettings>
+    {
+        public ConnectionSettingsValidator()
+        {
+            RuleFor(x => x.IP)
+                .NotEmpty().WithMessage("IP/Host is required")
+                .Must(BeValidIpOrDomain).WithMessage("Invalid IP address or domain name format");
+
+
+            RuleFor(x => x.Port)
+                .NotEmpty().WithMessage("Port is required")
+                .Must(BeValidPort).WithMessage("Port must be between 1 and 65535");
+
+            RuleFor(x => x.Database)
+                .NotEmpty().WithMessage("Database name is required")
+                .MaximumLength(128).WithMessage("Database name too long")
+                .Matches("^[a-zA-Z0-9_-]*$").WithMessage("Database name can only contain letters, numbers, underscores, and hyphens")
+                .Must(x => !x.StartsWith("_")).WithMessage("Database name cannot start with an underscore");
+
+
+            RuleFor(x => x.Username)
+                .NotEmpty().WithMessage("Username is required")
+                .MaximumLength(128).WithMessage("Username too long")
+                .Matches("^[a-zA-Z0-9_-]*$").WithMessage("Username can only contain letters, numbers, underscores, and hyphens")
+                .Must(x => !x.StartsWith("_")).WithMessage("Username cannot start with an underscore");
+
+
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("Password is required")
+                .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+                .MaximumLength(128).WithMessage("Password too long")
+                .Must(password => 
+                    password.Any(char.IsUpper) && 
+                    password.Any(char.IsLower) && 
+                    password.Any(char.IsDigit))
+                .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number");
+
+        }
+
+        private bool BeValidIpOrDomain(string host)
+        {
+            // Check if it's a valid IP address
+            if (System.Net.IPAddress.TryParse(host, out _))
+                return true;
+
+            // Check if it's a valid domain name
+            try
+            {
+                // Domain name validation regex
+                // Allows: letters, numbers, dots, and hyphens
+                // Cannot start or end with hyphen
+                // Cannot have consecutive dots
+                var domainRegex = @"^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})$";
+                return System.Text.RegularExpressions.Regex.IsMatch(host, domainRegex);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool BeValidPort(string port)
+        {
+            return int.TryParse(port, out int portNum) && portNum > 0 && portNum <= 65535;
+        }
+    }
+
     
 }

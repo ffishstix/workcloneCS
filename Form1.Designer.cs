@@ -194,6 +194,7 @@
             ConfigBtnControlPanel.TabIndex = 2;
             ConfigBtnControlPanel.Text = "Config";
             ConfigBtnControlPanel.UseVisualStyleBackColor = true;
+            ConfigBtnControlPanel.Click += ConfigSideBtn_Click;
             // 
             // syncTillBtnConfigPanel
             // 

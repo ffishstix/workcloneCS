@@ -1,4 +1,5 @@
 ﻿using System;
+
 using System.Collections.Generic;
 
 namespace WorkCloneCS
@@ -43,9 +44,12 @@ namespace WorkCloneCS
         
         public static void syncAll()
         {
+            DateTime start = DateTime.Now;
             SQL.initSQL();
             syncStaff();
             syncCatagory();
+            Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
+
         }
     }
 }

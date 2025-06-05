@@ -12,7 +12,7 @@ namespace WorkCloneCS
 
     public partial class Form1 : Form
     {
-
+        
         private staff currentStaff;        
         int globalCount = 0;
         private List<catagory> cat = sync.catagories;
@@ -218,7 +218,7 @@ namespace WorkCloneCS
             leftLabel.Tag = 0;
             leftLabel.Text = "Items: 0";
             rightLabel.Tag = 0m;
-            rightLabel.Text = "Price: �0.00";
+            rightLabel.Text = "Price: 0.00";
         }
 
         private void generalItem_Click(object sender, EventArgs e)
@@ -460,11 +460,22 @@ namespace WorkCloneCS
             allPannelsBlank();
             addCatagory();
         }
-        
 
-        
-        
-        
+
+        private void ConfigSideBtn_Click(object sender, EventArgs e)
+        {
+            FirstRunWindow reLoad = new FirstRunWindow(true);
+            reLoad.FormClosed += (s, args) =>
+            {
+                allPannelsBlank();
+                addCatagory();
+                deleteAllItemsOrdered();
+                
+            };
+            reLoad.Show();
+        }
+
+
     }
 
 
