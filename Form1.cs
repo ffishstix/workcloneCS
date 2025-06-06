@@ -189,29 +189,29 @@ public partial class Form1 : Form
                 if (deltaX < -100 && rowPannel != null) // Swipe left threshold
                 {
                     Label left = row.Left;
-                    if (row.ItemCount > 1)
+                    if (row.itemCount > 1)
                     {
-                        row.ItemCount--;
+                        row.itemCount--;
                         row.updateText();
 
 
                     }
                     else
                     {
-                        itemsToBeOrdered.Remove(itemsToBeOrdered.Find(x => x.itemName == row.FoodName));
+                        itemsToBeOrdered.Remove(itemsToBeOrdered.Find(x => x.itemName == row.itemName));
                         refreshScrollPanel();
                     }
-                    updateTotalPrice(-row.Price);
-                    updateTotalItems(-row.ItemCount);
+                    updateTotalPrice(-row.price);
+                    updateTotalItems(-row.itemCount);
                 }
                 else if (deltaX > 100 && rowPannel != null)
                 {
-                    row.ItemCount++;
+                    row.itemCount++;
                     row.updateText();
-                    itemsToBeOrdered[itemsToBeOrdered.FindIndex(x => x.itemName == row.FoodName)].itemCount = row.ItemCount;
+                    itemsToBeOrdered[itemsToBeOrdered.FindIndex(x => x.itemName == row.itemName)].itemCount = row.itemCount;
                     refreshScrollPanel();
                     updateTotalItems(1);
-                    updateTotalPrice(row.Price);
+                    updateTotalPrice(row.price);
                     row.updateText();
 
                 }
@@ -507,7 +507,13 @@ public partial class Form1 : Form
     //top layer btn's currently unused icl
     private void tableBtn_Click(object sender, EventArgs e)
     {
-
+        foreach (item tem in itemsToBeOrdered)
+        {
+            Logger.Log("sending through the following item: ");
+            Logger.Log(tem.itemName);
+            Logger.Log($"{tem.price}");
+            Logger.Log($"{tem.itemCount}");
+        }
     }
 
     private void nameBtn_Click(object sender, EventArgs e)

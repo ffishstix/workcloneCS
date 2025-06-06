@@ -26,8 +26,8 @@ put simply a clone of a very popular pos system...
 ## todo
 
 - a lot more realistic:
-    - [ ] items displayed properly 
-    - [ ] reformat how items are stored in variables when clicked on (food items)
+    - [x] items displayed properly - that was very difficult, full refactor 
+    - [x] reformat how items are stored in variables when clicked on (food items)
     - [x] give functionality for sign on and sign off buttons
     - [x] add first run form to initialize database connections
     - [x] add responsive errors to the first run form so the user knows what to change

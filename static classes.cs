@@ -212,7 +212,7 @@ public class rowOfItem : item
     public void updateText()
     {
         left.Text = itemCount.ToString();
-        middle.Text = itemName;;
+        middle.Text = itemName;
         right.Text = (itemCount * price).ToString("c");
     }
 
