@@ -45,5 +45,7 @@ put simply a clone of a very popular pos system...
   - [ ] add the ordering system
   - [ ] including the databases to go along with it
   - [ ] add a quick website to view the ordering system
+
+
 ---
 please help me with this page i am absolutely useless at markdown (and everything else tbh) and if you have absolutely any ideas or help for it i would appreciate it so much i dont think you understand but yeah contact me with a quick dm i am open for any ideas ;)

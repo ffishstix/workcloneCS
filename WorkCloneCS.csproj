@@ -20,4 +20,10 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="TableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

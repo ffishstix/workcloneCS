@@ -11,7 +11,7 @@ namespace WorkCloneCS;
 
 public partial class Form1 : Form
 {
-
+    private int tableSelected = 0;
     private staff currentStaff;        
     private List<catagory> cat = new();
     private List<item> itemsToBeOrdered = new();
@@ -274,6 +274,7 @@ public partial class Form1 : Form
 
     private void deleteAllItemsOrdered()
     {
+        itemsToBeOrdered.Clear();
         scrollPanel.Controls.Clear();
         leftLabel.Tag = 0;
         leftLabel.Text = "Items: 0";
@@ -507,6 +508,22 @@ public partial class Form1 : Form
     //top layer btn's currently unused icl
     private void tableBtn_Click(object sender, EventArgs e)
     {
+        if (tableSelected == 0)
+        {
+            //select table logic displaying if it is open currently
+            //probs sql db of currently open tables with the items stored on it
+            
+            //TableForm table = new TableForm();
+            //table.ShowDialog();
+            //if (table.tableSelected != 0)
+            //{
+            //    tableSelected = table.tableSelected;
+            //}
+        }
+        else
+        {
+            //send through logic with checks
+        }
         foreach (item tem in itemsToBeOrdered)
         {
             Logger.Log("sending through the following item: ");
