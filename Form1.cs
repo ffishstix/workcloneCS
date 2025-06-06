@@ -11,7 +11,7 @@ namespace WorkCloneCS;
 
 public partial class Form1 : Form
 {
-    private int tableSelected = 0;
+    public table tableSelected = new table();
     private staff currentStaff;        
     private List<catagory> cat = new();
     private List<item> itemsToBeOrdered = new();
@@ -508,29 +508,37 @@ public partial class Form1 : Form
     //top layer btn's currently unused icl
     private void tableBtn_Click(object sender, EventArgs e)
     {
-        if (tableSelected == 0)
+        if (tableSelected.tableId == 0)
         {
             //select table logic displaying if it is open currently
             //probs sql db of currently open tables with the items stored on it
             
-            //TableForm table = new TableForm();
-            //table.ShowDialog();
-            //if (table.tableSelected != 0)
-            //{
-            //    tableSelected = table.tableSelected;
-            //}
+            TableForm table = new TableForm();
+            table.ShowDialog();
+            if (table.tableSelected != 0)
+            {
+                tableSelected.tableId = table.tableSelected;
+            }
+            tableBtn.Text = $"Table {tableSelected.tableId}";
+            return;
         }
-        else
-        {
-            //send through logic with checks
-        }
-        foreach (item tem in itemsToBeOrdered)
-        {
-            Logger.Log("sending through the following item: ");
-            Logger.Log(tem.itemName);
-            Logger.Log($"{tem.price}");
-            Logger.Log($"{tem.itemCount}");
-        }
+        //this section runs
+        sentToTable();
+        
+    }
+
+    private void sentToTable()
+    {
+        tableSelected.ordered = itemsToBeOrdered;
+        Logger.Log("sent through all items and cleared them");
+        itemsToBeOrdered.Clear();
+        refreshScrollPanel();
+        leftLabel.Text = "Items: 0";
+        leftLabel.Tag = 0;
+        rightLabel.Text = "Price: 0.00";
+        rightLabel.Tag = 0m;
+        tableSelected = new table();
+        tableBtn.Text = "Table";
     }
 
     private void nameBtn_Click(object sender, EventArgs e)

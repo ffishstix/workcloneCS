@@ -8,9 +8,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace WorkCloneCS;
 
-class table
+public class table
 {
     public int tableId { get; set; }
+    public List<item> ordered { get; set; }
+
+    public table()
+    {
+        tableId = 0;
+        ordered = new List<item>();
+    }
 }
 
 class Logger
