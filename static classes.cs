@@ -83,7 +83,7 @@ public class item
     public int itemCount { get; set; }
     public decimal price { get; set; }
     public string chosenColour { get; set; }
-
+    public int lineId { get; set; }
 }
 
 public class rowPanelTag
@@ -113,11 +113,10 @@ public class rowPanelTag
 public class rowOfItem : item
 {
     private int rowHeight = 40;
-
     private Label left, middle, right;
 
     private item Tag;
-
+    public int lineId;
     public int maxWidth = 850;
     public FlowLayoutPanel rowPannel;
 
@@ -132,6 +131,7 @@ public class rowOfItem : item
         int countLabelWidth = 30;
         int priceLabelWidth = 60;
         itemId = 0;
+        lineId = 0;
         price = 0;
         itemCount = 1;
         Tag = new item()
@@ -139,7 +139,8 @@ public class rowOfItem : item
             itemCount = itemCount,
             itemName = itemName,
             price = price,
-            itemId = itemId
+            itemId = itemId,
+            lineId = lineId
 
         };
 
@@ -470,7 +471,7 @@ class SQL
         catagory currentCatagory = new catagory();
         List<item> values = new List<item>();
         string query = 
-        "SELECT cat.catagoryId, catName, itemName, price, " +
+        "SELECT cat.catagoryId, catName, ai.name as itemName, price, " +
         "ISNULL(ai.extraInfo, '') AS extraInfo, ISNULL(cat.extraInfo, '') AS catExtraInfo, " +
         "isnull(ai.chosenColour, 'grey') as chosenColour " +
         "FROM allItems ai " +

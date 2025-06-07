@@ -27,7 +27,6 @@ public partial class TableForm : Form
         button500.Click += tableBtn_Click;
         button700.Click += tableBtn_Click;
         button800.Click += tableBtn_Click;
-
     }
     private void tableBtn_Click(object sender, EventArgs e)
     {

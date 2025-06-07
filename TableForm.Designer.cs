@@ -1024,6 +1024,7 @@ partial class TableForm
         button13.TabIndex = 12;
         button13.Text = "13";
         button13.UseVisualStyleBackColor = true;
+        button13.Visible = false;
         // 
         // button14
         // 

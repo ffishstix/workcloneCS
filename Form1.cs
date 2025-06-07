@@ -11,9 +11,11 @@ namespace WorkCloneCS;
 
 public partial class Form1 : Form
 {
+    private int lineId = 1;
     public table tableSelected = new table();
     private staff currentStaff;        
     private List<catagory> cat = new();
+    private List<item> currentlyDisplayedItems = new();
     private List<item> itemsToBeOrdered = new();
 
     public Form1()
@@ -292,33 +294,45 @@ public partial class Form1 : Form
         leftLabel.Text = leftLabel.Tag.ToString();
         updateTotalPrice(item.price);
         refreshScrollPanel();
-        /*
-        item item = (item)((Control)sender).Tag;
-        string name = item.itemName;
-        decimal price = item.price;
-        itemsToBeOrdered.Add(item);
-        leftLabel.Tag = (int)leftLabel.Tag + 1;
-        leftLabel.Text = $"Items: {leftLabel.Tag}";
-        updateTotalPrice(item.price);
-        refreshScrollPanel();
-        Logger.Log($"added item {name} to the list");
-        Logger.Log($"price is {price}");
-        Logger.Log($"items to be ordered is {itemsToBeOrdered.Count}");
-        Logger.Log($"items in the list are {itemsToBeOrdered}");
-        Logger.Log($"the item is {item}");
-        Logger.Log($"the item is {item.itemName}");
-        Logger.Log($"the item is {item.price}");
-        Logger.Log($"the item is {item.chosenColour}");
-        */
     }
 
     private void refreshScrollPanel()
     {
-        scrollPanel.Controls.Clear();
-        foreach (item item in itemsToBeOrdered)
+        List<item> items = itemsToBeOrdered;
+        itemsToBeOrdered = new List<item>();
+        foreach (Control ctrl in scrollPanel.Controls)
         {
-            addItem(item);
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null && t.lineId != null)
+            {
+                bool valid = false;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    if (items[i].lineId == t.lineId)
+                    {
+                        itemsToBeOrdered.Add(items[i]);
+                        items.RemoveAt(i);
+                        valid = true;
+                        break;
+                    }
+                }
+
+                if (!valid)
+                {
+                    scrollPanel.Controls.Remove(ctrl);
+                }
+            }
         }
+
+        if (items != null)
+        {
+            foreach (item item in items)
+            {
+                itemsToBeOrdered.Add(item);
+                addItem(item);
+            }
+        }
+        
+        
     }
 
     //in the bottom right
@@ -352,8 +366,9 @@ public partial class Form1 : Form
             {
                 try
                 {
-                    
-                    addLabel(foodItems[i]);
+                    var d = foodItems[i];
+                    d.lineId = lineId++;
+                    addLabel(d);
                 } catch (Exception ex)
                 {
                     Logger.Log($"{ex.Message}    {e}");
