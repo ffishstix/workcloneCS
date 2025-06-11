@@ -48,7 +48,7 @@ public partial class Form1 : Form
     {
         // Create a TaskCompletionSource to wait for categories
         var tcs = new TaskCompletionSource<bool>();
-
+        Logger.Log("inside syncAll just gonna run syncAll rn");
         sync.syncAll();
 
         // Wait until categories are loaded or timeout
