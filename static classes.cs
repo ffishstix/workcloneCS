@@ -253,6 +253,7 @@ class SQL
                 try
                 {
                     connection.Open();
+                    Logger.Log("connected to database");
                     Program.localOnly = false;
                 }
                 catch (Exception ex)
@@ -314,7 +315,7 @@ class SQL
                             while (reader.Read())
                             {
                                 max = reader.GetInt32(0);
-                                Logger.Log($"max: {min}");
+                                Logger.Log($"max: {max}");
                             }
                         }
 
@@ -324,7 +325,7 @@ class SQL
                             while (reader.Read())
                             {
                                 min = reader.GetInt32(0);
-                                Logger.Log($"max: {max}");
+                                Logger.Log($"max: {min}");
                             }
                         }
                     }
@@ -333,6 +334,7 @@ class SQL
                         return errorCallCI(ex);
                     }
                 }
+                return (min, max);
             }
 
             return errorCallCI(null);
@@ -343,7 +345,7 @@ class SQL
 
         }
 
-        return (min, max);
+        
     }
     
     public static List<staff> getStaffData()
@@ -359,7 +361,7 @@ class SQL
                     try
                     {
                         connection.Open();
-
+                        Logger.Log("connected to database");
                         using (SqlCommand command = new SqlCommand(query, connection))
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
@@ -447,7 +449,7 @@ class SQL
         catagory currentCatagory = new catagory();
         List<item> values = new List<item>();
         string query = 
-        "SELECT cat.catagoryId, catName, ai.name as itemName, price, " +
+        "SELECT cat.catagoryId, catName, ai.itemName as itemName, price, " +
         "ISNULL(ai.extraInfo, '') AS extraInfo, ISNULL(cat.extraInfo, '') AS catExtraInfo, " +
         "isnull(ai.chosenColour, 'grey') as chosenColour " +
         "FROM allItems ai " +
@@ -471,6 +473,7 @@ class SQL
                     try
                     {
                         connection.Open();
+                        Logger.Log("opened connection for catagories");
                         SqlCommand command = new SqlCommand(query, connection);
                         command.Parameters.AddWithValue("@catagoryId", catagoryChosen);
                         using (command)
@@ -478,6 +481,7 @@ class SQL
                         {
                             while (reader.Read())
                             {
+                                Logger.Log("reading currently catagories btw");
                                 currentCatagory.catagoryId = reader.GetInt32(0);
                                 currentCatagory.catName = reader.GetString(1);
                                 currentCatagory.catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5);
@@ -621,6 +625,7 @@ class SQL
         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
         if (File.Exists(file)) {
             List<staff> staff = JsonSerializer.Deserialize<List<staff>>(File.ReadAllText(file));
+            Logger.Log("file exists so im gonna try and read it staff btw");
             return staff;
 
         }

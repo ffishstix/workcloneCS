@@ -14,11 +14,13 @@ class sync
         try
         {
             allStaff = SQL.getStaffData();
+            Logger.Log("staff synced");
         } catch(Exception ex) { Logger.Log(ex.Message); }
     }
 
     public static void syncCatagory()
     {
+        Logger.Log("entered sync catagory");
         catagories = new List<catagory>();
         catagoryIdRange = SQL.getRangeOfCatagoryID();
         Logger.Log(catagoryIdRange.Item1.ToString());
@@ -56,7 +58,9 @@ class sync
             DateTime start = DateTime.Now;
             SQL.initSQL();
             syncStaff();
+            Logger.Log("just about to go into syncCatagory");
             syncCatagory();
+            
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
         });
     }
