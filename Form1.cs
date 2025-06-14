@@ -467,11 +467,11 @@ public partial class Form1 : Form
             panel1Height = 279;
             foreach (Control ctrl in scrollPanel.Controls)
             {
-                if (ctrl is FlowLayoutPanel panel && panel.Tag is rowPanelTag t && t != null) // or check Name, Tag, etc.
+                if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
                 {
                     foreach (Control ctrl2 in panel.Controls)
                     {
-                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.Count}")
+                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
                         {
                             lbl.Width += 92;
                         }
@@ -486,11 +486,11 @@ public partial class Form1 : Form
             panel1Height = 0;
             foreach (Control ctrl in scrollPanel.Controls)
             {
-                if (ctrl is FlowLayoutPanel panel && panel.Tag is rowPanelTag t && t != null) // or check Name, Tag, etc.
+                if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
                 {
                     foreach (Control ctrl2 in panel.Controls)
                     {
-                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.Count}")
+                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
                         {
                             lbl.Width += 92;
                         }
