@@ -50,6 +50,62 @@ class sync
             }
         }
     }
+
+    public static void getFiles()
+    {
+        string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs";
+        string sqlDir = dir + "/sql/";
+        if (Directory.Exists(sqlDir))
+        {
+            if (File.Exists(sqlDir + "catagoryJson.txt"))
+            {
+                try
+                {
+                    List<catagory> j = SQL.pullCatFile();
+                    catagories = j;
+                    int min = j[0].catagoryId;
+                    int max = j[0].catagoryId;
+                    foreach (catagory cat in j)
+                    {
+                        if (cat.catagoryId < min)
+                        {
+                            min = cat.catagoryId;
+                        }
+
+                        if (cat.catagoryId > max)
+                        {
+                            max = cat.catagoryId;
+                        }
+                    }
+
+                    catagoryIdRange = (min, max);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"ex {ex}");
+                }
+            }
+           
+            if (File.Exists(sqlDir+"staff.txt"))
+            {
+                try
+                {
+                    allStaff = SQL.errorCallSD(null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"excetion in the getFiles function {ex}");
+                }
+            }
+
+        }
+        else
+        {
+            Logger.Log("this shouldnt have ever ran but i dont really know what to say probs " +
+                       "something to do with permissions so i would start there");
+        }
+        
+    }
     
     public static void syncAll()
     {

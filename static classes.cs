@@ -232,7 +232,7 @@ class SQL
     
     public static void initSQL()
     {
-        
+        connectionString = null;
         string sql = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/";
         jsonDir = sql + "catagoryJson.txt";
         jsonstaffDir = sql + "staff.txt";
@@ -423,7 +423,7 @@ class SQL
     }
 
     
-    private static List<catagory> pullCatFile()
+    public static List<catagory> pullCatFile()
     {
         if (File.Exists(jsonDir))
         {
@@ -568,8 +568,8 @@ class SQL
         }
 
     }
-    
-    
+
+   
     // only used in getCatagory when catch is called
     private static catagory errorCallGC(Exception ex, int catagoryChosen)
     {
@@ -618,10 +618,15 @@ class SQL
     }
     
     //only used in getStaffData when catch is called
-    private static List<staff> errorCallSD(Exception ex)
+    public static List<staff> errorCallSD(Exception ex)
     {
-        Logger.Log(ex.Message);
-        Console.WriteLine("Error: " + ex.Message);
+        if (ex != null)
+        {
+            Logger.Log($"{ex.Message}");
+            Console.WriteLine("Error: " + ex.Message);
+        }
+        
+        
         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
         if (File.Exists(file)) {
             List<staff> staff = JsonSerializer.Deserialize<List<staff>>(File.ReadAllText(file));

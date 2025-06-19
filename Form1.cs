@@ -49,13 +49,13 @@ public partial class Form1 : Form
         // Create a TaskCompletionSource to wait for categories
         var tcs = new TaskCompletionSource<bool>();
         Logger.Log("inside syncAll just gonna run syncAll rn");
-        sync.syncAll();
 
         // Wait until categories are loaded or timeout
         int attempts = 0;
         while (attempts < 10 && (sync.catagories == null || sync.catagories.Count < 10))
         {
             await Task.Delay(3000);
+            sync.getFiles();
             cat = sync.catagories;
             attempts++;
         }
@@ -258,8 +258,7 @@ public partial class Form1 : Form
 
         panel1.Controls.Add(scrollPanel);
     }
-
-
+    
     private void InitFoodList()
     {
         createScrollPanel();
@@ -518,9 +517,6 @@ public partial class Form1 : Form
 
     }
 
-    //yet to be implemented
-
-    //top layer btn's currently unused icl
     private void tableBtn_Click(object sender, EventArgs e)
     {
         if (tableSelected.tableId == 0)
@@ -648,9 +644,7 @@ public partial class Form1 : Form
     }
 
 
-
-
-
+    
 
 
     }
