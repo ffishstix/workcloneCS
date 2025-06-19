@@ -626,9 +626,9 @@ class SQL
             Console.WriteLine("Error: " + ex.Message);
         }
         
+        string file = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\sql\staff.txt";
         
-        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
-        if (File.Exists(file)) {
+        if (File.Exists(file) && file != null) {
             List<staff> staff = JsonSerializer.Deserialize<List<staff>>(File.ReadAllText(file));
             Logger.Log("file exists so im gonna try and read it staff btw");
             return staff;
