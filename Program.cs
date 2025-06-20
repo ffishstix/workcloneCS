@@ -5,7 +5,7 @@ namespace WorkCloneCS
 {
     internal static class Program
     {
-        public static bool localOnly = true;
+        static bool localOnly = false;
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
