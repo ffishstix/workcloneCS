@@ -211,7 +211,7 @@ class SQL
     }
 
     
-    private static List<catagory> pullCatFile()
+    public static List<catagory> pullCatFile()
     {
         if (File.Exists(jsonDir))
         {
@@ -406,7 +406,7 @@ class SQL
     }
     
     //only used in getStaffData when catch is called
-    private static List<staff> errorCallSD(Exception ex)
+    public static List<staff> errorCallSD(Exception ex)
     {
         Logger.Log(ex.Message);
         Console.WriteLine("Error: " + ex.Message);

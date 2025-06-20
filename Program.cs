@@ -12,6 +12,12 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
+            Task.Run(() =>
+            {
+                SQL.initSQL();
+
+            });
+            
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             
@@ -24,7 +30,7 @@ namespace WorkCloneCS
             else
             {
                 ApplicationConfiguration.Initialize();
-                sync.syncAll();
+                sync.getFiles();
                 Application.Run(new Form1());
             }
             Logger.Log("exiting program, last line of code\n\n\n");
