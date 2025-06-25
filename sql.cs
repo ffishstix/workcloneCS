@@ -75,9 +75,6 @@ class SQL
     }
 
 
-
-
-
     public static (int, int) getRangeOfCatagoryID()
     {
         string query = "SELECT top 1 catagoryId " +
@@ -432,14 +429,15 @@ class SQL
                 SqlCommand command = new SqlCommand(sqlcommand, connection);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
-                    {
+                    if (reader.Read() && ! reader.IsDBNull(0)){
+                       
                         int max = reader.GetInt32(0);
                         Logger.Log($"got this number in the getHigest HeaderId function : {max}");
                         return max;
                     }
+
+                    return 0;
                 }
-                return -1;
             }
             catch (Exception ex)
             {
@@ -467,23 +465,26 @@ class SQL
             }
         }
     }
-    
+         
     public static void pushItemsToTables(int tableId, int staffId, List<item> itemsToBeOrdered) {
         int headerId = getHighestidFromTable("headers") + 1;
         int orderId = getHighestidFromTable("orders") + 1;
         int LineId = getHighestidFromTable("orderLine") + 1;
-        
+        if (headerId == 0 || orderId == 0 || LineId == 0)
+        {
+            Logger.Log("one of the ids was 0 so it errored the fuck out ngl cheieve this shouldnt happen but fuck me ig");
+        }
         if (tableId < 1)
         {
             tableId = 4000;
             // this is specifically for when using the till and you dont want to have to add a table number
         }
         //header table
-        string command = $"insert into headers(headerId, staffId) values({headerId}, {staffId})";
+        string command = $"insert into headers(Id, staffId, tableNumber) values({headerId}, {staffId}, {tableId})";
         modifyTableSql(command);
         Logger.Log("put header table thing");
         //order table
-        command = $"insert into orders(orderid, headerId) values ({orderId}, {headerId})";
+        command = $"insert into orders(Id, headerId) values ({orderId}, {headerId})";
         
         modifyTableSql(command);
         Logger.Log("put orders table thing");
@@ -494,11 +495,9 @@ class SQL
             modifyTableSql(command);
             Logger.Log("added item");
         }
+        Logger.Log("end of items being ordered");
         
-        
-
-
-
+ 
 
     }
     
