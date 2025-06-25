@@ -420,4 +420,87 @@ class SQL
 
         return null;
     }
+
+    private static int getHighestidFromTable(string tableName)
+    {
+        string sqlcommand = $"select max(Id) from {tableName}";
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            try
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand(sqlcommand, connection);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int max = reader.GetInt32(0);
+                        Logger.Log($"got this number in the getHigest HeaderId function : {max}");
+                        return max;
+                    }
+                }
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message);
+                return -1;
+            }
+        }
+    }
+
+    private static void modifyTableSql(string sqlCommand)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            try
+            {
+                connection.Open();
+                SqlCommand sql = new SqlCommand(sqlCommand, connection);
+                sql.ExecuteNonQuery();
+                Logger.Log($"Executed {sqlCommand} successfully");
+                }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message);
+             
+            }
+        }
+    }
+    
+    public static void pushItemsToTables(int tableId, int staffId, List<item> itemsToBeOrdered) {
+        int headerId = getHighestidFromTable("headers") + 1;
+        int orderId = getHighestidFromTable("orders") + 1;
+        int LineId = getHighestidFromTable("orderLine") + 1;
+        
+        if (tableId < 1)
+        {
+            tableId = 4000;
+            // this is specifically for when using the till and you dont want to have to add a table number
+        }
+        //header table
+        string command = $"insert into headers(headerId, staffId) values({headerId}, {staffId})";
+        modifyTableSql(command);
+        Logger.Log("put header table thing");
+        //order table
+        command = $"insert into orders(orderid, headerId) values ({orderId}, {headerId})";
+        
+        modifyTableSql(command);
+        Logger.Log("put orders table thing");
+        //orderLine table
+        foreach (item item in itemsToBeOrdered)
+        {
+            command = $"insert into orderLine(Id, orderId, itemId) values({LineId}, {orderId}, {item.itemId})";
+            modifyTableSql(command);
+            Logger.Log("added item");
+        }
+        
+        
+
+
+
+
+    }
+    
 }
+

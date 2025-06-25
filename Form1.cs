@@ -550,6 +550,11 @@ public partial class Form1 : Form
         rightLabel.Tag = 0m;
         tableSelected = new table();
         tableBtn.Text = "Table";
+
+        Logger.Log(
+            "probs best to ignore the last one however i am now going to try and call the sql to inser the values, " +
+            "still not sure what to do with no table number tbh");
+        SQL.pushItemsToTables(tableSelected.tableId, currentStaff.Id, itemsToBeOrdered);
     }
 
     private void nameBtn_Click(object sender, EventArgs e)
