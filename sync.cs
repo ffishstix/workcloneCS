@@ -119,7 +119,7 @@ class sync
         {
             DateTime start = DateTime.Now;
             SQL.initSQL();
-            syncStaff();
+            
             Logger.Log("just about to go into syncCatagory");
             syncCatagory();
             

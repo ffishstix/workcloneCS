@@ -559,9 +559,9 @@ public partial class Form1 : Form
 
     private void nameBtn_Click(object sender, EventArgs e)
     {
-        NameForm nameForm = new NameForm();
-        nameForm.ShowDialog();
-        if (nameForm.staffSelected == null)
+        NameForm name = new NameForm();
+        if (name != null && ! name.IsDisposed)  name.ShowDialog();
+        if (name.staffSelected == null)
         {
             currentStaff = new staff()
             {
@@ -573,7 +573,7 @@ public partial class Form1 : Form
         }
         else
         {
-            currentStaff = nameForm.staffSelected;
+            currentStaff = name.staffSelected;
         }
         nameBtn.Tag = currentStaff;
         nameBtn.Text = currentStaff.Name.ToUpper();

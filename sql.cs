@@ -56,10 +56,40 @@ class SQL
         {
             ErrorCallIS(null);
         }
+        sync.allStaff = getStaffFromFile();
+        if (sync.allStaff == null)
+        {
+            Logger.Log("staff didnt staff");
+        }
+        
     }
+    
 
     private static bool created = false;
 
+    private static List<staff> getStaffFromFile()
+    {
+        try
+        {
+            if (File.Exists(jsonstaffDir))
+            {
+                string json = File.ReadAllText(jsonstaffDir);
+                List<staff> fileJson = JsonSerializer.Deserialize<List<staff>>(json);
+                Logger.Log("json was read");
+                return fileJson;
+
+            }
+
+            Logger.Log(jsonstaffDir + " doesn't exist");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"getStaffFromFile() failed: {ex.Message}");
+            return null;
+        }
+    }
+    
     private static void ErrorCallIS(Exception ex)
     {
         
