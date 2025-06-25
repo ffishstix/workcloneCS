@@ -297,6 +297,7 @@ public partial class Form1 : Form
 
     private void refreshScrollPanel()
     {
+        List<item> itemsCusIdkWhatIDid = itemsToBeOrdered;
         List<item> items = itemsToBeOrdered;
         itemsToBeOrdered = new List<item>();
         foreach (Control ctrl in scrollPanel.Controls)
@@ -331,7 +332,7 @@ public partial class Form1 : Form
             }
         }
         
-        
+        itemsToBeOrdered = itemsCusIdkWhatIDid;
     }
 
     //in the bottom right
@@ -535,6 +536,7 @@ public partial class Form1 : Form
         }
         //this section runs
         sentToTable();
+        refreshScrollPanel();
         
     }
 
@@ -647,9 +649,6 @@ public partial class Form1 : Form
         Logger.Log("showed catagories");
         reLoad.Show();
     }
-
-
-    
 
 
     }

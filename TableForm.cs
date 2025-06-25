@@ -2,10 +2,11 @@ namespace WorkCloneCS;
 
 public partial class TableForm : Form
 {
-    public int tableSelected = 0;
+    public int tableSelected;
     public TableForm()
     {
         InitializeComponent();
+        tableSelected = 0;
         clickSection();
     }
 
