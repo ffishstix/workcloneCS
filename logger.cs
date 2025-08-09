@@ -12,12 +12,13 @@ class Logger
     }
 
 
-    public static void Log(string message)
+    public static void Log(string? message)
     {
         lock (_lock)
         {
             try
             {
+                if (message == null) message = "logger was called with null message";
                 if (!File.Exists(logFilePath)) File.Create(logFilePath).Dispose();
                 logCount++;
                 string number = logCount.ToString();

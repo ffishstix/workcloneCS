@@ -205,6 +205,7 @@
             syncTillBtnConfigPanel.TabIndex = 3;
             syncTillBtnConfigPanel.Text = "SyncTill";
             syncTillBtnConfigPanel.UseVisualStyleBackColor = true;
+            syncTillBtnConfigPanel.Click += syncBtn_Click;
             // 
             // ReciptToggleBtnConfigPanel
             // 
