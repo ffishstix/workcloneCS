@@ -26,11 +26,20 @@ namespace WorkCloneCS
             InitializeComponent();
             timeSinceLastClick = DateTime.MinValue;
             x = sync.allStaff;
-
             if (x == null)
             {
+                x = SQL.getStaffData();
+            }
+            if (x == null)
+            {
+                
                 this.Close();
                 Logger.Log("staff was null so closing window");
+            }
+            else
+            {
+                Logger.Log("staff be staffing icl ");
+                sync.allStaff = x;
             }
             displayBtn.Text = "";
         }

@@ -22,16 +22,27 @@ class SQL
     {
         
         string sql = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/";
+        if (!Directory.Exists(sql)) Directory.CreateDirectory(sql);
         jsonDir = sql + "catagoryJson.txt";
         jsonstaffDir = sql + "staff.txt";
         catagoriesFromFile = pullCatFile();
         if (!testFiles && connectionString == null)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(sql + "ConnectionStringsConfiguration.json")
-                .Build();
-            connectionString = configuration.GetConnectionString("DefaultConnection");
+            try
+            {
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(sql + "ConnectionStringsConfiguration.json")
+                    .Build();
+                connectionString = configuration.GetConnectionString("DefaultConnection");
+            }
+            catch (Exception ex)
+            {
+                created = true;
+                connectionString = null;
+                Logger.Log($"something went wrong here insite initSQL {ex}");
+            }
+            
             
         }
 
@@ -92,8 +103,7 @@ class SQL
     
     private static void ErrorCallIS(Exception ex)
     {
-        
-        Logger.Log(ex.Message);
+        if (ex != null) Logger.Log(ex.Message);
         if (!created)
         {
             created = true;
@@ -165,6 +175,7 @@ class SQL
     
     public static List<staff> getStaffData()
     {
+        Logger.Log("inside getStaffData");
         string query = "select * from staff order by id desc";
         List<staff> values= new List<staff>();
         if (connectionString != null)
@@ -357,7 +368,7 @@ class SQL
                             }
                             catch (Exception ex)
                             {
-                                Logger.Log($"error while logging items {ex.Message}");
+                                Logger.Log($"error while storing items {ex.Message}");
                             }
 
                             currentCatagory.connected = true;
@@ -433,11 +444,16 @@ class SQL
     }
     
     //only used in getStaffData when catch is called
-    public static List<staff> errorCallSD(Exception ex)
+    private static List<staff> errorCallSD(Exception ex)
     {
         Logger.Log(ex.Message);
         Console.WriteLine("Error: " + ex.Message);
         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
+        return staffreturnthing(file);
+    }
+
+    public static List<staff> staffreturnthing(string file)
+    {
         if (File.Exists(file)) {
             List<staff> staff = JsonSerializer.Deserialize<List<staff>>(File.ReadAllText(file));
             Logger.Log("file exists so im gonna try and read it staff btw");
@@ -447,7 +463,6 @@ class SQL
 
         return null;
     }
-
     private static int getHighestidFromTable(string tableName)
     {
         string sqlcommand = $"select max(Id) from {tableName}";
@@ -496,7 +511,7 @@ class SQL
         }
     }
          
-    public static void pushItemsToTables(int tableId, int staffId, List<item> itemsToBeOrdered) {
+    public static void pushItemsToTables(table table, staff staff) {
         int headerId = getHighestidFromTable("headers") + 1;
         int orderId = getHighestidFromTable("orders") + 1;
         int LineId = getHighestidFromTable("orderLine") + 1;
@@ -504,22 +519,22 @@ class SQL
         {
             Logger.Log("one of the ids was 0 so it errored the fuck out ngl cheieve this shouldnt happen but fuck me ig");
         }
-        if (tableId < 1)
+        if (table.tableId < 1)
         {
-            tableId = 4000;
+            table.tableId = 4000;
             // this is specifically for when using the till and you dont want to have to add a table number
         }
         //header table
-        string command = $"insert into headers(Id, staffId, tableNumber) values({headerId}, {staffId}, {tableId})";
+        string command = $"insert into headers(Id, staffId, tableNumber) values({headerId}, {staff.Id}, {table.tableId})";
         modifyTableSql(command);
-        Logger.Log("put header table thing");
+        Logger.Log("successfully inserted headers(id, staffID, tableNumber)");
         //order table
         command = $"insert into orders(Id, headerId) values ({orderId}, {headerId})";
         
         modifyTableSql(command);
-        Logger.Log("put orders table thing");
+        Logger.Log("successfully inserted orders(Id, headerId)");
         //orderLine table
-        foreach (item item in itemsToBeOrdered)
+        foreach (item item in table.ordered)
         {
             command = $"insert into orderLine(Id, orderId, itemId) values({LineId}, {orderId}, {item.itemId})";
             modifyTableSql(command);

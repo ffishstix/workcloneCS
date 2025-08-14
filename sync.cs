@@ -96,7 +96,7 @@ class sync
             {
                 try
                 {
-                    allStaff = SQL.errorCallSD(null);
+                    allStaff = SQL.staffreturnthing(null);
                 }
                 catch (Exception ex)
                 {
@@ -118,10 +118,13 @@ class sync
         Task.Run(() =>
         {
             DateTime start = DateTime.Now;
-            SQL.initSQL();
+            Logger.Log("just about to go into syncStaff");
+            syncStaff();
+            Logger.Log("synced staff");
             
             Logger.Log("just about to go into syncCatagory");
             syncCatagory();
+            Logger.Log("synced catagory");
             
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
         });

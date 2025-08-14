@@ -40,6 +40,7 @@ public partial class Form1 : Form
             }
         });
         
+        
         Logger.Log("added catagories");
         Visible = true;
         Show();
@@ -48,7 +49,6 @@ public partial class Form1 : Form
     {
         // Create a TaskCompletionSource to wait for categories
         var tcs = new TaskCompletionSource<bool>();
-        Logger.Log("inside syncAll just gonna run syncAll rn");
 
         // Wait until categories are loaded or timeout
         int attempts = 0;
@@ -530,11 +530,12 @@ public partial class Form1 : Form
             if (table.tableSelected != 0)
             {
                 tableSelected.tableId = table.tableSelected;
+                
             }
+            tableSelected.openStaff = currentStaff;
             tableBtn.Text = $"Table {tableSelected.tableId}";
             return;
         }
-        //this section runs
         sentToTable();
         refreshScrollPanel();
         
@@ -550,13 +551,12 @@ public partial class Form1 : Form
         leftLabel.Tag = 0;
         rightLabel.Text = "Price: 0.00";
         rightLabel.Tag = 0m;
-        tableSelected = new table();
-        tableBtn.Text = "Table";
-
         Logger.Log(
             "probs best to ignore the last one however i am now going to try and call the sql to inser the values, " +
             "still not sure what to do with no table number tbh");
-        SQL.pushItemsToTables(tableSelected.tableId, currentStaff.Id, itemsToBeOrdered);
+        SQL.pushItemsToTables(tableSelected, currentStaff);
+        tableSelected = new table();
+        tableBtn.Text = "Table";
     }
 
     private void nameBtn_Click(object sender, EventArgs e)
@@ -650,5 +650,16 @@ public partial class Form1 : Form
         reLoad.Show();
     }
 
+    private void syncBtn_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            sync.syncAll();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"Error in syncBtn_Click: {ex.Message}");
+        }
+    }
 
     }
