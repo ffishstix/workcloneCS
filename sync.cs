@@ -57,13 +57,34 @@ class sync
         }
     }
 
+    public static bool checkCatFile()
+    {
+        string path = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/catagoryJson.txt";
+        if (!File.Exists(path)) return false;
+        try
+        {
+            string json = File.ReadAllText(path); // Read file contents
+            List<catagory> fileJson = JsonSerializer.Deserialize<List<catagory>>(json); // Deserialize JSON text
+            if (fileJson[0].catagoryId == 0 || fileJson[0].catName == null || fileJson[0].items == null)
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error in checkCaatFile {ex.Message}");
+            return false;
+        }
+
+        return true;
+    }
     public static void getFiles()
     {
         string dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs";
         string sqlDir = dir + "/sql/";
         if (Directory.Exists(sqlDir))
         {
-            if (File.Exists(sqlDir + "catagoryJson.txt"))
+            if (checkCatFile())
             {
                 try
                 {

@@ -251,13 +251,13 @@ class SQL
     
     public static List<catagory> pullCatFile()
     {
-        if (File.Exists(jsonDir))
+        if (sync.checkCatFile())
         {
             try
             {
                 string json = File.ReadAllText(jsonDir); // Read file contents
                 List<catagory> fileJson = JsonSerializer.Deserialize<List<catagory>>(json); // Deserialize JSON text
-                Logger.Log("json was read");
+                Logger.Log("json was read and was valid");
                 return fileJson;
             }
             catch (Exception ex)
@@ -266,7 +266,7 @@ class SQL
                 return null;
             }
         }
-        Logger.Log(jsonDir + " doesn't exist");
+        Logger.Log(jsonDir + " doesn't exist or is null/corrupt");
         return null;
     }
 
@@ -275,9 +275,8 @@ class SQL
         catagory currentCatagory = new catagory();
         List<item> values = new List<item>();
         string query = 
-        "SELECT cat.catagoryId, catName, ai.itemName as itemName, price, " +
-        "ISNULL(ai.extraInfo, '') AS extraInfo, ISNULL(cat.extraInfo, '') AS catExtraInfo, " +
-        "isnull(ai.chosenColour, 'grey') as chosenColour " +
+        "SELECT ai.itemId, ai.itemName, ISNULL(ai.extraInfo, ''), ai.price, ISNULL(ai.chosenColour, 'grey'), " +
+        "cat.catName, cat.catagoryId, ISNULL(cat.extraCatInfo, '') " +
         "FROM allItems ai " +
         "JOIN [foodCatagory] foo ON ai.itemID = foo.itemId " +
         "JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId " +
@@ -308,18 +307,36 @@ class SQL
                             while (reader.Read())
                             {
                                 Logger.Log("reading currently catagories btw");
-                                currentCatagory.catagoryId = reader.GetInt32(0);
-                                currentCatagory.catName = reader.GetString(1);
-                                currentCatagory.catagoryExtraInfo = reader.IsDBNull(4) ? null : reader.GetString(5);
+                                currentCatagory.catagoryId = reader.GetInt32(6);
+                                currentCatagory.catName = reader.GetString(5);
+                                currentCatagory.catagoryExtraInfo = reader.IsDBNull(7) ? null : reader.GetString(7);
                                 values.Add(new item()
                                 {
-                                    itemName = reader.GetString(2),
+                                    /*
+                                     * items......
+                                     * itemId
+                                     * itemName
+                                     * extraInfo
+                                     * itemCount - input manually
+                                     * price
+                                     * chosenColour
+                                     * lineId = blank
+                                     *
+                                     * catagories...
+                                     * connected - true or false
+                                     * catName
+                                     * catId
+                                     * catExtraInfo
+                                     * list of items
+                                     */
+                                    itemName = reader.GetString(1),
                                     price = (decimal)reader.GetInt32(3) / 100,
-                                    extraInfo = reader.IsDBNull(4) ? null : reader.GetString(4),
-                                    chosenColour = reader.GetString(6),
+                                    extraInfo = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                    chosenColour = reader.GetString(4),
+                                    itemId = reader.GetInt32(0),
                                     itemCount = 1
                                 });
-                                Logger.Log($"got: item: {reader.GetString(2)}");
+                                Logger.Log($"got: item: {reader.GetString(1)}");
                             }
 
                             currentCatagory.items = values;
@@ -514,7 +531,7 @@ class SQL
     public static void pushItemsToTables(table table, staff staff) {
         int headerId = getHighestidFromTable("headers") + 1;
         int orderId = getHighestidFromTable("orders") + 1;
-        int LineId = getHighestidFromTable("orderLine") + 1;
+        int LineId = getHighestidFromTable("orderLine");
         if (headerId == 0 || orderId == 0 || LineId == 0)
         {
             Logger.Log("one of the ids was 0 so it errored the fuck out ngl cheieve this shouldnt happen but fuck me ig");
@@ -527,16 +544,14 @@ class SQL
         //header table
         string command = $"insert into headers(Id, staffId, tableNumber) values({headerId}, {staff.Id}, {table.tableId})";
         modifyTableSql(command);
-        Logger.Log("successfully inserted headers(id, staffID, tableNumber)");
         //order table
         command = $"insert into orders(Id, headerId) values ({orderId}, {headerId})";
         
         modifyTableSql(command);
-        Logger.Log("successfully inserted orders(Id, headerId)");
         //orderLine table
-        foreach (item item in table.ordered)
+        foreach (item item in table.itemsToOrder)
         {
-            command = $"insert into orderLine(Id, orderId, itemId) values({LineId}, {orderId}, {item.itemId})";
+            command = $"insert into orderLine(Id, orderId, itemId) values({LineId++}, {orderId}, {item.itemId})";
             modifyTableSql(command);
             Logger.Log("added item");
         }

@@ -13,12 +13,13 @@ public class table
     public staff openStaff { get; set; }
     public int tableId { get; set; }
     public List<item> ordered { get; set; }
-
+    public List<item> itemsToOrder { get; set; }
     public table()
     {
         tableId = 0;
         openStaff = null;
         ordered = new List<item>();
+        itemsToOrder = new List<item>();
     }
 }
 

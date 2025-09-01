@@ -17,7 +17,6 @@ public partial class Form1 : Form
     private List<catagory> cat = new();
     private List<item> currentlyDisplayedItems = new();
     private List<item> itemsToBeOrdered = new();
-
     public Form1()
     {
         cat = sync.catagories;
@@ -150,9 +149,10 @@ public partial class Form1 : Form
         row.updateText();
         EnableSwipeToDelete(row);
         row.SetHeight(rowHeight);
+        scrollPanel.SuspendLayout();
         scrollPanel.Controls.Add(row.rowPannel);
         scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
-        scrollPanel.PerformLayout();
+        scrollPanel.ResumeLayout();
     }
 
     private void EnableSwipeToDelete(rowOfItem row)
@@ -204,7 +204,7 @@ public partial class Form1 : Form
                         refreshScrollPanel();
                     }
                     updateTotalPrice(-row.price);
-                    updateTotalItems(-row.itemCount);
+                    updateTotalItems(-1);
                 }
                 else if (deltaX > 100 && rowPannel != null)
                 {
@@ -286,6 +286,7 @@ public partial class Form1 : Form
     private void generalItem_Click(object sender, EventArgs e)
     {
         item item = (item)((Control)sender).Tag;
+        item.lineId = lineId++;
         itemsToBeOrdered.Add(item);
         
         //updating middle row shizzle
@@ -297,42 +298,21 @@ public partial class Form1 : Form
 
     private void refreshScrollPanel()
     {
-        List<item> itemsCusIdkWhatIDid = itemsToBeOrdered;
-        List<item> items = itemsToBeOrdered;
-        itemsToBeOrdered = new List<item>();
-        foreach (Control ctrl in scrollPanel.Controls)
+        foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
+        createScrollPanel();
+        if (itemsToBeOrdered != null)
         {
-            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null && t.lineId != null)
+            foreach (item item in itemsToBeOrdered)
             {
-                bool valid = false;
-                for (int i = 0; i < items.Count; i++)
+                if (scrollPanel.InvokeRequired)
                 {
-                    if (items[i].lineId == t.lineId)
-                    {
-                        itemsToBeOrdered.Add(items[i]);
-                        items.RemoveAt(i);
-                        valid = true;
-                        break;
-                    }
+                    scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
                 }
 
-                if (!valid)
-                {
-                    scrollPanel.Controls.Remove(ctrl);
-                }
+                else addItem(item);
             }
+            scrollPanel.PerformLayout();
         }
-
-        if (items != null)
-        {
-            foreach (item item in items)
-            {
-                itemsToBeOrdered.Add(item);
-                addItem(item);
-            }
-        }
-        
-        itemsToBeOrdered = itemsCusIdkWhatIDid;
     }
 
     //in the bottom right
@@ -366,9 +346,9 @@ public partial class Form1 : Form
             {
                 try
                 {
-                    var d = foodItems[i];
-                    d.lineId = lineId++;
-                    addLabel(d);
+                    item item = foodItems[i];
+                    item.lineId = lineId++;
+                    addLabel(item);
                 } catch (Exception ex)
                 {
                     Logger.Log($"{ex.Message}    {e}");
@@ -543,13 +523,12 @@ public partial class Form1 : Form
 
     private void sentToTable()
     {
-        tableSelected.ordered = itemsToBeOrdered;
+        tableSelected.itemsToOrder = itemsToBeOrdered;
         Logger.Log("sent through all items and cleared them");
-        itemsToBeOrdered.Clear();
         refreshScrollPanel();
         leftLabel.Text = "Items: 0";
         leftLabel.Tag = 0;
-        rightLabel.Text = "Price: 0.00";
+        rightLabel.Text = "Price: £0.00";
         rightLabel.Tag = 0m;
         Logger.Log(
             "probs best to ignore the last one however i am now going to try and call the sql to inser the values, " +
@@ -557,6 +536,7 @@ public partial class Form1 : Form
         SQL.pushItemsToTables(tableSelected, currentStaff);
         tableSelected = new table();
         tableBtn.Text = "Table";
+        itemsToBeOrdered.Clear();
     }
 
     private void nameBtn_Click(object sender, EventArgs e)
@@ -655,6 +635,7 @@ public partial class Form1 : Form
         try
         {
             sync.syncAll();
+            CancelBtn_Click(null, null);
         }
         catch (Exception ex)
         {
@@ -663,3 +644,46 @@ public partial class Form1 : Form
     }
 
     }
+/*
+ 
+ this is the original shite that i made honest to go it has hurt me deeply when debugging so i am remaking it
+    private void refreshScrollPanel()
+    {
+        List<item> itemsCusIdkWhatIDid = itemsToBeOrdered;
+        List<item> items = itemsToBeOrdered;
+        itemsToBeOrdered = new List<item>();
+        foreach (Control ctrl in scrollPanel.Controls)
+        {
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null && t.lineId != null)
+            {
+                bool valid = false;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    if (items[i].lineId == t.lineId)
+                    {
+                        itemsToBeOrdered.Add(items[i]);
+                        items.RemoveAt(i);
+                        valid = true;
+                        break;
+                    }
+                }
+
+                if (!valid)
+                {
+                    scrollPanel.Controls.Remove(ctrl);
+                }
+            }
+        }
+
+        if (items != null)
+        {
+            foreach (item item in items)
+            {
+                itemsToBeOrdered.Add(item);
+                addItem(item);
+            }
+        }
+        
+        itemsToBeOrdered = itemsCusIdkWhatIDid;
+    }
+*/
