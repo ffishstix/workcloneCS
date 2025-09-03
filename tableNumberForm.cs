@@ -14,38 +14,20 @@ using Microsoft.VisualBasic.ApplicationServices;
 
 namespace WorkCloneCS
 {
-    public partial class NameForm : Form
+    public partial class tableNumberForm : Form
     {
         private int currentID;
-        private List<staff> x;
-        public staff staffSelected;
+        public int tableSelected;
+        private int maxTableNumber = 1000;
         private DateTime timeSinceLastClick;
-        public NameForm()
+        
+        public tableNumberForm()
         {
             currentID = 0;
             InitializeComponent();
             timeSinceLastClick = DateTime.MinValue;
-            x = sync.allStaff;
-            if (x == null)
-            {
-                x = SQL.getStaffData();
-            }
-            if (x == null)
-            {
-                
-                this.Close();
-                Logger.Log("staff was null so closing window");
-            }
-            else
-            {
-                Logger.Log("staff be staffing icl ");
-                sync.allStaff = x;
-            }
             displayBtn.Text = "";
         }
-
-
-        
 
         private void updateDisplayBtnText()
         {
@@ -66,7 +48,7 @@ namespace WorkCloneCS
         {
             if (timeSinceLastClick >= (DateTime.Now) - TimeSpan.FromSeconds(0.2))
             {
-                staffSelected = null;
+                tableSelected = 0;
                 this.Close();
                 
             }
@@ -77,18 +59,13 @@ namespace WorkCloneCS
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            staffSelected = null;
-            foreach(staff staff in x)
+            tableSelected = 0;
+            if (currentID < maxTableNumber && currentID > 0)
             {
-                if (staff.Id == currentID)
-                {
-                    staffSelected = staff;
-                    this.Close();
-                    break;
-                } 
-
-            }
-            if (staffSelected == null)
+                tableSelected = currentID;
+                Close();
+            } 
+            if (tableSelected == 0)
             {
                 MessageBox.Show("invalid id");
             }

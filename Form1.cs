@@ -512,32 +512,49 @@ public partial class Form1 : Form
 
     private void tableBtn_Click(object sender, EventArgs e)
     {
-        if (tableSelected.tableId == 0)
+        if (currentStaff != null)
         {
-            //select table logic displaying if it is open currently
-            //probs sql db of currently open tables with the items stored on it
-            
-            TableForm table = new TableForm();
-            table.ShowDialog();
-            if (table.tableSelected != 0)
+            if (tableSelected.tableId == 0)
             {
-                tableSelected.tableId = table.tableSelected;
-                tableSelected.openStaff = currentStaff;
-                tableBtn.Text = $"Table {tableSelected.tableId}";
-                List<item> items = SQL.getTableItems(tableSelected.tableId); //pulls all items on a table
-                tableSelected.ordered = items;
-                foreach (item item in items)
-                {
-                    addItem(item);
-                }
-            }
+                //select table logic displaying if it is open currently
+                //probs sql db of currently open tables with the items stored on it
             
+                TableForm table = new TableForm();
+                table.ShowDialog();
+                if (table.tableSelected != 0)
+                {
+                    tableSelected.tableId = table.tableSelected;
+                    tableSelected.openStaff = currentStaff;
+                    tableBtn.Text = $"Table {tableSelected.tableId}";
+                    List<item> items = SQL.getTableItems(tableSelected.tableId); //pulls all items on a table
+                    if (items != null)
+                    {
+                        tableSelected.ordered = items;
+                        foreach (item item in items)
+                        {
+                            addItem(item);
+                        }
+                    }  
+                    else Logger.Log("empty table loaded");
+               
+                }
+            
+                return;
+            }
 
-            return;
+            if (itemsToBeOrdered != null)
+            {
+                sentToTable();
+                refreshScrollPanel();
+            }
+            Logger.Log("had a table open and then closed it but didnt send any orders through so just continuing anyways");
         }
-
-        sentToTable();
-        refreshScrollPanel();
+        else
+        {
+            MessageBox.Show("No Staff selected");
+            Logger.Log("pressed table button without being logged in please log in to continue");
+        }
+        
 
     }
 
@@ -588,14 +605,6 @@ public partial class Form1 : Form
             "\n and it is something you would only ever change on the tills anyways sooo" +
             "\n return not implemented lol");
     }
-
-    private void CancelBtn_Click(object sender, EventArgs e)
-    {
-        deleteAllItemsOrdered();
-        allPannelsBlank();
-        addCatagory();
-    }
-
 
     private async void ConfigSideBtn_Click(object sender, EventArgs e)
     {
@@ -655,7 +664,7 @@ public partial class Form1 : Form
         try
         {
             sync.syncAll();
-            CancelBtn_Click(null, null);
+            SignOffBtn_Click(null, null);
         }
         catch (Exception ex)
         {

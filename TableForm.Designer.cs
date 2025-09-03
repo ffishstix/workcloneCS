@@ -1170,6 +1170,7 @@ partial class TableForm
         openTableBtn.TabIndex = 4;
         openTableBtn.Text = "Open Table";
         openTableBtn.UseVisualStyleBackColor = true;
+        openTableBtn.Click += openTableBtn_Click;
         // 
         // defaultTableBtn
         // 
@@ -1179,6 +1180,7 @@ partial class TableForm
         defaultTableBtn.TabIndex = 3;
         defaultTableBtn.Text = "Default Table";
         defaultTableBtn.UseVisualStyleBackColor = true;
+        defaultTableBtn.Click += defaultTableBtn_Click;
         // 
         // tableNumBtn
         // 
