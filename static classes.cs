@@ -17,7 +17,7 @@ public class table
     public table()
     {
         tableId = 0;
-        openStaff = null;
+        openStaff = new staff();
         ordered = new List<item>();
         itemsToOrder = new List<item>();
     }
@@ -29,6 +29,13 @@ public class staff
     public int Id { get; set; }
     public string Name { get; set; }
     public int Access { get; set; }
+
+    public staff()
+    {
+        Id = 0;
+        Name = "";
+        Access = 0;
+    }
 }
 
 class catagory

@@ -14,9 +14,8 @@ public partial class Form1 : Form
 {
     private int lineId = 1;
     public table tableSelected = new table();
-    private staff currentStaff;        
+    private staff currentStaff;
     private List<catagory> cat = new();
-    private List<item> currentlyDisplayedItems = new();
     private List<item> itemsToBeOrdered = new();
     public Form1()
     {
@@ -152,8 +151,9 @@ public partial class Form1 : Form
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
         };
+        
         row.updateText();
-        EnableSwipeToDelete(row);
+        if (! item.ordered) EnableSwipeToDelete(row);
         row.SetHeight(rowHeight);
         scrollPanel.SuspendLayout();
         scrollPanel.Controls.Add(row.rowPannel);
@@ -281,6 +281,8 @@ public partial class Form1 : Form
 
     private void deleteAllItemsOrdered()
     {
+        tableSelected = null;
+        tableBtn.Text = "Table";
         itemsToBeOrdered.Clear();
         scrollPanel.Controls.Clear();
         leftLabel.Tag = 0;
@@ -422,7 +424,8 @@ public partial class Form1 : Form
 
     private void SignOffBtn_Click(object sender, EventArgs e)
     {
-        currentStaff = null;
+        tableSelected = new table(); // currently not working and i honestly dont know why good luck future me ;0
+        currentStaff = new staff();
         nameBtn.Text = "name";
         nameBtn.Tag = currentStaff;
         deleteAllItemsOrdered();
@@ -512,7 +515,7 @@ public partial class Form1 : Form
 
     private void tableBtn_Click(object sender, EventArgs e)
     {
-        if (currentStaff != null)
+        if (currentStaff != null && tableSelected != null)
         {
             if (tableSelected.tableId == 0)
             {
@@ -606,7 +609,7 @@ public partial class Form1 : Form
             "\n return not implemented lol");
     }
 
-    private async void ConfigSideBtn_Click(object sender, EventArgs e)
+    private void ConfigSideBtn_Click(object sender, EventArgs e)
     {
         FirstRunWindow reLoad = new FirstRunWindow(true);
         reLoad.FormClosed += async (s, args) =>
@@ -672,47 +675,4 @@ public partial class Form1 : Form
         }
     }
 
-    }
-/*
- 
- this is the original shite that i made honest to go it has hurt me deeply when debugging so i am remaking it
-    private void refreshScrollPanel()
-    {
-        List<item> itemsCusIdkWhatIDid = itemsToBeOrdered;
-        List<item> items = itemsToBeOrdered;
-        itemsToBeOrdered = new List<item>();
-        foreach (Control ctrl in scrollPanel.Controls)
-        {
-            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null && t.lineId != null)
-            {
-                bool valid = false;
-                for (int i = 0; i < items.Count; i++)
-                {
-                    if (items[i].lineId == t.lineId)
-                    {
-                        itemsToBeOrdered.Add(items[i]);
-                        items.RemoveAt(i);
-                        valid = true;
-                        break;
-                    }
-                }
-
-                if (!valid)
-                {
-                    scrollPanel.Controls.Remove(ctrl);
-                }
-            }
-        }
-
-        if (items != null)
-        {
-            foreach (item item in items)
-            {
-                itemsToBeOrdered.Add(item);
-                addItem(item);
-            }
-        }
-        
-        itemsToBeOrdered = itemsCusIdkWhatIDid;
-    }
-*/
+}

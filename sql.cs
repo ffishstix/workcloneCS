@@ -520,7 +520,7 @@ class SQL
                 }
             catch (Exception ex)
             {
-                Logger.Log(ex.Message);
+                Logger.Log($"message in modifyTableSql in sql.cs sqlCommand: {sqlCommand}" + ex.Message);
              
             }
         }
@@ -529,18 +529,18 @@ class SQL
     public static List<item> getTableItems(int tableId)
     {
         string sqlCommand = $"""
-                      SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED 
-                      SELECT allItems.itemId, allItems.itemName, allItems.Price, 
-                      ISNULL(allItems.chosenColour, 'grey'), ISNULL(allItems.extraInfo, '')
-                      FROM workclonecs.dbo.headers AS headers 
-                      LEFT JOIN workclonecs.dbo.orders AS orders ON 
-                      (orders.headerId = headers.Id)
-                      LEFT JOIN workclonecs.dbo.orderLine AS orderLines 
-                      ON (orderLines.orderId = orders.Id) 
-                      LEFT JOIN workclonecs.dbo.allItems AS allItems 
-                      ON (allItems.itemId = orderLines.itemId) 
-                      WHERE (headers.finished = 0) 
-                      AND (headers.tableNumber) = {tableId}
+                      SELECT allItems.itemId, allItems.itemName, allItems.Price,
+                             ISNULL(allItems.chosenColour, 'grey') as chosenColour, ISNULL(allItems.extraInfo, '') as extraInfo
+                      FROM workclonecs.dbo.headers AS headers
+                               LEFT JOIN workclonecs.dbo.orders AS orders ON
+                          (orders.headerId = headers.Id)
+                               LEFT JOIN workclonecs.dbo.orderLine AS orderLines
+                                         ON (orderLines.orderId = orders.Id)
+                               LEFT JOIN workclonecs.dbo.allItems AS allItems
+                                         ON (allItems.itemId = orderLines.itemId)
+                      WHERE (headers.finished = 0)
+                        AND (headers.tableNumber) = 300
+                        AND allItems.itemId IS NOT NULL;
                       """;
         List<item> items = new List<item>();
         using (SqlConnection connection = new SqlConnection(SQL.connectionString))
