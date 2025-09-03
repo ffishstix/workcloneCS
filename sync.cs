@@ -150,4 +150,14 @@ class sync
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
         });
     }
+
+    public static void LoadTables()
+    {
+        (int min, int max) MainVisibleTableRange = (1, 98);
+        List<int> aditionalVisibleTableNums = [300, 500, 700, 800];
+        
+        
+    }
+    
+    
 }

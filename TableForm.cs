@@ -34,4 +34,20 @@ public partial class TableForm : Form
         tableSelected = int.Parse(((Button)sender).Text);
         Close();
     }
+
+    private void escapeBtn_Click(object sender, EventArgs e)
+    {
+        tableSelected = 0;
+        Close();
+    }
+
+    private void printBillBtn_Click(object sender, EventArgs e)
+    {
+        Logger.Log("printBillBtn clicked but i havent implemented it yet lol");
+    }
+
+    private void tableNumBtn_Click(object sender, EventArgs e)
+    {
+        throw new System.NotImplementedException();
+    }
 }

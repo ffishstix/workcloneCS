@@ -14,9 +14,7 @@ class SQL
     private static List<catagory> catagoriesFromFile;
     private static string jsonDir;
     private static string jsonstaffDir;
-    private static string connectionString;
-    
-    public static string ConnectionString { set{  connectionString = value; } }
+    public static string connectionString;
     
     public static void initSQL()
     {
@@ -527,7 +525,65 @@ class SQL
             }
         }
     }
-         
+
+    public static List<item> getTableItems(int tableId)
+    {
+        string sqlCommand = $"""
+                      SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED 
+                      SELECT allItems.itemId, allItems.itemName, allItems.Price, 
+                      ISNULL(allItems.chosenColour, 'grey'), ISNULL(allItems.extraInfo, '')
+                      FROM workclonecs.dbo.headers AS headers 
+                      LEFT JOIN workclonecs.dbo.orders AS orders ON 
+                      (orders.headerId = headers.Id)
+                      LEFT JOIN workclonecs.dbo.orderLine AS orderLines 
+                      ON (orderLines.orderId = orders.Id) 
+                      LEFT JOIN workclonecs.dbo.allItems AS allItems 
+                      ON (allItems.itemId = orderLines.itemId) 
+                      WHERE (headers.finished = 0) 
+                      AND (headers.tableNumber) = {tableId}
+                      """;
+        List<item> items = new List<item>();
+        using (SqlConnection connection = new SqlConnection(SQL.connectionString))
+        {
+            try
+            {
+                connection.Open();
+                SqlCommand sql = new SqlCommand(sqlCommand, connection);
+                using (SqlDataReader reader = sql.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.GetInt32(0) == null)
+                        {
+                            Logger.Log("table is null");
+                            return null;
+                        }
+
+                        items.Add(new item
+                        {
+                            itemId = reader.GetInt32(0),
+                            itemName = reader.GetString(1),
+                            price = reader.GetInt32(2) / 100,
+                            chosenColour = reader.GetString(3),
+                            extraInfo = reader.GetString(4),
+                            itemCount = 1
+                        });
+                        Logger.Log("item added to list");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("error in getTabled, called by tableBtn_Click tried getting " + tableId + ex.Message);
+                return null;
+            }
+        }
+
+        return items;
+    }
+    
+
+    
     public static void pushItemsToTables(table table, staff staff) {
         int headerId = getHighestidFromTable("headers") + 1;
         int orderId = getHighestidFromTable("orders") + 1;

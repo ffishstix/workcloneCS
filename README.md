@@ -43,6 +43,7 @@ put simply a clone of a very popular pos system...
 
 - bit far out:
   - [ ] add the ordering system
+  - [x] add a way to push orders to the table
   - [x] including the databases to go along with it
   - [ ] add a quick website to view the ordering system
   - [x] add allergies database with a connected info button to each item with an allergy connected 

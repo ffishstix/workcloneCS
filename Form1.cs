@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Xml.Linq;
+using Microsoft.Data.SqlClient;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 namespace WorkCloneCS;
@@ -27,8 +28,6 @@ public partial class Form1 : Form
         Logger.Log("initialized food list");
         Task.Run(async () => {
             await LoadCategories();
-
-            // Use Invoke to update UI from background thread
             if (IsHandleCreated)
             {
                 Invoke(new Action(() => {
@@ -38,12 +37,20 @@ public partial class Form1 : Form
                 }));
             }
         });
+        Logger.Log("started loading open tables");
+        loadOpenTables();
         
         
         Logger.Log("added catagories");
         Visible = true;
         Show();
     }
+
+    private void loadOpenTables()
+    {
+
+    }
+    
     private async Task LoadCategories()
     {
         // Create a TaskCompletionSource to wait for categories
@@ -144,7 +151,6 @@ public partial class Form1 : Form
             itemId = item.itemId,
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
-            
         };
         row.updateText();
         EnableSwipeToDelete(row);
@@ -300,19 +306,25 @@ public partial class Form1 : Form
     {
         foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
         createScrollPanel();
-        if (itemsToBeOrdered != null)
+        if (itemsToBeOrdered.Count != 0 || tableSelected.ordered.Count != 0)
         {
-            foreach (item item in itemsToBeOrdered)
+            List<item> combinedItems = tableSelected.ordered;
+            foreach (item itemt in itemsToBeOrdered) combinedItems.Append(itemt);
+            if (combinedItems != null)
             {
-                if (scrollPanel.InvokeRequired)
+                foreach (item item in combinedItems)
                 {
-                    scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
-                }
+                    if (scrollPanel.InvokeRequired)
+                    {
+                        scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
+                    }
 
-                else addItem(item);
+                    else addItem(item);
+                }
+                scrollPanel.PerformLayout();
             }
-            scrollPanel.PerformLayout();
         }
+        
     }
 
     //in the bottom right
@@ -510,15 +522,23 @@ public partial class Form1 : Form
             if (table.tableSelected != 0)
             {
                 tableSelected.tableId = table.tableSelected;
-                
+                tableSelected.openStaff = currentStaff;
+                tableBtn.Text = $"Table {tableSelected.tableId}";
+                List<item> items = SQL.getTableItems(tableSelected.tableId); //pulls all items on a table
+                tableSelected.ordered = items;
+                foreach (item item in items)
+                {
+                    addItem(item);
+                }
             }
-            tableSelected.openStaff = currentStaff;
-            tableBtn.Text = $"Table {tableSelected.tableId}";
+            
+
             return;
         }
+
         sentToTable();
         refreshScrollPanel();
-        
+
     }
 
     private void sentToTable()
