@@ -50,7 +50,7 @@ namespace WorkCloneCS
                 
             }
             Logger.Log("applying settings");
-            SQL.ConnectionString = lastWorkingConnection;
+            SQL.connectionString = lastWorkingConnection;
             sync.syncAll();
             if (!t)
             {

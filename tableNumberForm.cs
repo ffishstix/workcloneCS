@@ -14,13 +14,13 @@ using Microsoft.VisualBasic.ApplicationServices;
 
 namespace WorkCloneCS
 {
-    public partial class tableNumberForm : Form
+    public partial class NameForm : Form
     {
         private int currentID;
         private List<staff> x;
         public staff staffSelected;
         private DateTime timeSinceLastClick;
-        public tableNumberForm()
+        public NameForm()
         {
             currentID = 0;
             InitializeComponent();

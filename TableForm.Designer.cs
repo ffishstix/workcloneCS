@@ -132,7 +132,14 @@ partial class TableForm
         button3 = new System.Windows.Forms.Button();
         button2 = new System.Windows.Forms.Button();
         button1 = new System.Windows.Forms.Button();
+        flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+        openTableBtn = new System.Windows.Forms.Button();
+        defaultTableBtn = new System.Windows.Forms.Button();
+        tableNumBtn = new System.Windows.Forms.Button();
+        printBillBtn = new System.Windows.Forms.Button();
+        escapeBtn = new System.Windows.Forms.Button();
         panel1.SuspendLayout();
+        flowLayoutPanel1.SuspendLayout();
         SuspendLayout();
         // 
         // panel1
@@ -1143,16 +1150,84 @@ partial class TableForm
         button1.Text = "1";
         button1.UseVisualStyleBackColor = true;
         // 
+        // flowLayoutPanel1
+        // 
+        flowLayoutPanel1.Controls.Add(openTableBtn);
+        flowLayoutPanel1.Controls.Add(defaultTableBtn);
+        flowLayoutPanel1.Controls.Add(tableNumBtn);
+        flowLayoutPanel1.Controls.Add(printBillBtn);
+        flowLayoutPanel1.Controls.Add(escapeBtn);
+        flowLayoutPanel1.Location = new System.Drawing.Point(682, 12);
+        flowLayoutPanel1.Name = "flowLayoutPanel1";
+        flowLayoutPanel1.Size = new System.Drawing.Size(106, 425);
+        flowLayoutPanel1.TabIndex = 1;
+        // 
+        // openTableBtn
+        // 
+        openTableBtn.Location = new System.Drawing.Point(3, 3);
+        openTableBtn.Name = "openTableBtn";
+        openTableBtn.Size = new System.Drawing.Size(104, 73);
+        openTableBtn.TabIndex = 4;
+        openTableBtn.Text = "Open Table";
+        openTableBtn.UseVisualStyleBackColor = true;
+        // 
+        // defaultTableBtn
+        // 
+        defaultTableBtn.Location = new System.Drawing.Point(3, 82);
+        defaultTableBtn.Name = "defaultTableBtn";
+        defaultTableBtn.Size = new System.Drawing.Size(104, 73);
+        defaultTableBtn.TabIndex = 3;
+        defaultTableBtn.Text = "Default Table";
+        defaultTableBtn.UseVisualStyleBackColor = true;
+        // 
+        // tableNumBtn
+        // 
+        tableNumBtn.Location = new System.Drawing.Point(3, 161);
+        tableNumBtn.Name = "tableNumBtn";
+        tableNumBtn.Size = new System.Drawing.Size(104, 73);
+        tableNumBtn.TabIndex = 2;
+        tableNumBtn.Text = "Table";
+        tableNumBtn.UseVisualStyleBackColor = true;
+        tableNumBtn.Click += tableNumBtn_Click;
+        // 
+        // printBillBtn
+        // 
+        printBillBtn.Location = new System.Drawing.Point(3, 240);
+        printBillBtn.Name = "printBillBtn";
+        printBillBtn.Size = new System.Drawing.Size(104, 73);
+        printBillBtn.TabIndex = 1;
+        printBillBtn.Text = "PrintBill";
+        printBillBtn.UseVisualStyleBackColor = true;
+        printBillBtn.Click += printBillBtn_Click;
+        // 
+        // escapeBtn
+        // 
+        escapeBtn.Location = new System.Drawing.Point(3, 319);
+        escapeBtn.Name = "escapeBtn";
+        escapeBtn.Size = new System.Drawing.Size(103, 73);
+        escapeBtn.TabIndex = 0;
+        escapeBtn.Text = "Escape";
+        escapeBtn.UseVisualStyleBackColor = true;
+        escapeBtn.Click += escapeBtn_Click;
+        // 
         // TableForm
         // 
         AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
         AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         ClientSize = new System.Drawing.Size(800, 450);
+        Controls.Add(flowLayoutPanel1);
         Controls.Add(panel1);
         Text = "TableForm";
         panel1.ResumeLayout(false);
+        flowLayoutPanel1.ResumeLayout(false);
         ResumeLayout(false);
     }
+
+    private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+    private System.Windows.Forms.Button printBillBtn;
+    private System.Windows.Forms.Button tableNumBtn;
+    private System.Windows.Forms.Button defaultTableBtn;
+    private System.Windows.Forms.Button openTableBtn;
 
     private System.Windows.Forms.Button button300;
     private System.Windows.Forms.Button button500;
@@ -1246,7 +1321,7 @@ partial class TableForm
     private System.Windows.Forms.Button button85;
     private System.Windows.Forms.Button button86;
     private System.Windows.Forms.Button button87;
-    private System.Windows.Forms.Button button88;
+    private System.Windows.Forms.Button escapeBtn;
     private System.Windows.Forms.Button button90;
     private System.Windows.Forms.Button button91;
     private System.Windows.Forms.Button button92;

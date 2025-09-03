@@ -52,6 +52,7 @@ public class item
     public decimal price { get; set; }
     public string chosenColour { get; set; }
     public int lineId { get; set; }
+    public bool ordered { get; set; }
 }
 
 public class rowPanelTag
@@ -108,7 +109,8 @@ public class rowOfItem : item
             itemName = itemName,
             price = price,
             itemId = itemId,
-            lineId = lineId
+            lineId = lineId,
+            ordered = ordered
 
         };
 
