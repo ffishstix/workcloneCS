@@ -333,8 +333,6 @@ public partial class Form1 : Form
     private void backBtn_Click(object sender, EventArgs e)
     {
         deleteChildbox();
-
-
         addCatagory();
         allPannelsBlank();
     }
@@ -405,6 +403,7 @@ public partial class Form1 : Form
     //click issues and other annoying shite
     private void allPannelsBlank()
     {
+        addCatagory();
         ConfigPannel.Visible = false;
         finalPanel.Visible = false;
         tablePanel.Visible = false;
@@ -419,7 +418,7 @@ public partial class Form1 : Form
         allPannelsBlank();
         ConfigPannel.Visible = temp;
         ConfigPannel.BringToFront();
-
+        
     }
 
     private void SignOffBtn_Click(object sender, EventArgs e)
