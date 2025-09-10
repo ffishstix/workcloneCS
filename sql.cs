@@ -478,7 +478,7 @@ class SQL
 
         return null;
     }
-    private static int getHighestidFromTable(string tableName)
+    public static int getHighestidFromTable(string tableName)
     {
         string sqlcommand = $"select max(Id) from {tableName}";
         using (SqlConnection connection = new SqlConnection(connectionString))
@@ -492,7 +492,7 @@ class SQL
                     if (reader.Read() && ! reader.IsDBNull(0)){
                        
                         int max = reader.GetInt32(0);
-                        Logger.Log($"got this number in the getHigest HeaderId function : {max}");
+                        Logger.Log($"got this number in the getHighestId function : {max}");
                         return max;
                     }
 
@@ -539,7 +539,7 @@ class SQL
                                LEFT JOIN workclonecs.dbo.allItems AS allItems
                                          ON (allItems.itemId = orderLines.itemId)
                       WHERE (headers.finished = 0)
-                        AND (headers.tableNumber) = 300
+                        AND (headers.tableNumber) = {tableId}
                         AND allItems.itemId IS NOT NULL;
                       """;
         List<item> items = new List<item>();
@@ -584,11 +584,9 @@ class SQL
     
 
     
-    public static void pushItemsToTables(table table, staff staff) {
-        int headerId = getHighestidFromTable("headers") + 1;
-        int orderId = getHighestidFromTable("orders") + 1;
-        int LineId = getHighestidFromTable("orderLine");
-        if (headerId == 0 || orderId == 0 || LineId == 0)
+    public static void pushItemsToTables(table table, staff staff, int headerId, int orderId, int lineId) {
+        
+        if (headerId == 0 || orderId == 0 || lineId == 0)
         {
             Logger.Log("one of the ids was 0 so it errored the fuck out ngl cheieve this shouldnt happen but fuck me ig");
         }
@@ -607,7 +605,7 @@ class SQL
         //orderLine table
         foreach (item item in table.itemsToOrder)
         {
-            command = $"insert into orderLine(Id, orderId, itemId) values({LineId++}, {orderId}, {item.itemId})";
+            command = $"insert into orderLine(Id, orderId, itemId) values({lineId++}, {orderId}, {item.itemId})";
             modifyTableSql(command);
             Logger.Log("added item");
         }

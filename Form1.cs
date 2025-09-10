@@ -26,16 +26,7 @@ public partial class Form1 : Form
         InitFoodList();
         Logger.Log("initialized food list");
         Task.Run(async () => {
-            await LoadCategories();
-            if (IsHandleCreated)
-            {
-                Invoke(new Action(() => {
-                    addCatagory();
-                    Logger.Log("added catagories");
-                    
-                }));
-            }
-        });
+            await LoadCategories(); });
         Logger.Log("started loading open tables");
         loadOpenTables();
         
@@ -56,15 +47,8 @@ public partial class Form1 : Form
         var tcs = new TaskCompletionSource<bool>();
 
         // Wait until categories are loaded or timeout
-        int attempts = 0;
-        while (attempts < 10 && (sync.catagories == null || sync.catagories.Count < 10))
-        {
-            await Task.Delay(3000);
-            sync.getFiles();
-            cat = sync.catagories;
-            attempts++;
-        }
-
+        sync.getFiles();
+        cat = sync.catagories;
         if (cat != null && cat.Count > 0)
         {
             tcs.SetResult(true);
@@ -74,7 +58,7 @@ public partial class Form1 : Form
             Logger.Log("Failed to load categories after timeout");
             tcs.SetResult(false);
         }
-
+        addCatagory();
         await tcs.Task;
     }
 
@@ -308,19 +292,17 @@ public partial class Form1 : Form
     {
         foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
         createScrollPanel();
-        if (itemsToBeOrdered.Count != 0 || tableSelected.ordered.Count != 0)
+        if (tableSelected.ordered.Count != 0)
         {
             List<item> combinedItems = tableSelected.ordered;
-            foreach (item itemt in itemsToBeOrdered) combinedItems.Append(itemt);
+            if (itemsToBeOrdered.Count != 0) foreach (item itemt in itemsToBeOrdered) combinedItems.Append(itemt);
+            
             if (combinedItems != null)
             {
+                
                 foreach (item item in combinedItems)
                 {
-                    if (scrollPanel.InvokeRequired)
-                    {
-                        scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
-                    }
-
+                    if (scrollPanel.InvokeRequired) scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
                     else addItem(item);
                 }
                 scrollPanel.PerformLayout();
@@ -403,7 +385,7 @@ public partial class Form1 : Form
     //click issues and other annoying shite
     private void allPannelsBlank()
     {
-        addCatagory();
+        
         ConfigPannel.Visible = false;
         finalPanel.Visible = false;
         tablePanel.Visible = false;
@@ -414,8 +396,10 @@ public partial class Form1 : Form
     //the following 5 functions are to bring up user specific panels
     private void ConfigBtn_Click(object sender, EventArgs e)
     {
+        
         bool temp = !ConfigPannel.Visible;
         allPannelsBlank();
+        if (temp) addCatagory();
         ConfigPannel.Visible = temp;
         ConfigPannel.BringToFront();
         
@@ -423,13 +407,20 @@ public partial class Form1 : Form
 
     private void SignOffBtn_Click(object sender, EventArgs e)
     {
-        tableSelected = new table(); // currently not working and i honestly dont know why good luck future me ;0
-        currentStaff = new staff();
+        tableSelected = new table()
+        {
+            tableId = 0
+        }; // currently not working and i honestly dont know why good luck future me ;0
+        currentStaff = new staff()
+        {
+            Id = 24,
+            Name = "fin"
+        };
         nameBtn.Text = "name";
         nameBtn.Tag = currentStaff;
         deleteAllItemsOrdered();
         allPannelsBlank();
-        addCatagory();
+        LoadCategories();
         
     }
     private void FinalBtn_Click(object sender, EventArgs e)
@@ -514,7 +505,7 @@ public partial class Form1 : Form
 
     private void tableBtn_Click(object sender, EventArgs e)
     {
-        if (currentStaff != null && tableSelected != null)
+        if ((currentStaff != null || currentStaff.Id != 0) && tableSelected != null)
         {
             if (tableSelected.tableId == 0)
             {
@@ -548,6 +539,7 @@ public partial class Form1 : Form
             {
                 sentToTable();
                 refreshScrollPanel();
+                return;
             }
             Logger.Log("had a table open and then closed it but didnt send any orders through so just continuing anyways");
         }
@@ -572,7 +564,10 @@ public partial class Form1 : Form
         Logger.Log(
             "probs best to ignore the last one however i am now going to try and call the sql to inser the values, " +
             "still not sure what to do with no table number tbh");
-        SQL.pushItemsToTables(tableSelected, currentStaff);
+        int headerId = SQL.getHighestidFromTable("headers") + 1;
+        int orderId = SQL.getHighestidFromTable("orders") + 1;
+        int lineId = SQL.getHighestidFromTable("orderLine") + 1;
+        SQL.pushItemsToTables(tableSelected, currentStaff, headerId, orderId, lineId);
         tableSelected = new table();
         tableBtn.Text = "Table";
         itemsToBeOrdered.Clear();
