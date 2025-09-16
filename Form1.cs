@@ -28,7 +28,6 @@ public partial class Form1 : Form
         Task.Run(async () => {
             await LoadCategories(); });
         Logger.Log("started loading open tables");
-        loadOpenTables();
         
         
         Logger.Log("added catagories");
@@ -36,10 +35,7 @@ public partial class Form1 : Form
         Show();
     }
 
-    private void loadOpenTables()
-    {
 
-    }
     
     private async Task LoadCategories()
     {
