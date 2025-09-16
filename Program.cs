@@ -1,6 +1,3 @@
-using System.Windows.Forms.VisualStyles;
-using Microsoft.Data.SqlTypes;
-
 namespace WorkCloneCS
 {
     internal static class Program

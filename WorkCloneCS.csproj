@@ -33,6 +33,18 @@
     <Compile Update="TableForm.code.cs">
       <DependentUpon>TableForm.cs</DependentUpon>
     </Compile>
+    <Compile Update="sync.cs">
+      <DependentUpon>static classes.cs</DependentUpon>
+    </Compile>
+    <Compile Update="sql.cs">
+      <DependentUpon>static classes.cs</DependentUpon>
+    </Compile>
+    <Compile Update="logger.cs">
+      <DependentUpon>static classes.cs</DependentUpon>
+    </Compile>
+    <Compile Update="connection.cs">
+      <DependentUpon>static classes.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
