@@ -24,6 +24,15 @@
     <Compile Update="TableForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="firstRun.code.cs">
+      <DependentUpon>firstRun.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Form1.code.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Update="TableForm.code.cs">
+      <DependentUpon>TableForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
