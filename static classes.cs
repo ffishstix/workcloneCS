@@ -62,29 +62,6 @@ public class item
     public bool ordered { get; set; }
 }
 
-public class rowPanelTag
-{
-    private string name;
-    private int count;
-    private decimal price;
-    private int itemCount;
-    public rowPanelTag()
-    {
-        name = "changeMe";
-        count = 1;
-        price = 0;
-        itemCount = 1;
-    }
-    public string Name { get { return name; } set { name = value; } }
-    public int Count { get { return count; } set { count = value; } }
-    public decimal Price { get { return price; } set { price = value; } }
-    public int ItemCount { get { return itemCount; } set { itemCount += value; } }
-    public decimal TotalPrice
-    {
-        get { return itemCount * Price; }
-    }
-
-}
 
 public class rowOfItem : item
 {

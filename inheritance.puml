@@ -1,0 +1,41 @@
+﻿@startuml
+' settings - to make it look nicer
+hide methods
+hide attributes
+
+' initiallising all of my classes
+class Form <<builtin>>
+class FirstRunWindow
+class firstRun
+class Form1 
+class NameForm
+class SQL
+class table
+class staff
+class catagory
+class item
+class rowOfItem
+class tableForm
+class tableNumberForm
+class program
+class AbstractValidator <<builtin>>
+
+class ConnectionSettings
+class ConnectionSettingsValidator
+' the one above inherits AbstractValidator<ConnectionSettings>
+class logger
+class sync
+
+
+
+'inheritance
+Form1 --|> Form
+tableNumberForm --|> Form
+NameForm --|> Form
+tableForm --|> Form
+FirstRunWindow --|> Form
+rowOfItem --|> item
+ConnectionSettingsValidator --|> AbstractValidator
+
+
+@enduml

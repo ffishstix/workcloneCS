@@ -187,7 +187,7 @@ namespace WorkCloneCS
             connectionString = lastWorkingConnection;
         }
     }
-    public partial class firstRun
+    public class firstRun
     {
         public static string basestr = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs";
 
