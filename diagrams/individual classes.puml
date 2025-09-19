@@ -2,7 +2,7 @@
 class Form <<builtin>>
 
 class Program {
-  - {static} localOnly : bool
+  
   + {static} Main() : void
 }
 

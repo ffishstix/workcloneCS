@@ -1,0 +1,79 @@
+@startuml
+
+
+skinparam linetype ortho
+
+rectangle ConnectionSettings
+rectangle ConnectionSettingsValidator
+rectangle FirstRunWindow
+rectangle Form1
+rectangle Logger
+rectangle NameForm
+rectangle Program
+rectangle SQL
+rectangle TableForm
+rectangle catagory
+rectangle firstRun
+rectangle item
+rectangle rowOfItem
+rectangle staff
+rectangle sync
+rectangle table
+rectangle tableNumberForm
+
+ConnectionSettingsValidator  -[#3574f0,plain]->>  ConnectionSettings          
+FirstRunWindow               -[#3574f0,plain]->>  ConnectionSettings          
+FirstRunWindow               -[#3574f0,plain]->>  ConnectionSettingsValidator 
+FirstRunWindow               -[#5fad65,dotted]->>  ConnectionSettingsValidator 
+FirstRunWindow               -[#3574f0,plain]->>  Form1                       
+FirstRunWindow               -[#3574f0,plain]->>  Logger                      
+FirstRunWindow               -[#3574f0,plain]->>  SQL                         
+FirstRunWindow               -[#3574f0,plain]->>  firstRun                    
+FirstRunWindow               -[#3574f0,plain]->>  sync                        
+Form1                        -[#3574f0,plain]->>  FirstRunWindow              
+Form1                        -[#3574f0,plain]->>  Logger                      
+Form1                        -[#3574f0,plain]->>  NameForm                    
+Form1                        -[#3574f0,plain]->>  SQL                         
+Form1                        -[#3574f0,plain]->>  TableForm                   
+Form1                        -[#3574f0,plain]->>  catagory                    
+Form1                        -[#3574f0,plain]->>  item                        
+Form1                        -[#3574f0,plain]->>  rowOfItem                   
+Form1                        -[#5fad65,dotted]->>  rowOfItem                   
+Form1                        -[#5fad65,dotted]->>  staff                       
+Form1                        -[#3574f0,plain]->>  staff                       
+Form1                        -[#3574f0,plain]->>  sync                        
+Form1                        -[#3574f0,plain]->>  table                       
+Form1                        -[#5fad65,dotted]->>  table                       
+NameForm                     -[#3574f0,plain]->>  Logger                      
+NameForm                     -[#3574f0,plain]->>  SQL                         
+NameForm                     -[#3574f0,plain]->>  staff                       
+NameForm                     -[#5fad65,dotted]->>  staff                       
+NameForm                     -[#3574f0,plain]->>  sync                        
+Program                      -[#3574f0,plain]->>  FirstRunWindow              
+Program                      -[#3574f0,plain]->>  Form1                       
+Program                      -[#3574f0,plain]->>  Logger                      
+Program                      -[#3574f0,plain]->>  SQL                         
+Program                      -[#3574f0,plain]->>  firstRun                    
+Program                      -[#3574f0,plain]->>  sync                        
+SQL                          -[#3574f0,plain]->>  Logger                      
+SQL                          -[#955ae0,plain]->>  catagory                    
+SQL                          -[#3574f0,plain]->>  catagory                    
+SQL                          -[#3574f0,plain]->>  item                        
+SQL                          -[#3574f0,plain]->>  staff                       
+SQL                          -[#3574f0,plain]->>  sync                        
+SQL                          -[#3574f0,plain]->>  table                       
+TableForm                    -[#3574f0,plain]->>  Logger                      
+TableForm                    -[#3574f0,plain]->>  tableNumberForm             
+catagory                     -[#3574f0,plain]->>  item                        
+firstRun                     -[#3574f0,plain]->>  Logger                      
+rowOfItem                    -[#3574f0,plain]->>  item                        
+rowOfItem                    -[#5fad65,dotted]->>  item                        
+rowOfItem                    -[#24a394,dashed]-^  item                        
+sync                         -[#3574f0,plain]->>  Logger                      
+sync                         -[#3574f0,plain]->>  SQL                         
+sync                         -[#3574f0,plain]->>  catagory                    
+sync                         -[#3574f0,plain]->>  staff                       
+table                        -[#3574f0,plain]->>  item                        
+table                        -[#955ae0,plain]->>  staff                       
+table                        -[#3574f0,plain]->>  staff                       
+@enduml
