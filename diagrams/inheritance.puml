@@ -19,16 +19,14 @@ class tableForm
 class tableNumberForm
 class program
 class AbstractValidator <<builtin>>
-
 class ConnectionSettings
 class ConnectionSettingsValidator
-' the one above inherits AbstractValidator<ConnectionSettings>
 class logger
 class sync
 
 
 
-'inheritance
+'joining lines
 Form1 --|> Form
 tableNumberForm --|> Form
 NameForm --|> Form
@@ -36,6 +34,11 @@ tableForm --|> Form
 FirstRunWindow --|> Form
 rowOfItem --|> item
 ConnectionSettingsValidator --|> AbstractValidator
+program --> Form1 : already setup 
+program --> FirstRunWindow : not setup before
+
+
+'notes
 
 
 @enduml
