@@ -1,7 +1,6 @@
 ﻿@startuml
 ' settings - to make it look nicer
-hide methods
-hide attributes
+
 
 ' initiallising all of my classes
 class Form <<builtin>>

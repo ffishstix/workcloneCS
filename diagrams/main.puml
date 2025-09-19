@@ -1,235 +1,37 @@
 ﻿@startuml
 
-class Form {
-}
+'config
+hide methods
+hide attributes
 
-class Form1 {
-  - lineId : int
-  - tableSelected : table
-  - currentStaff : staff
-  - cat : List<catagory>
-  - itemsToBeOrdered : List<item>
-  
-  + Form1()
-  - formClosing(sender : object, e : FormClosingEventArgs) : void
-  - deleteChildbox() : void
-  - catClick(sender : object, e : EventArgs) : void
-  - generalItem_Click(sender : object, e : EventArgs) : void
-  - backBtn_Click(sender : object, e : EventArgs) : void
-  - Form1_Load(sender : object, e : EventArgs) : void
-  - allPannelsBlank() : void
-  - ConfigBtn_Click(sender : object, e : EventArgs) : void
-  - SignOffBtn_Click(sender : object, e : EventArgs) : void
-  - FinalBtn_Click(sender : object, e : EventArgs) : void
-  - tableBottomBtn_Click(sender : object, e : EventArgs) : void
-  - OrderBtn_Click(sender : object, e : EventArgs) : void
-  - miscBtn_Click(sender : object, e : EventArgs) : void
-  - tableBtn_Click(sender : object, e : EventArgs) : void
-  - nameBtn_Click(sender : object, e : EventArgs) : void
-  - PricingBtn_Click(sender : object, e : EventArgs) : void
-  - ConfigSideBtn_Click(sender : object, e : EventArgs) : void
-  - syncBtn_Click(sender : object, e : EventArgs) : void
-  - addCatagory() : void
-  - LoadCategories() : Task
-  - addItem(item : item) : void
-  - EnableSwipeToDelete(row : rowOfItem) : void
-  - updateTotalItems(number : int) : void
-  - updateTotalPrice(change : decimal) : void
-  - createScrollPanel() : void
-  - InitFoodList() : void
-  - deleteAllItemsOrdered() : void
-  - refreshScrollPanel() : void
-  - InitItemList(e : int) : void
-  - addLabel(tag : item) : void
-}
 
-class TableForm {
-  + tableSelected : int
-  
-  + TableForm()
-  - clickSection() : void
-  - tableBtn_DoubleClick(sender : object, e : EventArgs) : void
-  - tableBtn_Click(sender : object, e : EventArgs) : void
-  - escapeBtn_Click(sender : object, e : EventArgs) : void
-  - printBillBtn_Click(sender : object, e : EventArgs) : void
-  - tableNumBtn_Click(sender : object, e : EventArgs) : void
-  - openTableBtn_Click(sender : object, e : EventArgs) : void
-  - defaultTableBtn_Click(sender : object, e : EventArgs) : void
-  # Dispose(disposing : bool) : void
-  - InitializeComponent() : void
-  - {field} components : IContainer
-}
+'init
+class Program
+class SQL
+class firstRun
+class FirstRunWindow
+class Form1
+class NameForm
+class TableForm
+class tableNumberForm
+class Logger
+class sync
+class ConnectionSettingsValidator
+class AbstractValidator<ConnectionSettings>
+class table
+class item
+class staff
+class catagory
+class rowOfItem
+class ConnectionSettings
 
-class FirstRunWindow {
-  - _validator : ConnectionSettingsValidator
-  - lastWorkingConnection : string
-  + connectionString : string
-  - t : bool
-  
-  + FirstRunWindow(te : bool)
-  - CancelBtn_Click(sender : object, e : EventArgs) : void
-  - Apply_Click(sender : object, e : EventArgs) : void
-  - CheckBtn_Click(sender : object, e : EventArgs) : void
-  - RemoveTempTextId(sender : object, e : EventArgs) : void
-  - AddTempTextId(sender : object, e : EventArgs) : void
-  - RemoveTempTextIP(sender : object, e : EventArgs) : void
-  - AddTempTextIP(sender : object, e : EventArgs) : void
-  - RemoveTempTextPort(sender : object, e : EventArgs) : void
-  - AddTempTextPort(sender : object, e : EventArgs) : void
-  - RemoveTempTextDatabase(sender : object, e : EventArgs) : void
-  - AddTempTextDatabase(sender : object, e : EventArgs) : void
-  - RemoveTempTextPassword(sender : object, e : EventArgs) : void
-  - AddTempTextPassword(sender : object, e : EventArgs) : void
-  - LastBtn_Click(sender : object, e : EventArgs) : void
-}
 
-class NameForm {
-  - currentID : int
-  - x : List<staff>
-  - staffSelected : staff
-  - timeSinceLastClick : DateTime
-  - components : IContainer
-  - panel1 : Panel
-  - displayBtn : Button
-  - OKBtn : Button
-  - Btn0..Btn9 : Button
-  - EscBtn : Button
-  
-  + NameForm()
-  # Dispose(disposing : bool) : void
-  - InitializeComponent() : void
-  - updateDisplayBtnText() : void
-  - numberBtn_Click(sender : object, e : EventArgs) : void
-  - btnEsc_Click(sender : object, e : EventArgs) : void
-  - btnOK_Click(sender : object, e : EventArgs) : void
-}
-
-class table {
-  + tableId : int
-  + openStaff : staff
-  + ordered : List<item>
-  + itemsToOrder : List<item>
-}
-
-class staff {
-  + Id : int
-  + Name : string
-  + Access : int
-}
-
-class catagory {
-  + connected : bool
-  + catName : string
-  + catagoryId : int
-  + catagoryExtraInfo : string
-  + items : List<item>
-}
-
-class item {
-  + itemName : string
-  + price : decimal
-  + itemCount : int
-  + itemId : int
-  + chosenColour : string
-  + extraInfo : string
-  + lineId : int
-  + ordered : bool
-}
-
-class rowOfItem {
-  - rowHeight : int
-  - left : Label
-  - middle : Label
-  - right : Label
-  - Tag : item
-  + maxWidth : int
-  + rowPannel : FlowLayoutPanel
-  + Left : Label
-  + Right : Label
-  + Middle : Label
-  + rowOfItem()
-  + updateText() : void
-  + SetHeight(height : int) : void
-  + Dispose() : void
-}
-
-class firstRun {
-  + {static} basestr : string
-  + {static} ranBefore() : bool
-}
-
-class ConnectionSettings {
-  + IP : string
-  + Port : string
-  + Database : string
-  + Username : string
-  + Password : string
-}
-
-class ConnectionSettingsValidator {
-  + ConnectionSettingsValidator()
-  - BeValidIpOrDomain(host : string) : bool
-  - BeValidPort(port : string) : bool
-}
-
-class tableNumberForm {
-  - currentID : int
-  + tableSelected : int
-  - maxTableNumber : int
-  - timeSinceLastClick : DateTime
-  - components : IContainer
-  - panel1 : Panel
-  - displayBtn : Button
-  - OKBtn : Button
-  - Btn0..Btn9 : Button
-  - EscBtn : Button
-  
-  + tableNumberForm()
-  # Dispose(disposing : bool) : void
-  - InitializeComponent() : void
-  - updateDisplayBtnText() : void
-  - numberBtn_Click(sender : object, e : EventArgs) : void
-  - btnEsc_Click(sender : object, e : EventArgs) : void
-  - btnOK_Click(sender : object, e : EventArgs) : void
-}
-
-class SQL {
-  - {static} testFiles : bool
-  - {static} catagoriesFromFile : List<catagory>
-  - {static} jsonDir : string
-  - {static} jsonstaffDir : string
-  - {static} created : bool
-  + {static} connectionString : string
-
-  + {static} initSQL() : void
-  - {static} getStaffFromFile() : List<staff>
-  - {static} ErrorCallIS(ex : Exception) : void
-  + {static} getRangeOfCatagoryID() : (int, int)
-  + {static} getStaffData() : List<staff>
-  + {static} pullCatFile() : List<catagory>
-  + {static} getCatagory(catagoryChosen : int) : catagory
-  - {static} errorCallGC(ex : Exception, catagoryChosen : int) : catagory
-  - {static} errorCallCI(ex : Exception) : (int, int)
-  - {static} errorCallSD(ex : Exception) : List<staff>
-  + {static} staffreturnthing(file : string) : List<staff>
-}
-
-' [Previous class definitions remain the same...]
-
-' Add Program class
-class Program {
-  - {static} localOnly : bool
-  + {static} Main() : void
-}
-
-' Add flow relationships from Program
 Program ..> SQL : «initializes»
 Program ..> firstRun : «checks»
 Program ..> FirstRunWindow : «creates if first run»
 Program ..> Form1 : «creates if not first run»
 Program ..> sync : «uses»
 
-' Add control flow note
 note right of Program
   Main flow:
   1. Initialize SQL
@@ -294,18 +96,7 @@ SQL ..> staff : «uses»
 SQL ..> table : «uses»
 SQL ..> item : «uses»
 
-class sync {
-  + {static} catagoryIdRange : (int min, int max)
-  + {static} allStaff : List<staff>
-  + {static} catagories : List<catagory>
-  
-  + {static} syncStaff() : void
-  + {static} syncCatagory() : void
-  + {static} checkCatFile() : bool
-  + {static} getFiles() : void
-  + {static} syncAll() : void
-  + {static} LoadTables() : void
-}
+
 
 ' Add sync relationships
 sync ..> SQL : «uses»
@@ -320,14 +111,7 @@ note right of sync
   with database and files
 end note
 
-class Logger {
-  - {static} logFilePath : string
-  - {static} logCount : int
-  - {static} _lock : object
-  
-  + {static} Here() : void
-  + {static} Log(message : string) : void
-}
+
 
 ' Update Logger relationships
 Program ..> Logger : «uses»
@@ -350,26 +134,7 @@ sync ..> Logger : «uses»
 SQL ..> Logger : «uses»
 
 ' Update SQL's properties and relationships
-class SQL {
-  - {static} testFiles : bool
-  - {static} catagoriesFromFile : List<catagory>
-  - {static} jsonDir : string
-  - {static} jsonstaffDir : string
-  - {static} created : bool
-  + {static} connectionString : string
-  
-  + {static} initSQL() : void
-  - {static} getStaffFromFile() : List<staff>
-  - {static} ErrorCallIS(ex : Exception) : void
-  + {static} getRangeOfCatagoryID() : (int, int)
-  + {static} getStaffData() : List<staff>
-  + {static} pullCatFile() : List<catagory>
-  + {static} getCatagory(catagoryChosen : int) : catagory
-  - {static} errorCallGC(ex : Exception, catagoryChosen : int) : catagory
-  - {static} errorCallCI(ex : Exception) : (int, int)
-  - {static} errorCallSD(ex : Exception) : List<staff>
-  + {static} staffreturnthing(file : string) : List<staff>
-}
+
 
 ' Add circular dependency between SQL and sync
 SQL ..> sync : «uses»
