@@ -217,7 +217,6 @@ public partial class Form1
 
     private void deleteAllItemsOrdered()
     {
-        tableSelected = null;
         tableBtn.Text = "Table";
         itemsToBeOrdered.Clear();
         scrollPanel.Controls.Clear();
@@ -351,6 +350,7 @@ public partial class Form1
 
     private void tableBtn_Click_Code(object sender, EventArgs e)
     {
+        
         if ((currentStaff != null || currentStaff.Id != 0) && tableSelected != null)
         {
             if (tableSelected.tableId == 0)
