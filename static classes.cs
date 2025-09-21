@@ -194,7 +194,23 @@ public class rowOfItem : item
             control.Dispose();
         }
     }
-
+    
+    
 }
 
+
+public class TransparentPanel : Panel
+{
+    public int Opacity { get; set; } = 128; // 0=fully transparent, 255=opaque
+    public Color FillColor { get; set; } = Color.Black;
+
+    protected override void OnPaintBackground(PaintEventArgs e)
+    {
+        // Do not call base.OnPaintBackground, prevents default solid fill
+        using (SolidBrush brush = new SolidBrush(Color.FromArgb(Opacity, FillColor)))
+        {
+            e.Graphics.FillRectangle(brush, this.ClientRectangle);
+        }
+    }
+}
 
