@@ -66,7 +66,7 @@ namespace WorkCloneCS
         {
             if (timeSinceLastClick >= (DateTime.Now) - TimeSpan.FromSeconds(0.2))
             {
-                staffSelected = null;
+                staffSelected.Id = 0;
                 this.Close();
                 
             }

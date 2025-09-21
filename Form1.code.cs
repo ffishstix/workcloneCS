@@ -296,62 +296,75 @@ public partial class Form1
         catPan.Controls.Add(item);
     }
 
-    private void orderBtn_Click_Code(object sender, EventArgs e)
+    private int maximiseSelectPanel()
     {
-        bool temp = !orderPanel.Visible;
-        allPannelsBlank();
-        orderPanel.Visible = temp;
-        orderPanel.BringToFront();
+        int panel1Height = 279;
+        foreach (Control ctrl in scrollPanel.Controls)
+        {
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
+            {
+                foreach (Control ctrl2 in panel.Controls)
+                {
+                    if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
+                    {
+                        lbl.Width += 92;
+                    }
+                }
+            }
+        }
+        return panel1Height;
+    }
+
+    private int minimiseSelectPanel()
+    {
+        int panel1Height = 0;
+        foreach (Control ctrl in scrollPanel.Controls)
+        {
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
+            {
+                foreach (Control ctrl2 in panel.Controls)
+                {
+                    if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
+                    {
+                        lbl.Width += 92;
+                    }
+                }
+            }
+        }
+        return panel1Height;
+    }
+
+    private void finallyPanelCode(int panel1Height)
+    {
         int totalHeight = flowLayoutPanel1.Height;
-        int panel1Height;
-        if (!temp)
-        {
-            panel1Height = 279;
-            foreach (Control ctrl in scrollPanel.Controls)
-            {
-                if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
-                {
-                    foreach (Control ctrl2 in panel.Controls)
-                    {
-                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
-                        {
-                            lbl.Width += 92;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        else
-        {
-            panel1Height = 0;
-            foreach (Control ctrl in scrollPanel.Controls)
-            {
-                if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
-                {
-                    foreach (Control ctrl2 in panel.Controls)
-                    {
-                        if (ctrl2 is Label lbl && lbl.Name == $"foodLabel{t.itemCount}")
-                        {
-                            lbl.Width += 92;
-                        }
-                    }
-                }
-            }
-        }
-
         int panel2Height = 33;
         int catpanHeight = totalHeight - panel2Height - panel1Height - 20;
         panel1.Height = catpanHeight;
         catPan.Height = panel1Height;
+    }
+    
+    private void orderBtn_Click_Code(object sender, EventArgs e)
+    {
+        bool temp = orderPanel.Visible;
+        allPannelsBlank();
+        orderPanel.Visible = !temp;
+        orderPanel.BringToFront();
+        int panel1Height;
+        
+        if (temp) panel1Height = maximiseSelectPanel();
+
+        else panel1Height = minimiseSelectPanel();
+
+
+        finallyPanelCode(panel1Height);
 
     }
 
     private void tableBtn_Click_Code(object sender, EventArgs e)
     {
-        
-        if ((currentStaff != null || currentStaff.Id != 0) && tableSelected != null)
+        if (currentStaff == null) Logger.Log("staff is null inside tableBtn_Click_Code");
+        if (tableSelected == null) Logger.Log("tableSelected is null inside tableBtn_Click_Code");
+        if (currentStaff.Id != 0 && tableSelected.tableId != null)
         {
             if (tableSelected.tableId == 0)
             {
@@ -437,6 +450,9 @@ public partial class Form1
         }
         nameBtn.Tag = currentStaff;
         nameBtn.Text = currentStaff.Name.ToUpper();
+        
+        Logger.Log($"user: {currentStaff.Name} just logged in with id: {currentStaff.Id}");
+        
     }
 
     private void ConfigSideBtn_Click_Code(object sender, EventArgs e)
@@ -490,5 +506,22 @@ public partial class Form1
         };
         Logger.Log("showed catagories");
         reLoad.Show();
+    }
+    
+    
+}
+
+public class TransparentPanel : Panel
+{
+    public int Opacity { get; set; } = 128; // 0=fully transparent, 255=opaque
+    public Color FillColor { get; set; } = Color.Black;
+
+    protected override void OnPaintBackground(PaintEventArgs e)
+    {
+        // Do not call base.OnPaintBackground, prevents default solid fill
+        using (SolidBrush brush = new SolidBrush(Color.FromArgb(Opacity, FillColor)))
+        {
+            e.Graphics.FillRectangle(brush, this.ClientRectangle);
+        }
     }
 }

@@ -103,7 +103,11 @@ public partial class Form1 : Form
     //the following 5 functions are to bring up user specific panels
     private void ConfigBtn_Click(object sender, EventArgs e)
     {
-        
+        if (catPan.Height < 10)
+        {
+            int tempInt = maximiseSelectPanel();
+            finallyPanelCode(tempInt);
+        }
         bool temp = !ConfigPannel.Visible;
         allPannelsBlank();
         if (temp) addCatagory();
@@ -132,6 +136,11 @@ public partial class Form1 : Form
     }
     private void FinalBtn_Click(object sender, EventArgs e)
     {
+        if (catPan.Height < 10)
+        {
+            int tempInt = maximiseSelectPanel();
+            finallyPanelCode(tempInt);
+        }
         bool temp = !finalPanel.Visible;
         allPannelsBlank();
         finalPanel.Visible = temp;
@@ -140,6 +149,11 @@ public partial class Form1 : Form
 
     private void tableBottomBtn_Click(object sender, EventArgs e)
     {
+        if (catPan.Height < 10)
+        {
+            int tempInt = maximiseSelectPanel();
+            finallyPanelCode(tempInt);
+        }
         bool temp = !tablePanel.Visible;
         allPannelsBlank();
         tablePanel.Visible = temp;
@@ -153,6 +167,11 @@ public partial class Form1 : Form
 
     private void miscBtn_Click(object sender, EventArgs e)
     {
+        if (catPan.Height < 10)
+        {
+            int tempInt = maximiseSelectPanel();
+            finallyPanelCode(tempInt);
+        }
         bool temp = !miscPanel.Visible;
         allPannelsBlank();
         miscPanel.Visible = temp;
@@ -166,7 +185,12 @@ public partial class Form1 : Form
 
     }
 
-    
+    private void AllergiesBtn_Click(object sender, EventArgs e)
+    {
+        infoPanel.ForeColor = Color.Green;
+        infoPanel.Visible = true;
+        infoPanel.BringToFront();
+    }
 
     private void nameBtn_Click(object sender, EventArgs e)
     {
