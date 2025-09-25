@@ -33,7 +33,7 @@ put simply a clone of a very popular pos system...
     - [x] add responsive errors to the first run form so the user knows what to change
     - [x] add tab so i can easily input data
     - [x] add ability for users to go back to last successsful login data
-
+    - [ ] when tableForm is ran it should get all of the data for the table and then highlight tables that table
 
 - a couple packages that might be nice to integrate:
   - [ ] MaterialSkin - recomended for nicer visuals
