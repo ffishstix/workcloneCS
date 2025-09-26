@@ -16,7 +16,7 @@ public partial class Form1 : Form
     public table tableSelected = new table();
     private staff currentStaff;
     private List<catagory> cat = new();
-    private List<item> itemsToBeOrdered = new();
+
     public Form1()
     {
         cat = sync.catagories;
@@ -55,7 +55,7 @@ public partial class Form1 : Form
     {
         item item = (item)((Control)sender).Tag;
         item.lineId = lineId++;
-        itemsToBeOrdered.Add(item);
+        tableSelected.itemsToOrder.Add(item);
         
         //updating middle row shizzle
         leftLabel.Tag = (int)leftLabel.Tag + 1;

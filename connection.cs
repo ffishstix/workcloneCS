@@ -38,7 +38,7 @@ public class ConnectionSettingsValidator : AbstractValidator<ConnectionSettings>
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .MinimumLength(2).WithMessage("Password must be at least 8 characters")
             .MaximumLength(128).WithMessage("Password too long");
 
     }

@@ -18,7 +18,13 @@ namespace WorkCloneCS
     {
         private int currentID;
         private List<staff> x;
-        public staff staffSelected;
+
+        public staff staffSelected = new staff
+        {
+            Access = 0,
+            Name = "name",
+            Id = 0
+        };
         private DateTime timeSinceLastClick;
         public NameForm()
         {

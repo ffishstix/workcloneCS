@@ -7,6 +7,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86</Platforms>
+<Version>1.0.*</Version>
+  <AssemblyVersion>1.0.*</AssemblyVersion>
+  <FileVersion>1.0.*</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,7 +32,7 @@
     </Compile>
     <Compile Update="Form1.code.cs">
       <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
+    </Compile>s
     <Compile Update="TableForm.code.cs">
       <DependentUpon>TableForm.cs</DependentUpon>
     </Compile>

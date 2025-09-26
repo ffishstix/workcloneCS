@@ -19,6 +19,7 @@ public partial class Form1
 
         try
         {
+            // sort the categories using a specific sort to get exta marks...... there is a column in the table that tells you which order they want to be displayed in, sort the categories based on that. /////
             foreach (var category in cat)
             {
                 if (category != null)
@@ -137,12 +138,12 @@ public partial class Form1
                     {
                         row.itemCount--;
                         row.updateText();
-
+                        
 
                     }
                     else
                     {
-                        itemsToBeOrdered.Remove(itemsToBeOrdered.Find(x => x.itemName == row.itemName));
+                        tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.itemName == row.itemName));
                         refreshScrollPanel();
                     }
                     updateTotalPrice(-row.price);
@@ -152,11 +153,11 @@ public partial class Form1
                 {
                     row.itemCount++;
                     row.updateText();
-                    itemsToBeOrdered[itemsToBeOrdered.FindIndex(x => x.itemName == row.itemName)].itemCount = row.itemCount;
-                    refreshScrollPanel();
+                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.itemName == row.itemName)-1].itemCount = row.itemCount;
+                    //used to have refresh scoll pannel here lol absolutely no need
                     updateTotalItems(1);
                     updateTotalPrice(row.price);
-                    row.updateText();
+
 
                 }
 
@@ -218,7 +219,7 @@ public partial class Form1
     private void deleteAllItemsOrdered()
     {
         tableBtn.Text = "Table";
-        itemsToBeOrdered.Clear();
+        tableSelected.itemsToOrder.Clear();
         scrollPanel.Controls.Clear();
         leftLabel.Tag = 0;
         leftLabel.Text = "Items: 0";
@@ -232,7 +233,7 @@ public partial class Form1
         if (tableSelected.ordered.Count != 0)
         {
             List<item> combinedItems = tableSelected.ordered;
-            if (itemsToBeOrdered.Count != 0) foreach (item itemt in itemsToBeOrdered) combinedItems.Append(itemt);
+            if (tableSelected.itemsToOrder.Count != 0) foreach (item itemt in tableSelected.itemsToOrder) combinedItems.Append(itemt);
             
             if (combinedItems != null)
             {
@@ -364,7 +365,7 @@ public partial class Form1
     {
         if (currentStaff == null) Logger.Log("staff is null inside tableBtn_Click_Code");
         if (tableSelected == null) Logger.Log("tableSelected is null inside tableBtn_Click_Code");
-        if (currentStaff.Id != 0 && tableSelected.tableId != null)
+        if (currentStaff.Id != 0 && tableSelected != null)
         {
             if (tableSelected.tableId == 0)
             {
@@ -394,7 +395,7 @@ public partial class Form1
                 return;
             }
 
-            if (itemsToBeOrdered != null)
+            if (tableSelected.itemsToOrder != null)
             {
                 sentToTable();
                 refreshScrollPanel();
@@ -411,7 +412,7 @@ public partial class Form1
     }
     private void sentToTable()
     {
-        tableSelected.itemsToOrder = itemsToBeOrdered;
+        tableSelected.itemsToOrder = tableSelected.itemsToOrder;
         Logger.Log("sent through all items and cleared them");
         refreshScrollPanel();
         leftLabel.Text = "Items: 0";
@@ -427,7 +428,7 @@ public partial class Form1
         SQL.pushItemsToTables(tableSelected, currentStaff, headerId, orderId, lineId);
         tableSelected = new table();
         tableBtn.Text = "Table";
-        itemsToBeOrdered.Clear();
+        tableSelected.itemsToOrder.Clear();
     }
 
     private void nameBtn_Click_Code(object sender, EventArgs e)
