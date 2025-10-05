@@ -69,8 +69,7 @@ public partial class Form1
         await tcs.Task;
     }
 
-    
-    
+
     private void addItem(item item)
     {
         priceTotal += item.price;
@@ -226,6 +225,7 @@ public partial class Form1
         rightLabel.Tag = 0m;
         rightLabel.Text = "Price: 0.00";
     }
+    
     private void refreshScrollPanel()
     {
         foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
@@ -248,6 +248,7 @@ public partial class Form1
         }
         
     }
+    
     private void InitItemList(int e)
     {
         catagory cat = sync.catagories[e];
@@ -410,6 +411,7 @@ public partial class Form1
         }
 
     }
+    
     private void sentToTable()
     {
         tableSelected.itemsToOrder = tableSelected.itemsToOrder;
@@ -507,6 +509,13 @@ public partial class Form1
         };
         Logger.Log("showed catagories");
         reLoad.Show();
+    }
+
+    private void invertInfoPanel()
+    {
+        MainTextBox.Text = "";
+        detailsTextBox.Text = "";
+        infoPanel.Visible = infoPanel.Visible ? false : true;
     }
     
     

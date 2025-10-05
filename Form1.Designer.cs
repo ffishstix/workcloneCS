@@ -74,7 +74,10 @@
             categoryShiftBtn = new System.Windows.Forms.Button();
             discountAmountBtn = new System.Windows.Forms.Button();
             flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            infoPanel = new WorkCloneCS.TransparentPanel();
+            infoPanel = new System.Windows.Forms.Panel();
+            MainTextBox = new System.Windows.Forms.TextBox();
+            detailsTextBox = new System.Windows.Forms.TextBox();
+            okInfoPanelBtn = new System.Windows.Forms.Button();
             ConfigPannel.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
             finalPanel.SuspendLayout();
@@ -82,6 +85,7 @@
             orderPanel.SuspendLayout();
             miscPanel.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
+            infoPanel.SuspendLayout();
             SuspendLayout();
             // 
             // nameBtn
@@ -226,6 +230,7 @@
             InfoBtnControlPanel.TabIndex = 5;
             InfoBtnControlPanel.Text = "Info";
             InfoBtnControlPanel.UseVisualStyleBackColor = true;
+            InfoBtnControlPanel.Click += infoBtn_Click;
             // 
             // flowLayoutPanel2
             // 
@@ -567,13 +572,42 @@
             // 
             // infoPanel
             // 
-            infoPanel.FillColor = System.Drawing.Color.Black;
+            infoPanel.BackColor = System.Drawing.Color.Gainsboro;
+            infoPanel.Controls.Add(MainTextBox);
+            infoPanel.Controls.Add(detailsTextBox);
+            infoPanel.Controls.Add(okInfoPanelBtn);
             infoPanel.Location = new System.Drawing.Point(19, 48);
             infoPanel.Name = "infoPanel";
-            infoPanel.Opacity = 128;
-            infoPanel.Size = new System.Drawing.Size(847, 491);
+            infoPanel.Size = new System.Drawing.Size(757, 491);
             infoPanel.TabIndex = 14;
             infoPanel.Visible = false;
+            // 
+            // MainTextBox
+            // 
+            MainTextBox.Location = new System.Drawing.Point(3, 3);
+            MainTextBox.Multiline = true;
+            MainTextBox.Name = "MainTextBox";
+            MainTextBox.Size = new System.Drawing.Size(750, 160);
+            MainTextBox.TabIndex = 2;
+            MainTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // detailsTextBox
+            // 
+            detailsTextBox.Location = new System.Drawing.Point(3, 181);
+            detailsTextBox.Multiline = true;
+            detailsTextBox.Name = "detailsTextBox";
+            detailsTextBox.Size = new System.Drawing.Size(750, 196);
+            detailsTextBox.TabIndex = 1;
+            detailsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // okInfoPanelBtn
+            // 
+            okInfoPanelBtn.Location = new System.Drawing.Point(3, 402);
+            okInfoPanelBtn.Name = "okInfoPanelBtn";
+            okInfoPanelBtn.Size = new System.Drawing.Size(750, 72);
+            okInfoPanelBtn.TabIndex = 0;
+            okInfoPanelBtn.Text = "Understood";
+            okInfoPanelBtn.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -602,12 +636,21 @@
             orderPanel.ResumeLayout(false);
             miscPanel.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
+            infoPanel.ResumeLayout(false);
+            infoPanel.PerformLayout();
             ResumeLayout(false);
         }
 
-        private WorkCloneCS.TransparentPanel infoPanel;
+        private System.Windows.Forms.TextBox MainTextBox;
+
+        private System.Windows.Forms.TextBox detailsTextBox;
+
+        private System.Windows.Forms.Button okInfoPanelBtn;
+
+        private System.Windows.Forms.Panel infoPanel;
 
         #endregion
+        
         private rowOfItem[] mainRows;
         private Button nameBtn;
         private Button PricingBtn;

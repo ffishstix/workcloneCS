@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using Microsoft.Data.SqlClient;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.Reflection;
 namespace WorkCloneCS;
 
 public partial class Form1 : Form
@@ -187,11 +188,15 @@ public partial class Form1 : Form
 
     private void AllergiesBtn_Click(object sender, EventArgs e)
     {
-        infoPanel.ForeColor = Color.Green;
-        infoPanel.Visible = true;
-        infoPanel.BringToFront();
+        invertInfoPanel();
     }
 
+    private void infoBtn_Click(object sender, EventArgs e)
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+        Logger.Log($"Running version: {version}");
+    }
+    
     private void nameBtn_Click(object sender, EventArgs e)
     {
         nameBtn_Click_Code(sender, e);
@@ -223,4 +228,11 @@ public partial class Form1 : Form
         }
     }
 
+    
+    
+    
+    private void button1_Click(object sender, EventArgs e)
+    {
+        invertInfoPanel();
+    }
 }
