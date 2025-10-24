@@ -7,10 +7,16 @@
     <Compile Update="firstRun.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Form1.code.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="NameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="TableForm.code.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="tableNumberForm.cs">

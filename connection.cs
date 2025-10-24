@@ -7,7 +7,21 @@ public class ConnectionSettings
     public string Database { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+
+    private string ipPattern = @"^(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z]{2,63})+|(?:25[0-5]|2[0-4]\d|1?\d{1,2})(?:\.(?:25[0-5]|2[0-4]\d|1?\d{1,2})){3})$";
+    //could be either ip or domain so makes it more complicated
+    private string portPattern = @"";
+
+    public Tuple<bool, string> isValid()
+    {
+        
+        return new Tuple<bool, string>(true, null);
+    }
 }
+
+
+
+
 
 public class ConnectionSettingsValidator : AbstractValidator<ConnectionSettings>
 {
