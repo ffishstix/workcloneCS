@@ -68,6 +68,9 @@ namespace WorkCloneCS
                 Password = PasswordTextBox.Text
             };
 
+            Tuple<bool, string> b, s =  
+
+            /*
             // Validate each property individually
             var ipValidation = _validator.TestValidate(settings, options =>
                 options.IncludeProperties(x => x.IP));
@@ -79,7 +82,7 @@ namespace WorkCloneCS
                 options.IncludeProperties(x => x.Username));
             var passValidation = _validator.Validate(settings, options =>
                 options.IncludeProperties(x => x.Password));
-
+            */
             var errorMessages = new List<string>();
 
             // Check each validation result and update colors/messages
