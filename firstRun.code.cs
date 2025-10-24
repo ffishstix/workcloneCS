@@ -80,6 +80,7 @@ namespace WorkCloneCS
             var passValidation = _validator.Validate(settings, options =>
                 options.IncludeProperties(x => x.Password));
 
+            
             var errorMessages = new List<string>();
 
             // Check each validation result and update colors/messages
@@ -133,32 +134,40 @@ namespace WorkCloneCS
                                    $"Password={PasswordTextBox.Text};" +
                                    $"Encrypt=False";
                 //now we try the connection
-                try
+                string allPat = @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
+                Logger.Log(connectionString);
+                bool isAllCorrect = System.Text.RegularExpressions.Regex.IsMatch(connectionString, allPat);
+                if (isAllCorrect)
                 {
-                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    try
                     {
-                        await conn.OpenAsync();
-                        InfoLabel.Text = "connection successful";
-                        Logger.Log("connection successful");
-                        lastWorkingConnection = connectionString;
-                        LastBtn.Visible = false;
-                    }
+                        using (SqlConnection conn = new SqlConnection(connectionString))
+                        {
+                            await conn.OpenAsync();
+                            InfoLabel.Text = "connection successful";
+                            Logger.Log("connection successful");
+                            lastWorkingConnection = connectionString;
+                            LastBtn.Visible = false;
+                        }
 
-                }
-                catch (Exception ex)
-                {
-                    InfoLabel.Text = "failed to connect to database";
-                    Logger.Log($"user inputted invalid string {ex.Message}, {connectionString}");
-                    valid = false;
-                    connectionString = "";
-                    if (lastWorkingConnection != null)
+                    }
+                    catch (Exception ex)
                     {
-                        Logger.Log("last working connection string was: " + lastWorkingConnection +
-                                   "so gonna give option to return");
-                        LastBtn.Visible = true;
-                    }
+                        InfoLabel.Text = "failed to connect to database";
+                        Logger.Log($"user inputted invalid string {ex.Message}, {connectionString}");
+                        valid = false;
+                        connectionString = "";
+                        if (lastWorkingConnection != null)
+                        {
+                            Logger.Log("last working connection string was: " + lastWorkingConnection +
+                                       "so gonna give option to return");
+                            LastBtn.Visible = true;
+                        }
 
+                    }
                 }
+
+                else Logger.Log("connectionstring isnt valid");
             }
             else
             {
