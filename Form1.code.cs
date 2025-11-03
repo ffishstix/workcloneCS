@@ -2,7 +2,23 @@ namespace WorkCloneCS;
 
 public partial class Form1
 {
-    
+    #region default code
+    // <summary>
+    // this is the default generated code with each form and is not important
+    // </summary>
+    private void Form1_Load(object sender, EventArgs e)
+    {
+
+    }
+    private void formClosing(object sender, FormClosingEventArgs e)
+    {
+        Application.Exit();
+    }
+
+    #endregion
+
+    #region displayed categories code
+
     private void addCatagory()
     {
         if (!IsHandleCreated) return;
@@ -47,6 +63,15 @@ public partial class Form1
             Logger.Log($"Error in addCatagory: {ex.Message}");
         }
     }
+
+
+    private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
+    
+    private void catClick(object sender, EventArgs e)
+    {
+        deleteChildbox();
+        InitItemList((int)((Control)sender).Tag);
+    }
     
     private async Task LoadCategories()
     {
@@ -69,6 +94,71 @@ public partial class Form1
         await tcs.Task;
     }
 
+    private void InitItemList(int e)
+    {
+        List<item> catItems = sync.catagories[e].items;
+        if (catItems != null)
+        {
+            for (int i = 0; i < catItems.Count; i++)
+            {
+                try
+                {
+                    item item = catItems[i];
+                    item.lineId = lineId++;
+                    addLabel(item);
+                } catch (Exception ex)
+                {
+                    Logger.Log($"{ex.Message}    {e}");
+                }
+                
+            }
+        }
+    }
+    
+    private void addLabel(item tag)
+    {
+        Color colour = Color.Gray;
+        if (tag.chosenColour == "grey") colour = Color.Gray;
+        else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
+        foreach (string s in allergies) if(tag.containedAllergies.Contains(s)) colour = Color.DarkRed;
+
+        Label item = new Label
+        {
+            Text = tag.itemName,
+            Tag = tag,
+            AutoSize = false,
+            BackColor = colour,
+            Width = (catPan.Width / 8) - 2,
+            Height = 50,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Font = new Font("Segoe UI", 12, FontStyle.Regular),
+            Margin = new Padding(1)
+            
+        };
+        allergyToolTip.SetToolTip(item, "item contains selected allergies");
+        item.Click += generalItem_Click;
+
+        catPan.Controls.Add(item);
+    }
+    
+    #endregion
+    
+    
+    
+    
+
+    private void allPannelsBlank()
+    {
+        
+        ConfigPannel.Visible = false;
+        finalPanel.Visible = false;
+        tablePanel.Visible = false;
+        orderPanel.Visible = false;
+        miscPanel.Visible = false;
+    }
+
+    
+    
 
     private void addItem(item item)
     {
@@ -249,54 +339,11 @@ public partial class Form1
         
     }
     
-    private void InitItemList(int e)
-    {
-        catagory cat = sync.catagories[e];
-        List<item> foodItems = cat.items;
-        if (foodItems != null)
-        {
-            for (int i = 0; i < foodItems.Count; i++)
-            {
-                try
-                {
-                    item item = foodItems[i];
-                    item.lineId = lineId++;
-                    addLabel(item);
-                } catch (Exception ex)
-                {
-                    Logger.Log($"{ex.Message}    {e}");
-                }
-                
-            }
-        }
-    }
+    
 
 
     //add all of the items made clickeable that all take them to the gereralItem_Click()
-    private void addLabel(item tag)
-    {
-        Color colour = Color.Gray;
-        if (tag.chosenColour == "grey") colour = Color.Gray;
-        else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
-
-
-        Label item = new Label
-        {
-            Text = tag.itemName,
-            Tag = tag,
-            AutoSize = false,
-            BackColor = colour,
-            Width = (catPan.Width / 8) - 2,
-            Height = 50,
-            TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font("Segoe UI", 12, FontStyle.Regular),
-            Margin = new Padding(1)
-        };
-
-        item.Click += generalItem_Click;
-
-        catPan.Controls.Add(item);
-    }
+    
 
     private int maximiseSelectPanel()
     {
@@ -513,8 +560,6 @@ public partial class Form1
 
     private void invertInfoPanel()
     {
-        MainTextBox.Text = "";
-        detailsTextBox.Text = "";
         infoPanel.Visible = infoPanel.Visible ? false : true;
     }
     

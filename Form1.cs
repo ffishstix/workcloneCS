@@ -13,6 +13,7 @@ namespace WorkCloneCS;
 
 public partial class Form1 : Form
 {
+    private List<string> allergies = [];
     private int lineId = 1;
     public table tableSelected = new table();
     private staff currentStaff;
@@ -36,20 +37,6 @@ public partial class Form1 : Form
         Show();
     }
     
-    private void formClosing(object sender, FormClosingEventArgs e)
-    {
-        Application.Exit();
-    }
-
-    private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
-
-    private void catClick(object sender, EventArgs e)
-    {
-        deleteChildbox();
-        InitItemList((int)((Control)sender).Tag);
-    }
-
-    
     
     
     private void generalItem_Click(object sender, EventArgs e)
@@ -65,8 +52,6 @@ public partial class Form1 : Form
         refreshScrollPanel();
     }
 
-    
-
     //in the bottom right
     private void backBtn_Click(object sender, EventArgs e)
     {
@@ -75,33 +60,21 @@ public partial class Form1 : Form
         allPannelsBlank();
     }
 
+    
+    
 
-    //this happens when shit is open
-    private void Form1_Load(object sender, EventArgs e)
-    {
-
-    }
-
-
+    //<summary>
     //called when catagory clicked on, gets items from file called "{catagoryName}".txt -
     //should probs change for an api call icl but you never know yk 
     // then just goes through each and adds each value and what not
-    
-
+    //
+    //
     //for the config panels should always be called before toggling the visibility of a panel
     //probably useful for me to explain that this is a requirement else we could run into multiple 
     //click issues and other annoying shite
-    private void allPannelsBlank()
-    {
-        
-        ConfigPannel.Visible = false;
-        finalPanel.Visible = false;
-        tablePanel.Visible = false;
-        orderPanel.Visible = false;
-        miscPanel.Visible = false;
-    }
-
+    //
     //the following 5 functions are to bring up user specific panels
+    //</summary>
     private void ConfigBtn_Click(object sender, EventArgs e)
     {
         if (catPan.Height < 10)
@@ -230,9 +203,67 @@ public partial class Form1 : Form
 
     
     
+
     
-    private void button1_Click(object sender, EventArgs e)
+    
+    #region allergy menu
+    //<summary>
+    // allergy buttons
+    //</summary>
+    
+    private void selectedBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        invertInfoPanel();
     }
+    private void selectBtn_Click(object sender, EventArgs e)
+    {
+        int selectedIndex = selectableItems.SelectedIndex;
+        if (selectedIndex == -1) return; // if nothing selected returns.
+        string item = selectableItems.SelectedItem.ToString();
+        Logger.Log($"selected index: {selectedIndex} , item: {item}");
+        if (selectedBox.FindString(item) == -1)selectedBox.Items.Add(item);
+
+    }
+    // exact opposite functions funily enough
+    private void deselectBtn_Click(object sender, EventArgs e)
+    {
+        int selectedIndex = selectedBox.SelectedIndex;
+        if (selectedIndex == -1) return; // if nothing selected returns.
+        Logger.Log("deselect not null");
+        string item = selectedBox.SelectedItem.ToString();
+        Logger.Log($"selected index: {selectedIndex} , item: {item}");
+        try
+        {
+            selectedBox.Items.RemoveAt(selectedIndex);
+            Logger.Log("inside the try");
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error in deselectBtn_Click: most likely because the item doesnt exist: {ex.Message}");
+        }
+        
+    }
+    private void deselectAllBtn_Click(object sender, EventArgs e)
+    {
+        selectedBox.BeginUpdate();
+        while (selectedBox.Items.Count > 0)
+        {
+            selectedBox.Items.RemoveAt(0);
+        }
+        selectedBox.EndUpdate();
+        Logger.Log("removed all items in select box (deselectAllBtn_Click)");
+    }
+    
+    private void okInfoPanelBtn_Click(object sender, EventArgs e)
+    {
+        List<string> tempList = [];
+        foreach(string s in selectedBox.Items) tempList.Add(s);
+        allergies = tempList;
+        tempList.Clear();
+        infoPanel.Visible = !infoPanel.Visible;
+    }
+    
+    #endregion
+
+
+    
 }

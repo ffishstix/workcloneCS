@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             nameBtn = new System.Windows.Forms.Button();
             PricingBtn = new System.Windows.Forms.Button();
             tableBtn = new System.Windows.Forms.Button();
@@ -75,9 +76,13 @@
             discountAmountBtn = new System.Windows.Forms.Button();
             flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             infoPanel = new System.Windows.Forms.Panel();
-            MainTextBox = new System.Windows.Forms.TextBox();
-            detailsTextBox = new System.Windows.Forms.TextBox();
+            deselectAllBtn = new System.Windows.Forms.Button();
+            deselectBtn = new System.Windows.Forms.Button();
+            selectBtn = new System.Windows.Forms.Button();
+            selectedBox = new System.Windows.Forms.ListBox();
+            selectableItems = new System.Windows.Forms.ListBox();
             okInfoPanelBtn = new System.Windows.Forms.Button();
+            allergyToolTip = new System.Windows.Forms.ToolTip(components);
             ConfigPannel.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
             finalPanel.SuspendLayout();
@@ -573,8 +578,11 @@
             // infoPanel
             // 
             infoPanel.BackColor = System.Drawing.Color.Gainsboro;
-            infoPanel.Controls.Add(MainTextBox);
-            infoPanel.Controls.Add(detailsTextBox);
+            infoPanel.Controls.Add(deselectAllBtn);
+            infoPanel.Controls.Add(deselectBtn);
+            infoPanel.Controls.Add(selectBtn);
+            infoPanel.Controls.Add(selectedBox);
+            infoPanel.Controls.Add(selectableItems);
             infoPanel.Controls.Add(okInfoPanelBtn);
             infoPanel.Location = new System.Drawing.Point(19, 48);
             infoPanel.Name = "infoPanel";
@@ -582,23 +590,55 @@
             infoPanel.TabIndex = 14;
             infoPanel.Visible = false;
             // 
-            // MainTextBox
+            // deselectAllBtn
             // 
-            MainTextBox.Location = new System.Drawing.Point(3, 3);
-            MainTextBox.Multiline = true;
-            MainTextBox.Name = "MainTextBox";
-            MainTextBox.Size = new System.Drawing.Size(750, 160);
-            MainTextBox.TabIndex = 2;
-            MainTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            deselectAllBtn.Location = new System.Drawing.Point(140, 343);
+            deselectAllBtn.Name = "deselectAllBtn";
+            deselectAllBtn.Size = new System.Drawing.Size(137, 49);
+            deselectAllBtn.TabIndex = 19;
+            deselectAllBtn.Text = "deselect all";
+            deselectAllBtn.UseVisualStyleBackColor = true;
+            deselectAllBtn.Click += deselectAllBtn_Click;
             // 
-            // detailsTextBox
+            // deselectBtn
             // 
-            detailsTextBox.Location = new System.Drawing.Point(3, 181);
-            detailsTextBox.Multiline = true;
-            detailsTextBox.Name = "detailsTextBox";
-            detailsTextBox.Size = new System.Drawing.Size(750, 196);
-            detailsTextBox.TabIndex = 1;
-            detailsTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            deselectBtn.Location = new System.Drawing.Point(140, 288);
+            deselectBtn.Name = "deselectBtn";
+            deselectBtn.Size = new System.Drawing.Size(137, 49);
+            deselectBtn.TabIndex = 18;
+            deselectBtn.Text = "deselect";
+            deselectBtn.UseVisualStyleBackColor = true;
+            deselectBtn.Click += deselectBtn_Click;
+            // 
+            // selectBtn
+            // 
+            selectBtn.Location = new System.Drawing.Point(140, 238);
+            selectBtn.Name = "selectBtn";
+            selectBtn.Size = new System.Drawing.Size(137, 49);
+            selectBtn.TabIndex = 17;
+            selectBtn.Text = "select";
+            selectBtn.UseVisualStyleBackColor = true;
+            selectBtn.Click += selectBtn_Click;
+            // 
+            // selectedBox
+            // 
+            selectedBox.FormattingEnabled = true;
+            selectedBox.ItemHeight = 15;
+            selectedBox.Location = new System.Drawing.Point(283, 238);
+            selectedBox.Name = "selectedBox";
+            selectedBox.Size = new System.Drawing.Size(137, 154);
+            selectedBox.TabIndex = 16;
+            selectedBox.SelectedIndexChanged += selectedBox_SelectedIndexChanged;
+            // 
+            // selectableItems
+            // 
+            selectableItems.FormattingEnabled = true;
+            selectableItems.ItemHeight = 15;
+            selectableItems.Items.AddRange(new object[] { "gluten", "dairy", "nut (general)", "hazelnuts" });
+            selectableItems.Location = new System.Drawing.Point(3, 238);
+            selectableItems.Name = "selectableItems";
+            selectableItems.Size = new System.Drawing.Size(131, 154);
+            selectableItems.TabIndex = 15;
             // 
             // okInfoPanelBtn
             // 
@@ -608,6 +648,7 @@
             okInfoPanelBtn.TabIndex = 0;
             okInfoPanelBtn.Text = "Understood";
             okInfoPanelBtn.UseVisualStyleBackColor = true;
+            okInfoPanelBtn.Click += okInfoPanelBtn_Click;
             // 
             // Form1
             // 
@@ -637,20 +678,27 @@
             miscPanel.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
             infoPanel.ResumeLayout(false);
-            infoPanel.PerformLayout();
             ResumeLayout(false);
         }
 
-        private System.Windows.Forms.TextBox MainTextBox;
+        private System.Windows.Forms.ToolTip allergyToolTip;
 
-        private System.Windows.Forms.TextBox detailsTextBox;
+        private System.Windows.Forms.Button deselectAllBtn;
+
+        private System.Windows.Forms.Button selectBtn;
+        private System.Windows.Forms.Button deselectBtn;
+
+        private System.Windows.Forms.ListBox selectedBox;
+
+        private System.Windows.Forms.ListBox selectableItems;
 
         private System.Windows.Forms.Button okInfoPanelBtn;
 
         private System.Windows.Forms.Panel infoPanel;
 
         #endregion
-        
+
+        #region init
         private rowOfItem[] mainRows;
         private Button nameBtn;
         private Button PricingBtn;
@@ -701,5 +749,9 @@
         private Button categoryShiftBtn;
         private Button discountAmountBtn;
         private FlowLayoutPanel flowLayoutPanel1;
+        
+
+        #endregion
+        
     }
 }

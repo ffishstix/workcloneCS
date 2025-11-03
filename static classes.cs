@@ -60,6 +60,7 @@ public class item
     public string chosenColour { get; set; }
     public int lineId { get; set; }
     public bool ordered { get; set; }
+    public List<string> containedAllergies  { get; set; }
 }
 
 

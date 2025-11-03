@@ -272,18 +272,42 @@ class SQL
     {
         catagory currentCatagory = new catagory();
         List<item> values = new List<item>();
-        string query = 
-        "SELECT ai.itemId, ai.itemName, ISNULL(ai.extraInfo, ''), ai.price, ISNULL(ai.chosenColour, 'grey'), " +
-        "cat.catName, cat.catagoryId, ISNULL(cat.extraCatInfo, '') " +
-        "FROM allItems ai " +
-        "JOIN [foodCatagory] foo ON ai.itemID = foo.itemId " +
-        "JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId " +
-        "WHERE cat.catagoryId = @catagoryId " +
-        "AND cat.catagoryId IS NOT NULL " +
-        "AND catName IS NOT NULL " +
-        "AND itemName IS NOT NULL " +
-        "AND price IS NOT NULL " +
-        "ORDER BY cat.catagoryId ";
+        string query = """
+                       SELECT
+                       	 ai.itemId
+                       	,ai.itemName
+                       	,ISNULL(STRING_AGG(al.allergyName, ', '), '') as allergies
+                       	,ISNULL(ai.extraInfo, '') 
+                       	,ai.price
+                       	,ISNULL(ai.chosenColour, 'grey') 
+                       	,cat.catName
+                       	,cat.catagoryId
+                       	,ISNULL(cat.extraCatInfo, '') 
+                       FROM
+                       	allItems ai 
+                       	JOIN [foodCatagory] foo ON ai.itemID = foo.itemId 
+                       	JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId 
+                       	LEFT JOIN [allergyItem] ali ON ai.itemId = ali.itemId 
+                       	LEFT JOIN [allergies] al ON ali.allergyId = al.allergyId 
+                       WHERE
+                       		cat.catagoryId = @catagoryId 
+                       	AND cat.catagoryId IS NOT NULL 
+                       	AND catName IS NOT NULL			
+                       	AND itemName IS NOT NULL 		
+                       	AND price IS NOT NULL 			
+                       GROUP BY
+                       	 ai.itemId
+                       	,ai.itemName
+                       	,ai.extraInfo
+                       	,ai.price
+                       	,ai.chosenColour
+                       	,cat.catName
+                       	,cat.catagoryId
+                       	,cat.extraCatInfo 
+                       ORDER BY
+                       	cat.catagoryId 
+                       
+                       """;
         
         try
         {
@@ -314,6 +338,7 @@ class SQL
                                      * items......
                                      * itemId
                                      * itemName
+                                     * allergies
                                      * extraInfo
                                      * itemCount - input manually
                                      * price
@@ -329,7 +354,7 @@ class SQL
                                      */
                                     itemName = reader.GetString(1),
                                     price = (decimal)reader.GetInt32(3) / 100,
-                                    extraInfo = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                    extraInfo = reader.IsDBNull(3) ? null : reader.GetString(3),
                                     chosenColour = reader.GetString(4),
                                     itemId = reader.GetInt32(0),
                                     itemCount = 1
