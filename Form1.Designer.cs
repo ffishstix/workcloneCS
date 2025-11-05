@@ -634,9 +634,10 @@
             // 
             selectableItems.FormattingEnabled = true;
             selectableItems.ItemHeight = 15;
-            selectableItems.Items.AddRange(new object[] { "gluten", "dairy", "nut (general)", "hazelnuts" });
+            selectableItems.Items.AddRange(new object[] { "peanuts", "dairy", "Eggs", "nuts", "wheat", "soy", "Fish", "Meat", "gluten" });
             selectableItems.Location = new System.Drawing.Point(3, 238);
             selectableItems.Name = "selectableItems";
+            selectableItems.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             selectableItems.Size = new System.Drawing.Size(131, 154);
             selectableItems.TabIndex = 15;
             // 

@@ -108,7 +108,7 @@ public partial class Form1
                     addLabel(item);
                 } catch (Exception ex)
                 {
-                    Logger.Log($"{ex.Message}    {e}");
+                    Logger.Log($"error in InitItemList: {ex.Message}    {e}");
                 }
                 
             }
@@ -117,28 +117,36 @@ public partial class Form1
     
     private void addLabel(item tag)
     {
-        Color colour = Color.Gray;
-        if (tag.chosenColour == "grey") colour = Color.Gray;
-        else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
-        foreach (string s in allergies) if(tag.containedAllergies.Contains(s)) colour = Color.DarkRed;
-
-        Label item = new Label
+        try
         {
-            Text = tag.itemName,
-            Tag = tag,
-            AutoSize = false,
-            BackColor = colour,
-            Width = (catPan.Width / 8) - 2,
-            Height = 50,
-            TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font("Segoe UI", 12, FontStyle.Regular),
-            Margin = new Padding(1)
+            Color colour = Color.Gray;
+            if (tag.chosenColour == "grey") colour = Color.Gray;
+            else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
+            if (allergies != null) foreach (string s in allergies) if(tag.containedAllergies.Contains(s)) colour = Color.DarkRed;
             
-        };
-        allergyToolTip.SetToolTip(item, "item contains selected allergies");
-        item.Click += generalItem_Click;
+            Label item = new Label
+            {
+                Text = tag.itemName,
+                Tag = tag,
+                AutoSize = false,
+                BackColor = colour,
+                Width = (catPan.Width / 8) - 2,
+                Height = 50,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 12, FontStyle.Regular),
+                Margin = new Padding(1)
+            
+            };
+            allergyToolTip.SetToolTip(item, "item contains selected allergies");
+            item.Click += generalItem_Click;
 
-        catPan.Controls.Add(item);
+            catPan.Controls.Add(item);
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"got an error inside addLabel which is called by InitItemList: {ex.Message}");
+        }
+        
     }
     
     #endregion

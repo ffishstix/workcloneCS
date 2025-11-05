@@ -260,10 +260,11 @@ public partial class Form1 : Form
         allergies = tempList;
         tempList.Clear();
         infoPanel.Visible = !infoPanel.Visible;
+        backBtn_Click(null, null);
     }
     
     #endregion
 
 
-    
+
 }

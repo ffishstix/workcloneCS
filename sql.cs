@@ -328,13 +328,15 @@ class SQL
                         {
                             while (reader.Read())
                             {
+                                /*
                                 Logger.Log("reading currently catagories btw");
                                 currentCatagory.catagoryId = reader.GetInt32(6);
                                 currentCatagory.catName = reader.GetString(5);
                                 currentCatagory.catagoryExtraInfo = reader.IsDBNull(7) ? null : reader.GetString(7);
+
                                 values.Add(new item()
                                 {
-                                    /*
+
                                      * items......
                                      * itemId
                                      * itemName
@@ -351,14 +353,57 @@ class SQL
                                      * catId
                                      * catExtraInfo
                                      * list of items
-                                     */
+                                     *
                                     itemName = reader.GetString(1),
                                     price = (decimal)reader.GetInt32(3) / 100,
                                     extraInfo = reader.IsDBNull(3) ? null : reader.GetString(3),
                                     chosenColour = reader.GetString(4),
                                     itemId = reader.GetInt32(0),
                                     itemCount = 1
+
+
+
                                 });
+                            */
+                                
+                                int itemId = reader.GetInt32(0);
+                                string itemName = reader.GetString(1);
+                                string allergyString = reader.IsDBNull(2) ? "" : reader.GetString(2);
+                                string extraInfo = reader.IsDBNull(3) ? "" : reader.GetString(3);
+                                decimal price = reader.GetDecimal(4);
+                                string chosenColour = reader.GetString(5);
+                                string catName = reader.GetString(6);
+                                int catId = reader.GetInt32(7);
+                                string catExtraInfo = reader.IsDBNull(8) ? "" : reader.GetString(8);
+
+                                // Populate category details once
+                                currentCatagory.catagoryId = catId;
+                                currentCatagory.catName = catName;
+                                currentCatagory.catagoryExtraInfo = catExtraInfo;
+
+                                // Split allergy string into a list
+                                List<string> containedAllergies = new List<string>();
+                                if (!string.IsNullOrWhiteSpace(allergyString))
+                                {
+                                    containedAllergies = allergyString
+                                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(a => a.Trim())
+                                        .ToList();
+                                }
+                                
+                                item newItem = new item
+                                {
+                                    itemId = itemId,
+                                    itemName = itemName,
+                                    extraInfo = extraInfo,
+                                    price = price,
+                                    chosenColour = chosenColour,
+                                    itemCount = 1,
+                                    containedAllergies = containedAllergies
+                                };
+
+                                values.Add(newItem);
+                                
                                 Logger.Log($"got: item: {reader.GetString(1)}");
                             }
 
