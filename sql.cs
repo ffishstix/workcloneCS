@@ -596,6 +596,32 @@ class SQL
         }
     }
 
+    private static int betterModifyTableSql(string sqlCommand, string? connectionString)
+    {
+        int x = -1;
+        if (connectionString == null)
+        {
+            connectionString = SQL.connectionString;
+            
+        }
+
+        try
+        {
+            using (SqlConnection con = new SqlConnection((connectionString)))
+            {
+                SqlCommand com = new SqlCommand(sqlCommand, con);
+                x = com.ExecuteNonQuery();
+                
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Log("error ~line 610~ sql.cs betterModifyTableSql: " + ex.Message);
+        }
+        return x;
+    } 
+    
+
     public static List<item> getTableItems(int tableId)
     {
         string sqlCommand = $"""
