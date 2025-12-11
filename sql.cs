@@ -7,7 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 namespace WorkCloneCS;
 
-class SQL
+static class SQL
 {
 
     private static bool testFiles = false;
@@ -15,14 +15,16 @@ class SQL
     private static string jsonDir;
     private static string jsonstaffDir;
     public static string connectionString;
-    
+    public static bool initCompleted = false;
+    public static string dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
+    public static string sqlDir = dir + "sql/";
+    private static SqlConnection sqlCon;
     public static void initSQL()
     {
-        
-        string sql = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/";
-        if (!Directory.Exists(sql)) Directory.CreateDirectory(sql);
-        jsonDir = sql + "catagoryJson.txt";
-        jsonstaffDir = sql + "staff.txt";
+        SQL.dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
+        if (!Directory.Exists(sqlDir)) Directory.CreateDirectory(sqlDir);
+        jsonDir = sqlDir + "catagoryJson.txt";
+        jsonstaffDir = sqlDir + "staff.txt";
         catagoriesFromFile = pullCatFile();
         if (!testFiles && connectionString == null)
         {
@@ -30,7 +32,7 @@ class SQL
             {
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile(sql + "ConnectionStringsConfiguration.json")
+                    .AddJsonFile(sqlDir + "ConnectionStringsConfiguration.json")
                     .Build();
                 connectionString = configuration.GetConnectionString("DefaultConnection");
             }
@@ -70,7 +72,9 @@ class SQL
         {
             Logger.Log("staff didnt staff");
         }
-        
+
+        sqlCon = new SqlConnection(connectionString);
+        initCompleted = true;
     }
     
 
@@ -710,6 +714,119 @@ class SQL
  
 
     }
+
+
+    
+    #region local database initialisation
+    ///<summary>
+    /// the code in this section only contains the initialisation code
+    /// for setting up the local database
+    /// this could either be the first time making one or
+    /// just adding the modifications 
+    /// </summary>
+    
+    
+    public static int getDatabaseVNum()
+    {
+        int x = -1;
+        const string sqlCommand = @"
+                            select try_convert(int, value) as databaseVersion
+                            from sys.extended_properties 
+                            where class = 0
+                            and name = N'DatabaseVersion'
+                            ";
+        
+        SqlCommand com = new SqlCommand(sqlCommand, sqlCon);
+        sqlCon.Open();
+        object? result = com.ExecuteScalar(); 
+        sqlCon.Close();
+        if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
+        
+        return x;
+    }
+    
+    public static int getLocalDBVNum()
+    {
+        try
+        {
+            return int.Parse(File.ReadAllText(dir + "sql/DBvNum.txt"));
+        } catch (Exception ex)
+        {
+            Logger.Log(ex.Message);
+            return -1;
+        }
+        
+    }
+
+    public static List<item> getAllItems()
+    {
+        List<item> localItems = new List<item>();
+        using var cmd = new SqlCommand("select itemId, itemName, price, " +
+                                       "ISNULL(chosenColour, 'grey'), ISNULL(extraInfo, '') from allItems", sqlCon);
+        sqlCon.Open();
+        using SqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            localItems.Add(new item()
+            {
+                itemId = reader.GetInt32(0),
+                itemName = reader.GetString(1),
+                price = reader.GetInt32(2) / 100,
+                chosenColour = reader.GetString(3),
+                extraInfo = reader.GetString(4),
+                itemCount = 1,
+                ordered = false,
+                containedAllergies = null
+            });
+        }
+        sqlCon.Close();
+        
+        return localItems;
+    }
+
+    public static List<catagory> getAllCatagories()
+    {
+        List<catagory> cats = new List<catagory>();
+        string command = "select catagoryId, catName, ISNULL(extraInfo, ''), ISNULL(chosenColour, '') from catagories";
+        SqlCommand com = new SqlCommand(command, sqlCon);
+        sqlCon.Open();
+        using SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            cats.Add(new catagory()
+            {
+                catagoryId = reader.GetInt32(0),
+                catName = reader.GetString(1),
+                catagoryExtraInfo = reader.GetString(2),
+                catColour = reader.GetString(3)
+            });
+        }
+        sqlCon.Close();
+        return cats;
+    }
+
+    public static List<List<int>> getCatItemLinks()
+    {
+        
+        int count = 0;
+        List<List<int>> itemCat = new List<List<int>>();
+        SqlCommand com = new SqlCommand("select catagoryId, itemId from foodCatagory order by catagoryId asc", sqlCon);
+        sqlCon.Open();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            count++;
+            while (itemCat.Count <= reader.GetInt32(0)) itemCat.Add(new List<int>());
+            itemCat[reader.GetInt32(0)].Add(reader.GetInt32(1));
+        }
+        sqlCon.Close();
+        Logger.Log($"got {count} links");
+        return itemCat; // this returns a list of catagories that has a list of items that has the catagoryId and itemId in that order
+    }
+    
+    
+    
+    #endregion
     
 }
 

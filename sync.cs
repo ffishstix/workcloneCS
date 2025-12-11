@@ -148,6 +148,8 @@ class sync
             Logger.Log("synced catagory");
             
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
+            int cloudV = SQL.getDatabaseVNum();
+            File.WriteAllText($@"{SQL.dir}\sql\DBvNum.txt", $"{cloudV}");
         });
     }
 

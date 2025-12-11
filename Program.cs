@@ -9,26 +9,45 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
+            bool deepDebugging = false;
+            
             Task.Run(() =>
             {
                 SQL.initSQL();
+                database.initLocalDatabase();
             });
-            
-            
-            if (!firstRun.ranBefore())
+
+            if (!deepDebugging)
             {
-                ApplicationConfiguration.Initialize();
-                FirstRunWindow firstRunWindow = new FirstRunWindow();
-                Application.Run(firstRunWindow);
+                if (!firstRun.ranBefore())
+                {
+                    ApplicationConfiguration.Initialize();
+                    FirstRunWindow firstRunWindow = new FirstRunWindow();
+                    Application.Run(firstRunWindow);
+                }
+                else
+                {
+                    ApplicationConfiguration.Initialize();
+                    sync.getFiles();
+                    Application.Run(new Form1());
+                }
+
+                Logger.Log("exiting program, last line of code\n\n\n");
+                
             }
             else
             {
-                ApplicationConfiguration.Initialize();
-                sync.getFiles();
-                Application.Run(new Form1());
+                // custom code
+                Logger.Log("deep debugging enabled");
+                
+                do {
+                    Thread.Sleep(100);
+                    
+                }while (!SQL.initCompleted);
+                Logger.Log(SQL.getDatabaseVNum().ToString());    
+                
+                
             }
-            Logger.Log("exiting program, last line of code\n\n\n");
-        
         }
     }
 }
