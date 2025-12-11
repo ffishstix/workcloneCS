@@ -7,7 +7,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace WorkCloneCS;
-
 public class table
 {
     public staff openStaff { get; set; }
@@ -47,6 +46,7 @@ class catagory
     public int catagoryId { get; set; }
     public string catagoryExtraInfo { get; set; }
 
+    public string catColour { get; set; }
     public List<item> items { get; set; }
 }
 
@@ -200,5 +200,118 @@ public class rowOfItem : item
 }
 
 
+///
+/// this will be where i put the daatabase class i am going to redo the waya i store my local database.
+/// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
+///
+
+class dbCatagories
+{
+    private List<int> itemIds;
+    private string catName;
+    private int catId;
+
+    dbCatagories()
+    {
+        catId = 0;
+        catName = "";
+    }
+}
+
+
+class database
+{
+    private static SqlConnection connection;
+    private static List<item> items;
+    private static List<catagory> catagories;
+    private static bool DBExists;
+    private static List<List<int>> catItemLinks;
+
+    public static void initLocalDatabase()
+    {
+        DBExists = databaseExists();
+        if(DBExists) checkDBVNum();
+        items = SQL.getAllItems();
+        catagories = SQL.getAllCatagories();
+        catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and catagories
+        updateCatagories();
+        
+        
+    }
+
+    private static bool databaseExists()
+    {
+        string dir = @$"{SQL.dir}sql/";
+        if (Directory.Exists(dir)) return File.Exists(dir + "DBvNum.txt");
+        Logger.Log($"static Classes databaseExists() {dir} directory doesnt exist");
+        return false;
+
+    }
+
+    private static void checkDBVNum()
+    {
+        int cloud = SQL.getDatabaseVNum();
+        int local = SQL.getLocalDBVNum();
+        if (local != cloud)
+        {
+            Logger.Log("local database version is different from cloud database version updating now");
+            sync.syncAll();
+        }
+        else Logger.Log("local database is up to date");
+        
+        
+
+    }
+
+    private static void updateCatagories()
+    {
+        if (catagories == null)
+        {
+            Logger.Log("updateCatagories(): catagories is null (SQL.getAllCatagories returned null).");
+            return;
+        }
+
+        if (items == null)
+        {
+            Logger.Log("updateCatagories(): items is null (SQL.getAllItems returned null).");
+            return;
+        }
+
+        if (catItemLinks == null)
+        {
+            Logger.Log("updateCatagories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
+            return;
+        }
+        var catById = new Dictionary<int, catagory>(catagories.Count);
+        foreach (catagory cat in catagories)
+        {
+            cat.items ??= new List<item>();
+            catById[cat.catagoryId] = cat;
+        }
+
+        var itemById = new Dictionary<int, item>(items.Count);
+        foreach (item it in items)
+            itemById[it.itemId] = it;
+        
+        foreach (var link in catItemLinks)
+        {
+            if (link == null || link.Count < 2)
+                continue;
+
+            int itemId = link[1];
+            int catagoryId = link[0];
+
+            if (!catById.TryGetValue(catagoryId, out var cat))
+                continue;
+
+            if (!itemById.TryGetValue(itemId, out var it))
+                continue;
+
+            cat.items.Add(it);
+        }
+        Logger.Log("finished updating catagories");
+    }
+    
+}
 
 
