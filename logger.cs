@@ -3,7 +3,7 @@
 class Logger
 {
     private static readonly string logFilePath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\log.txt";
-    private static int logCount = 0;
+    private static int logCount;
     private static readonly object _lock = new object();
 
     public static void Here()

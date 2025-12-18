@@ -7,10 +7,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 namespace WorkCloneCS;
 
-static class SQL
+static partial class SQL
 {
 
     private static bool testFiles = false;
+    private static bool created = false;
     private static List<catagory> catagoriesFromFile;
     private static string jsonDir;
     private static string jsonstaffDir;
@@ -21,7 +22,8 @@ static class SQL
     private static SqlConnection sqlCon;
     public static void initSQL()
     {
-        SQL.dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
+        //database connection section
+        dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
         if (!Directory.Exists(sqlDir)) Directory.CreateDirectory(sqlDir);
         jsonDir = sqlDir + "catagoryJson.txt";
         jsonstaffDir = sqlDir + "staff.txt";
@@ -46,13 +48,15 @@ static class SQL
             
         }
 
-        if (connectionString != null){
+        if (connectionString == null) ErrorCallIS(null);
+        else {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
                     Logger.Log("connected to database");
+                    connection.Close();
                 
                 }
                 catch (Exception ex)
@@ -63,10 +67,8 @@ static class SQL
             }
 
         }
-        else
-        {
-            ErrorCallIS(null);
-        }
+        
+        //staff section
         sync.allStaff = getStaffFromFile();
         if (sync.allStaff == null)
         {
@@ -78,43 +80,8 @@ static class SQL
     }
     
 
-    private static bool created = false;
-
-    private static List<staff> getStaffFromFile()
-    {
-        try
-        {
-            if (File.Exists(jsonstaffDir))
-            {
-                string json = File.ReadAllText(jsonstaffDir);
-                List<staff> fileJson = JsonSerializer.Deserialize<List<staff>>(json);
-                Logger.Log("json was read");
-                return fileJson;
-
-            }
-
-            Logger.Log(jsonstaffDir + " doesn't exist");
-            return null;
-        }
-        catch (Exception ex)
-        {
-            Logger.Log($"getStaffFromFile() failed: {ex.Message}");
-            return null;
-        }
-    }
     
-    private static void ErrorCallIS(Exception ex)
-    {
-        if (ex != null) Logger.Log(ex.Message);
-        if (!created)
-        {
-            created = true;
-            Task.Run(() => MessageBox.Show(
-                "it is recomened for you to go through the config settings," +
-                "\n you are currently using the backup database on your local device," +
-                "\n you will not be able to send an order through in this state"));
-        }
-    }
+
 
 
     public static (int, int) getRangeOfCatagoryID()
@@ -122,131 +89,47 @@ static class SQL
         string query = "SELECT top 1 catagoryId " +
             "from catagories " +
             "order by catagoryId ";
-        int min = 0;
-        int max = 0;
-        try
-        {
-            if (connectionString != null)
-            {
+        int min = -1;
+        int max = -1;
+        SqlCommand com = new SqlCommand(query + "desc ", sqlCon);
+        SqlCommand com2 = new SqlCommand(query + "asc ", sqlCon); 
+        sqlCon.Open();
+        object? descResult = com.ExecuteScalar();
+        object? ascResult = com.ExecuteScalar();
+        sqlCon.Close();
+        if (descResult != null || descResult != DBNull.Value) max = Convert.ToInt32(descResult);
+        if (ascResult != null || ascResult != DBNull.Value) min = Convert.ToInt32(ascResult);
 
-                //main method
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    try
-                    {
-                        connection.Open();
-                        SqlCommand command = new SqlCommand(query + " desc ", connection);
-                        Logger.Log(command.Parameters.ToString());
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                max = reader.GetInt32(0);
-                                Logger.Log($"max: {max}");
-                            }
-                        }
 
-                        command = new SqlCommand(query + "asc ", connection);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                min = reader.GetInt32(0);
-                                Logger.Log($"max: {min}");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        return errorCallCI(ex);
-                    }
-                }
-                return (min, max);
-            }
-
-            return errorCallCI(null);
-        }
-        catch (Exception ex)
-        {
-            return errorCallCI(ex);
-
-        }
-
-        
+        return (min, max);
     }
     
-    public static List<staff> getStaffData()
+    public static List<staff> getStaffDataCloud()
     {
         Logger.Log("inside getStaffData");
         string query = "select * from staff order by id desc";
         List<staff> values= new List<staff>();
-        if (connectionString != null)
+        if (connectionString == null) return null;
+        SqlCommand com = new SqlCommand(query, sqlCon);
+        sqlCon.Open();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
         {
-            try
+            Logger.Here();
+            int id = reader.GetInt32(0);
+            string name = reader.GetString(1);
+            int access = reader.GetInt32(2);
+            values.Add(new staff
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    try
-                    {
-                        connection.Open();
-                        Logger.Log("connected to database");
-                        using (SqlCommand command = new SqlCommand(query, connection))
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            try
-                            {
-                                while (reader.Read())
-                                {
-                                    int id = reader.GetInt32(0);
-                                    string name = reader.GetString(1);
-                                    int access = reader.GetInt32(2);
-                                    values.Add(new staff
-                                    {
-                                        Id = id,
-                                        Access = access,
-                                        Name = name
-                                    });
-                                    Logger.Log($"ID: {id}, Name: {name}, accessLevel: {access}");
-
-
-                                }
-
-                                try
-                                {
-                                    // logging it just incase it cannot pull it next time
-                                    string jsonString = JsonSerializer.Serialize(values,
-                                        new JsonSerializerOptions { WriteIndented = true });
-
-                                    File.WriteAllText(jsonstaffDir, jsonString);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(ex.Message);
-                                    Logger.Log(ex.Message);
-                                }
-
-                                return values;
-                            }
-                            catch (Exception ex)
-                            {
-                                return errorCallSD(ex);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        return errorCallSD(ex);
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                return errorCallSD(ex);
-            }
+                Id = id,
+                Access = access,
+                Name = name
+            });
         }
 
-        return errorCallSD(null);
-
+        sqlCon.Close();
+        if (values.Count == 0) return null;
+        return values;
 
     }
 
@@ -313,233 +196,94 @@ static class SQL
                        
                        """;
         
-        try
-        {
-            if (connectionString != null)
+        SqlCommand com = new SqlCommand(query, sqlCon);
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
             {
+                
+                int itemId = reader.GetInt32(0);
+                string itemName = reader.GetString(1);
+                string allergyString = reader.IsDBNull(2) ? "" : reader.GetString(2);
+                string extraInfo = reader.IsDBNull(3) ? "" : reader.GetString(3);
+                decimal price = reader.GetDecimal(4);
+                string chosenColour = reader.GetString(5);
+                string catName = reader.GetString(6);
+                int catId = reader.GetInt32(7);
+                string catExtraInfo = reader.IsDBNull(8) ? "" : reader.GetString(8);
+                
+                // Populate category details once
+                currentCatagory.catagoryId = catId;
+                currentCatagory.catName = catName;
+                currentCatagory.catagoryExtraInfo = catExtraInfo;
 
-                //main method
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                // Split allergy string into a list
+                List<string> containedAllergies = new List<string>();
+                if (!string.IsNullOrWhiteSpace(allergyString))
+                    containedAllergies = allergyString
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(a => a.Trim())
+                        .ToList();
+                
+                values.Add(new item()
                 {
-                    try
+                    itemId = itemId,
+                    itemName = itemName,
+                    extraInfo = extraInfo,
+                    price = price,
+                    chosenColour = chosenColour,
+                    itemCount = 1,
+                    containedAllergies = containedAllergies
+                });
+                
+            }
+
+            currentCatagory.items = values;
+            currentCatagory.connected = false;
+            try
+            {
+                List<catagory> fileJson = new List<catagory>();
+
+                if (File.Exists(jsonDir))
+                {
+                    Logger.Here();
+                    fileJson = pullCatFile();
+
+                    if (fileJson == null)
                     {
-                        connection.Open();
-                        Logger.Log("opened connection for catagories");
-                        SqlCommand command = new SqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@catagoryId", catagoryChosen);
-                        using (command)
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                /*
-                                Logger.Log("reading currently catagories btw");
-                                currentCatagory.catagoryId = reader.GetInt32(6);
-                                currentCatagory.catName = reader.GetString(5);
-                                currentCatagory.catagoryExtraInfo = reader.IsDBNull(7) ? null : reader.GetString(7);
-
-                                values.Add(new item()
-                                {
-
-                                     * items......
-                                     * itemId
-                                     * itemName
-                                     * allergies
-                                     * extraInfo
-                                     * itemCount - input manually
-                                     * price
-                                     * chosenColour
-                                     * lineId = blank
-                                     *
-                                     * catagories...
-                                     * connected - true or false
-                                     * catName
-                                     * catId
-                                     * catExtraInfo
-                                     * list of items
-                                     *
-                                    itemName = reader.GetString(1),
-                                    price = (decimal)reader.GetInt32(3) / 100,
-                                    extraInfo = reader.IsDBNull(3) ? null : reader.GetString(3),
-                                    chosenColour = reader.GetString(4),
-                                    itemId = reader.GetInt32(0),
-                                    itemCount = 1
-
-
-
-                                });
-                            */
-                                
-                                int itemId = reader.GetInt32(0);
-                                string itemName = reader.GetString(1);
-                                string allergyString = reader.IsDBNull(2) ? "" : reader.GetString(2);
-                                string extraInfo = reader.IsDBNull(3) ? "" : reader.GetString(3);
-                                decimal price = reader.GetDecimal(4);
-                                string chosenColour = reader.GetString(5);
-                                string catName = reader.GetString(6);
-                                int catId = reader.GetInt32(7);
-                                string catExtraInfo = reader.IsDBNull(8) ? "" : reader.GetString(8);
-
-                                // Populate category details once
-                                currentCatagory.catagoryId = catId;
-                                currentCatagory.catName = catName;
-                                currentCatagory.catagoryExtraInfo = catExtraInfo;
-
-                                // Split allergy string into a list
-                                List<string> containedAllergies = new List<string>();
-                                if (!string.IsNullOrWhiteSpace(allergyString))
-                                {
-                                    containedAllergies = allergyString
-                                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                        .Select(a => a.Trim())
-                                        .ToList();
-                                }
-                                
-                                item newItem = new item
-                                {
-                                    itemId = itemId,
-                                    itemName = itemName,
-                                    extraInfo = extraInfo,
-                                    price = price,
-                                    chosenColour = chosenColour,
-                                    itemCount = 1,
-                                    containedAllergies = containedAllergies
-                                };
-
-                                values.Add(newItem);
-                                
-                                Logger.Log($"got: item: {reader.GetString(1)}");
-                            }
-
-                            currentCatagory.items = values;
-                            currentCatagory.connected = false;
-                            try
-                            {
-                                List<catagory> fileJson = new List<catagory>();
-
-
-
-                                if (File.Exists(jsonDir))
-                                {
-                                    Logger.Here();
-                                    fileJson = pullCatFile();
-
-                                    if (fileJson == null)
-                                    {
-                                        Logger.Log("file was null or weird so I'm starting again");
-                                        fileJson = new List<catagory>();
-                                    }
-                                }
-                                else
-                                {
-                                    Logger.Log($"{jsonDir} doesn't exist, creating a new one");
-                                    fileJson = new List<catagory>();
-                                }
-
-                                bool ah = false;
-                                foreach (catagory cat in fileJson)
-                                {
-                                    if (cat != null)
-                                    {
-                                        if ((cat.catName == currentCatagory.catName ||
-                                             cat.catagoryId == currentCatagory.catagoryId))
-                                        {
-                                            ah = true;
-                                        }
-                                    }
-
-                                }
-
-                                if (!ah) fileJson.Add(currentCatagory);
-                                string jsonStrings = JsonSerializer.Serialize(fileJson,
-                                    new JsonSerializerOptions { WriteIndented = true });
-                                File.WriteAllText(jsonDir, jsonStrings);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Log($"error while storing items {ex.Message}");
-                            }
-
-                            currentCatagory.connected = true;
-                            return currentCatagory;
-
-                        }
+                        Logger.Log("file was null or weird so I'm starting again");
+                        fileJson = new List<catagory>();
                     }
-                    catch (Exception ex)
-                    {
-                        //backup method just incase server down
-
-                        return errorCallGC(ex, catagoryChosen);
-
-                    }
-
                 }
+                else
+                {
+                    Logger.Log($"{jsonDir} doesn't exist, creating a new one");
+                    fileJson = new List<catagory>();
+                }
+
+                bool ah = false;
+                foreach (catagory cat in fileJson)
+                {
+                    if (cat != null && (cat.catName == currentCatagory.catName ||
+                                        cat.catagoryId == currentCatagory.catagoryId)) 
+                        ah = true;
+                }
+
+                if (!ah) fileJson.Add(currentCatagory);
+                string jsonStrings = JsonSerializer.Serialize(fileJson,
+                    new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(jsonDir, jsonStrings);
             }
-            return errorCallGC(null, catagoryChosen);
-        }
-        catch (Exception ex) {
-            return errorCallGC(ex, catagoryChosen);
-
-        }
-
-    }
-    
-    
-    // only used in getCatagory when catch is called
-    private static catagory errorCallGC(Exception ex, int catagoryChosen)
-    {
-        Logger.Log("\ncouldn't connect so am resorting to backup\n");
-        Logger.Log(ex.Message);
-        Logger.Here();
-        if (catagoriesFromFile != null)
-        {
-            Logger.Log("tbf i think it worked just have a quick look tbf");
-            foreach (catagory cat in catagoriesFromFile) 
+            catch (Exception ex)
             {
-                Logger.Log($"catID {cat.catagoryId}, chosen cat: {catagoryChosen}");
-                if (cat.catagoryId == catagoryChosen) return cat;
-            }
-        }
-                    
-        Logger.Log("catagories file or cat doesnt exist so :(");
-        return null;
-    }
-    
-    //only using in getRangeOfCatagoryID when catch is called
-    private static (int, int) errorCallCI(Exception ex)
-    {
-        int min = 0;
-        int max = 0;
-        Logger.Log(ex.Message);
-        List<int> d = new List<int>();
-        //couldnt connect or something so 
-        if (catagoriesFromFile != null)
-        {
-            foreach (catagory cat in catagoriesFromFile)
-            {
-                d.Add(cat.catagoryId);
+                Logger.Log($"error while storing items {ex.Message}");
             }
 
-            min = d.Min();
-            max = d.Max();    
-        }
-        // else basically means we are screwed icl
-        else
-        {
-            min = 0;
-            max = 0;
-        }
-        return (min, max);
+            currentCatagory.connected = true;
+            return currentCatagory;
+        
     }
     
-    //only used in getStaffData when catch is called
-    private static List<staff> errorCallSD(Exception ex)
-    {
-        Logger.Log(ex.Message);
-        Console.WriteLine("Error: " + ex.Message);
-        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
-        return staffreturnthing(file);
-    }
+    
 
     public static List<staff> staffreturnthing(string file)
     {
@@ -555,75 +299,32 @@ static class SQL
     public static int getHighestidFromTable(string tableName)
     {
         string sqlcommand = $"select max(Id) from {tableName}";
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            try
-            {
-                connection.Open();
-                SqlCommand command = new SqlCommand(sqlcommand, connection);
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read() && ! reader.IsDBNull(0)){
-                       
-                        int max = reader.GetInt32(0);
-                        Logger.Log($"got this number in the getHighestId function : {max}");
-                        return max;
-                    }
-
-                    return 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex.Message);
-                return -1;
-            }
-        }
+        SqlCommand com = new SqlCommand(sqlcommand, sqlCon);
+        sqlCon.Open();
+        object? result = com.ExecuteScalar();
+        sqlCon.Close();
+        int x = -1;
+        if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
+        return x;
     }
 
     private static void modifyTableSql(string sqlCommand)
     {
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            try
-            {
-                connection.Open();
-                SqlCommand sql = new SqlCommand(sqlCommand, connection);
-                sql.ExecuteNonQuery();
-                Logger.Log($"Executed {sqlCommand} successfully");
-                }
-            catch (Exception ex)
-            {
-                Logger.Log($"message in modifyTableSql in sql.cs sqlCommand: {sqlCommand}" + ex.Message);
-             
-            }
-        }
-    }
-
-    private static int betterModifyTableSql(string sqlCommand, string? connectionString)
-    {
-        int x = -1;
-        if (connectionString == null)
-        {
-            connectionString = SQL.connectionString;
-            
-        }
-
+        SqlCommand sql = new SqlCommand(sqlCommand, sqlCon);
         try
         {
-            using (SqlConnection con = new SqlConnection((connectionString)))
-            {
-                SqlCommand com = new SqlCommand(sqlCommand, con);
-                x = com.ExecuteNonQuery();
-                
-            }
+            sqlCon.Open();
+            sql.ExecuteNonQuery();
+            sqlCon.Close();
+            Logger.Log($"Executed {sqlCommand} successfully");
         }
         catch (Exception ex)
         {
-            Logger.Log("error ~line 610~ sql.cs betterModifyTableSql: " + ex.Message);
+            Logger.Log($"error in modifyTableSql with {sqlCommand} {ex}"); 
         }
-        return x;
-    } 
+        
+        
+    }
     
 
     public static List<item> getTableItems(int tableId)
@@ -643,42 +344,28 @@ static class SQL
                         AND allItems.itemId IS NOT NULL;
                       """;
         List<item> items = new List<item>();
-        using (SqlConnection connection = new SqlConnection(SQL.connectionString))
+        sqlCon.Open();
+        SqlCommand sql = new SqlCommand(sqlCommand, sqlCon);
+        SqlDataReader reader = sql.ExecuteReader();
+        while (reader.Read())
         {
-            try
+            if (reader.GetInt32(0) == null)
             {
-                connection.Open();
-                SqlCommand sql = new SqlCommand(sqlCommand, connection);
-                using (SqlDataReader reader = sql.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        if (reader.GetInt32(0) == null)
-                        {
-                            Logger.Log("table is null");
-                            return null;
-                        }
-
-                        items.Add(new item
-                        {
-                            itemId = reader.GetInt32(0),
-                            itemName = reader.GetString(1),
-                            price = reader.GetInt32(2) / 100,
-                            chosenColour = reader.GetString(3),
-                            extraInfo = reader.GetString(4),
-                            itemCount = 1
-                        });
-                        Logger.Log("item added to list");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log("error in getTabled, called by tableBtn_Click tried getting " + tableId + ex.Message);
+                Logger.Log("table is null");
                 return null;
             }
-        }
 
+            items.Add(new item
+            {
+                itemId = reader.GetInt32(0),
+                itemName = reader.GetString(1),
+                price = reader.GetInt32(2) / 100,
+                chosenColour = reader.GetString(3),
+                extraInfo = reader.GetString(4),
+                itemCount = 1
+            });
+            Logger.Log("item added to list");
+        }
         return items;
     }
     
@@ -761,8 +448,12 @@ static class SQL
     public static List<item> getAllItems()
     {
         List<item> localItems = new List<item>();
-        using var cmd = new SqlCommand("select itemId, itemName, price, " +
-                                       "ISNULL(chosenColour, 'grey'), ISNULL(extraInfo, '') from allItems", sqlCon);
+        string query = """
+                       select itemId, itemName, price, chosenColour, 
+                              extraInfo, subCatId, leadsToCategoryId, subItemOrder 
+                       from allItems
+                       """;
+        using var cmd = new SqlCommand(query, sqlCon);
         sqlCon.Open();
         using SqlDataReader reader = cmd.ExecuteReader();
         while (reader.Read())
@@ -776,7 +467,12 @@ static class SQL
                 extraInfo = reader.GetString(4),
                 itemCount = 1,
                 ordered = false,
-                containedAllergies = null
+                containedAllergies = null,
+                hasSubItems = reader.GetInt32(6) > -1,
+                subCatId = reader.GetInt32(5),
+                subItemOrder = reader.GetInt32(7),
+                leadsToCategoryId = reader.GetInt32(6),
+                
             });
         }
         sqlCon.Close();
@@ -784,21 +480,20 @@ static class SQL
         return localItems;
     }
 
-    public static List<catagory> getAllCatagories()
+    public static List<dbCatagory> getAllCatagories()
     {
-        List<catagory> cats = new List<catagory>();
-        string command = "select catagoryId, catName, ISNULL(extraInfo, ''), ISNULL(chosenColour, '') from catagories";
+        List<dbCatagory> cats = new List<dbCatagory>();
+        string command = "select catagoryId, catName, ISNULL(chosenColour, '') from catagories";
         SqlCommand com = new SqlCommand(command, sqlCon);
         sqlCon.Open();
         using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
-            cats.Add(new catagory()
+            cats.Add(new dbCatagory()
             {
-                catagoryId = reader.GetInt32(0),
+                catId = reader.GetInt32(0),
                 catName = reader.GetString(1),
-                catagoryExtraInfo = reader.GetString(2),
-                catColour = reader.GetString(3)
+                catColour = reader.GetString(2)
             });
         }
         sqlCon.Close();

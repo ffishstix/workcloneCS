@@ -33,9 +33,6 @@
             PricingBtn = new System.Windows.Forms.Button();
             tableBtn = new System.Windows.Forms.Button();
             BackBtn = new System.Windows.Forms.Button();
-            panel1 = new System.Windows.Forms.Panel();
-            panel2 = new System.Windows.Forms.Panel();
-            catPan = new System.Windows.Forms.FlowLayoutPanel();
             ConfigPannel = new System.Windows.Forms.FlowLayoutPanel();
             SignOnBtnConfigPanel = new System.Windows.Forms.Button();
             SignOffBtnControlPanel = new System.Windows.Forms.Button();
@@ -49,6 +46,9 @@
             tableBottomBtn = new System.Windows.Forms.Button();
             FinalBtn = new System.Windows.Forms.Button();
             ConfigBtn = new System.Windows.Forms.Button();
+            panel1 = new System.Windows.Forms.Panel();
+            panel2 = new System.Windows.Forms.Panel();
+            catPan = new System.Windows.Forms.FlowLayoutPanel();
             rightLabel = new System.Windows.Forms.Label();
             finalPanel = new System.Windows.Forms.FlowLayoutPanel();
             CancelBtn = new System.Windows.Forms.Button();
@@ -74,15 +74,8 @@
             AllergiesBtn = new System.Windows.Forms.Button();
             categoryShiftBtn = new System.Windows.Forms.Button();
             discountAmountBtn = new System.Windows.Forms.Button();
-            flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            infoPanel = new System.Windows.Forms.Panel();
-            deselectAllBtn = new System.Windows.Forms.Button();
-            deselectBtn = new System.Windows.Forms.Button();
-            selectBtn = new System.Windows.Forms.Button();
-            selectedBox = new System.Windows.Forms.ListBox();
-            selectableItems = new System.Windows.Forms.ListBox();
-            okInfoPanelBtn = new System.Windows.Forms.Button();
             allergyToolTip = new System.Windows.Forms.ToolTip(components);
+            flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             ConfigPannel.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
             finalPanel.SuspendLayout();
@@ -90,7 +83,6 @@
             orderPanel.SuspendLayout();
             miscPanel.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
-            infoPanel.SuspendLayout();
             SuspendLayout();
             // 
             // nameBtn
@@ -133,28 +125,6 @@
             BackBtn.Text = "Back";
             BackBtn.UseVisualStyleBackColor = true;
             BackBtn.Click += backBtn_Click;
-            // 
-            // panel1
-            // 
-            panel1.AutoScroll = true;
-            panel1.Location = new System.Drawing.Point(3, 3);
-            panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(853, 190);
-            panel1.TabIndex = 5;
-            // 
-            // panel2
-            // 
-            panel2.Location = new System.Drawing.Point(3, 199);
-            panel2.Name = "panel2";
-            panel2.Size = new System.Drawing.Size(853, 33);
-            panel2.TabIndex = 6;
-            // 
-            // catPan
-            // 
-            catPan.Location = new System.Drawing.Point(3, 238);
-            catPan.Name = "catPan";
-            catPan.Size = new System.Drawing.Size(853, 279);
-            catPan.TabIndex = 1;
             // 
             // ConfigPannel
             // 
@@ -299,6 +269,28 @@
             ConfigBtn.Text = "Config";
             ConfigBtn.UseVisualStyleBackColor = true;
             ConfigBtn.Click += ConfigBtn_Click;
+            // 
+            // panel1
+            // 
+            panel1.AutoScroll = true;
+            panel1.Location = new System.Drawing.Point(3, 3);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(853, 190);
+            panel1.TabIndex = 5;
+            // 
+            // panel2
+            // 
+            panel2.Location = new System.Drawing.Point(3, 199);
+            panel2.Name = "panel2";
+            panel2.Size = new System.Drawing.Size(853, 33);
+            panel2.TabIndex = 6;
+            // 
+            // catPan
+            // 
+            catPan.Location = new System.Drawing.Point(3, 238);
+            catPan.Name = "catPan";
+            catPan.Size = new System.Drawing.Size(853, 279);
+            catPan.TabIndex = 1;
             // 
             // rightLabel
             // 
@@ -575,88 +567,12 @@
             flowLayoutPanel1.Size = new System.Drawing.Size(861, 522);
             flowLayoutPanel1.TabIndex = 13;
             // 
-            // infoPanel
-            // 
-            infoPanel.BackColor = System.Drawing.Color.Gainsboro;
-            infoPanel.Controls.Add(deselectAllBtn);
-            infoPanel.Controls.Add(deselectBtn);
-            infoPanel.Controls.Add(selectBtn);
-            infoPanel.Controls.Add(selectedBox);
-            infoPanel.Controls.Add(selectableItems);
-            infoPanel.Controls.Add(okInfoPanelBtn);
-            infoPanel.Location = new System.Drawing.Point(19, 48);
-            infoPanel.Name = "infoPanel";
-            infoPanel.Size = new System.Drawing.Size(757, 491);
-            infoPanel.TabIndex = 14;
-            infoPanel.Visible = false;
-            // 
-            // deselectAllBtn
-            // 
-            deselectAllBtn.Location = new System.Drawing.Point(140, 343);
-            deselectAllBtn.Name = "deselectAllBtn";
-            deselectAllBtn.Size = new System.Drawing.Size(137, 49);
-            deselectAllBtn.TabIndex = 19;
-            deselectAllBtn.Text = "deselect all";
-            deselectAllBtn.UseVisualStyleBackColor = true;
-            deselectAllBtn.Click += deselectAllBtn_Click;
-            // 
-            // deselectBtn
-            // 
-            deselectBtn.Location = new System.Drawing.Point(140, 288);
-            deselectBtn.Name = "deselectBtn";
-            deselectBtn.Size = new System.Drawing.Size(137, 49);
-            deselectBtn.TabIndex = 18;
-            deselectBtn.Text = "deselect";
-            deselectBtn.UseVisualStyleBackColor = true;
-            deselectBtn.Click += deselectBtn_Click;
-            // 
-            // selectBtn
-            // 
-            selectBtn.Location = new System.Drawing.Point(140, 238);
-            selectBtn.Name = "selectBtn";
-            selectBtn.Size = new System.Drawing.Size(137, 49);
-            selectBtn.TabIndex = 17;
-            selectBtn.Text = "select";
-            selectBtn.UseVisualStyleBackColor = true;
-            selectBtn.Click += selectBtn_Click;
-            // 
-            // selectedBox
-            // 
-            selectedBox.FormattingEnabled = true;
-            selectedBox.ItemHeight = 15;
-            selectedBox.Location = new System.Drawing.Point(283, 238);
-            selectedBox.Name = "selectedBox";
-            selectedBox.Size = new System.Drawing.Size(137, 154);
-            selectedBox.TabIndex = 16;
-            selectedBox.SelectedIndexChanged += selectedBox_SelectedIndexChanged;
-            // 
-            // selectableItems
-            // 
-            selectableItems.FormattingEnabled = true;
-            selectableItems.ItemHeight = 15;
-            selectableItems.Items.AddRange(new object[] { "peanuts", "dairy", "Eggs", "nuts", "wheat", "soy", "Fish", "Meat", "gluten" });
-            selectableItems.Location = new System.Drawing.Point(3, 238);
-            selectableItems.Name = "selectableItems";
-            selectableItems.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
-            selectableItems.Size = new System.Drawing.Size(131, 154);
-            selectableItems.TabIndex = 15;
-            // 
-            // okInfoPanelBtn
-            // 
-            okInfoPanelBtn.Location = new System.Drawing.Point(3, 402);
-            okInfoPanelBtn.Name = "okInfoPanelBtn";
-            okInfoPanelBtn.Size = new System.Drawing.Size(750, 72);
-            okInfoPanelBtn.TabIndex = 0;
-            okInfoPanelBtn.Text = "Understood";
-            okInfoPanelBtn.UseVisualStyleBackColor = true;
-            okInfoPanelBtn.Click += okInfoPanelBtn_Click;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.SystemColors.Control;
             ClientSize = new System.Drawing.Size(1084, 619);
-            Controls.Add(infoPanel);
             Controls.Add(flowLayoutPanel1);
             Controls.Add(finalPanel);
             Controls.Add(flowLayoutPanel2);
@@ -668,6 +584,7 @@
             Controls.Add(tableBtn);
             Controls.Add(PricingBtn);
             Controls.Add(nameBtn);
+            Location = new System.Drawing.Point(15, 15);
             Text = "Form1";
             FormClosing += formClosing;
             Load += Form1_Load;
@@ -678,81 +595,66 @@
             orderPanel.ResumeLayout(false);
             miscPanel.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
-            infoPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
+        #endregion
+        
+                
+        private System.Windows.Forms.FlowLayoutPanel catPan;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 
         private System.Windows.Forms.ToolTip allergyToolTip;
 
-        private System.Windows.Forms.Button deselectAllBtn;
-
-        private System.Windows.Forms.Button selectBtn;
-        private System.Windows.Forms.Button deselectBtn;
-
-        private System.Windows.Forms.ListBox selectedBox;
-
-        private System.Windows.Forms.ListBox selectableItems;
-
-        private System.Windows.Forms.Button okInfoPanelBtn;
-
-        private System.Windows.Forms.Panel infoPanel;
-
-        #endregion
-
         #region init
         private rowOfItem[] mainRows;
-        private Button nameBtn;
-        private Button PricingBtn;
-        private Button tableBtn;
-        private Button BackBtn;
-        private Panel panel1;
-        private Panel panel2;
-        private Label leftLabel;
-        private Label rightLabel;
+        private System.Windows.Forms.Button nameBtn;
+        private System.Windows.Forms.Button PricingBtn;
+        private System.Windows.Forms.Button tableBtn;
+        private System.Windows.Forms.Button BackBtn;
+        private System.Windows.Forms.Label leftLabel;
+        private System.Windows.Forms.Label rightLabel;
         private decimal priceTotal;
         private FlowLayoutPanel scrollPanel;
-        private FlowLayoutPanel catPan;
-        private FlowLayoutPanel ConfigPannel;
-        private FlowLayoutPanel flowLayoutPanel2;
-        private Button miscBtn;
-        private Button OrderBtn;
-        private Button tableBottomBtn;
-        private Button FinalBtn;
-        private Button ConfigBtn;
-        private Button SignOnBtnConfigPanel;
-        private Button SignOffBtnControlPanel;
-        private Button ConfigBtnControlPanel;
-        private Button syncTillBtnConfigPanel;
-        private Button ReciptToggleBtnConfigPanel;
-        private Button InfoBtnControlPanel;
+        private System.Windows.Forms.FlowLayoutPanel ConfigPannel;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
+        private System.Windows.Forms.Button miscBtn;
+        private System.Windows.Forms.Button OrderBtn;
+        private System.Windows.Forms.Button tableBottomBtn;
+        private System.Windows.Forms.Button FinalBtn;
+        private System.Windows.Forms.Button ConfigBtn;
+        private System.Windows.Forms.Button SignOnBtnConfigPanel;
+        private System.Windows.Forms.Button SignOffBtnControlPanel;
+        private System.Windows.Forms.Button ConfigBtnControlPanel;
+        private System.Windows.Forms.Button syncTillBtnConfigPanel;
+        private System.Windows.Forms.Button ReciptToggleBtnConfigPanel;
+        private System.Windows.Forms.Button InfoBtnControlPanel;
         private FlowLayoutPanel basePanel;
-        private FlowLayoutPanel finalPanel;
-        private Button CancelBtn;
-        private Button SendToTableBtnFinalPanel;
-        private Button CardBtn;
-        private Button CashBtn;
-        private FlowLayoutPanel tablePanel;
-        private Button openTableBtn;
-        private Button blankBtn;
-        private Button sendToTableBtnTablePanel;
-        private Button printBillBtn;
-        private FlowLayoutPanel orderPanel;
-        private Button setSeatBtn;
-        private Button addItemBtn;
-        private Button subtractItemBtn;
-        private Button lineCorrectBtn;
-        private Button toggleBtn;
-        private Button multiplyBtn;
-        private FlowLayoutPanel miscPanel;
-        private Button currentSeatBtn;
-        private Button textMsgBtn;
-        private Button AllergiesBtn;
-        private Button categoryShiftBtn;
-        private Button discountAmountBtn;
-        private FlowLayoutPanel flowLayoutPanel1;
-        
-
-        #endregion
-        
+        private System.Windows.Forms.FlowLayoutPanel finalPanel;
+        private System.Windows.Forms.Button CancelBtn;
+        private System.Windows.Forms.Button SendToTableBtnFinalPanel;
+        private System.Windows.Forms.Button CardBtn;
+        private System.Windows.Forms.Button CashBtn;
+        private System.Windows.Forms.FlowLayoutPanel tablePanel;
+        private System.Windows.Forms.Button openTableBtn;
+        private System.Windows.Forms.Button blankBtn;
+        private System.Windows.Forms.Button sendToTableBtnTablePanel;
+        private System.Windows.Forms.Button printBillBtn;
+        private System.Windows.Forms.FlowLayoutPanel orderPanel;
+        private System.Windows.Forms.Button setSeatBtn;
+        private System.Windows.Forms.Button addItemBtn;
+        private System.Windows.Forms.Button subtractItemBtn;
+        private System.Windows.Forms.Button lineCorrectBtn;
+        private System.Windows.Forms.Button toggleBtn;
+        private System.Windows.Forms.Button multiplyBtn;
+        private System.Windows.Forms.FlowLayoutPanel miscPanel;
+        private System.Windows.Forms.Button currentSeatBtn;
+        private System.Windows.Forms.Button textMsgBtn;
+        private System.Windows.Forms.Button AllergiesBtn;
+        private System.Windows.Forms.Button categoryShiftBtn;
+        private System.Windows.Forms.Button discountAmountBtn;
+                #endregion
+                
     }
 }

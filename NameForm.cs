@@ -34,7 +34,7 @@ namespace WorkCloneCS
             x = sync.allStaff;
             if (x == null)
             {
-                x = SQL.getStaffData();
+                x = SQL.getStaffDataCloud();
             }
             if (x == null)
             {

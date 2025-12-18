@@ -1,6 +1,6 @@
 ﻿namespace WorkCloneCS;
 
-public partial class allergies
+public partial class allergiesForm
 {
     
 }

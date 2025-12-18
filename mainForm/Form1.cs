@@ -161,7 +161,9 @@ public partial class Form1 : Form
 
     private void AllergiesBtn_Click(object sender, EventArgs e)
     {
-        invertInfoPanel();
+        allergiesForm al = new allergiesForm();
+        al.ShowDialog();
+        
     }
 
     private void infoBtn_Click(object sender, EventArgs e)
@@ -200,70 +202,6 @@ public partial class Form1 : Form
             Logger.Log($"Error in syncBtn_Click: {ex.Message}");
         }
     }
-
-    
-    
-
-    
-    
-    #region allergy menu
-    //<summary>
-    // allergy buttons
-    //</summary>
-    
-    private void selectedBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
-    }
-    private void selectBtn_Click(object sender, EventArgs e)
-    {
-        int selectedIndex = selectableItems.SelectedIndex;
-        if (selectedIndex == -1) return; // if nothing selected returns.
-        string item = selectableItems.SelectedItem.ToString();
-        Logger.Log($"selected index: {selectedIndex} , item: {item}");
-        if (selectedBox.FindString(item) == -1)selectedBox.Items.Add(item);
-
-    }
-    // exact opposite functions funily enough
-    private void deselectBtn_Click(object sender, EventArgs e)
-    {
-        int selectedIndex = selectedBox.SelectedIndex;
-        if (selectedIndex == -1) return; // if nothing selected returns.
-        Logger.Log("deselect not null");
-        string item = selectedBox.SelectedItem.ToString();
-        Logger.Log($"selected index: {selectedIndex} , item: {item}");
-        try
-        {
-            selectedBox.Items.RemoveAt(selectedIndex);
-            Logger.Log("inside the try");
-        }
-        catch (Exception ex)
-        {
-            Logger.Log($"error in deselectBtn_Click: most likely because the item doesnt exist: {ex.Message}");
-        }
-        
-    }
-    private void deselectAllBtn_Click(object sender, EventArgs e)
-    {
-        selectedBox.BeginUpdate();
-        while (selectedBox.Items.Count > 0)
-        {
-            selectedBox.Items.RemoveAt(0);
-        }
-        selectedBox.EndUpdate();
-        Logger.Log("removed all items in select box (deselectAllBtn_Click)");
-    }
-    
-    private void okInfoPanelBtn_Click(object sender, EventArgs e)
-    {
-        List<string> tempList = [];
-        foreach(string s in selectedBox.Items) tempList.Add(s);
-        allergies = tempList;
-        tempList.Clear();
-        infoPanel.Visible = !infoPanel.Visible;
-        backBtn_Click(null, null);
-    }
-    
-    #endregion
 
 
 

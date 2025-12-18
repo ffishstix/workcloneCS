@@ -56,6 +56,9 @@
     <Compile Update="mainForm\allergies.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="sqlErrorCalls.cs">
+      <DependentUpon>sql.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

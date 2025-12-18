@@ -61,7 +61,16 @@ public class item
     public int lineId { get; set; }
     public bool ordered { get; set; }
     public List<string> containedAllergies  { get; set; }
+    public bool hasSubItems { get; set; }
+
+    public int subCatId { get; set; }
+    public int leadsToCategoryId { get; set; }
+    public int subItemOrder { get; set; }
+    
+
+
 }
+
 
 
 public class rowOfItem : item
@@ -205,38 +214,53 @@ public class rowOfItem : item
 /// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
 ///
 
-class dbCatagories
+class dbCatagory
 {
-    private List<int> itemIds;
-    private string catName;
-    private int catId;
+    public List<int> itemIds;
+    public string catName;
+    public int catId;
+    public string catColour;
 
-    dbCatagories()
+    public dbCatagory()
     {
         catId = 0;
         catName = "";
+        catColour = "";
+        itemIds = new List<int>();
     }
 }
 
-
-class database
+class orderLine
 {
+    private int orderId;
+    private int itemId;
+    
+}
+
+
+static class database
+{
+    public static readonly int databaseVersion;
     private static SqlConnection connection;
+
     private static List<item> items;
-    private static List<catagory> catagories;
+    private static List<dbCatagory> catagories;
     private static bool DBExists;
     private static List<List<int>> catItemLinks;
+    private static List<staff> staff;
+
 
     public static void initLocalDatabase()
     {
         DBExists = databaseExists();
-        if(DBExists) checkDBVNum();
+        if (DBExists) checkDBVNum();
         items = SQL.getAllItems();
         catagories = SQL.getAllCatagories();
         catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and catagories
         updateCatagories();
-        
-        
+        staff = SQL.getStaffDataCloud();
+
+
     }
 
     private static bool databaseExists()
@@ -258,8 +282,8 @@ class database
             sync.syncAll();
         }
         else Logger.Log("local database is up to date");
-        
-        
+
+
 
     }
 
@@ -282,17 +306,18 @@ class database
             Logger.Log("updateCatagories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
             return;
         }
-        var catById = new Dictionary<int, catagory>(catagories.Count);
-        foreach (catagory cat in catagories)
+
+        var catById = new Dictionary<int, dbCatagory>(catagories.Count);
+        foreach (dbCatagory cat in catagories)
         {
-            cat.items ??= new List<item>();
-            catById[cat.catagoryId] = cat;
+            cat.itemIds ??= new List<int>();
+            catById[cat.catId] = cat;
         }
 
-        var itemById = new Dictionary<int, item>(items.Count);
+        var itemById = new Dictionary<int, int>(items.Count);
         foreach (item it in items)
-            itemById[it.itemId] = it;
-        
+            itemById[it.itemId] = it.itemId;
+
         foreach (var link in catItemLinks)
         {
             if (link == null || link.Count < 2)
@@ -307,11 +332,22 @@ class database
             if (!itemById.TryGetValue(itemId, out var it))
                 continue;
 
-            cat.items.Add(it);
+            cat.itemIds.Add(it);
         }
+
         Logger.Log("finished updating catagories");
+    }
+
+    private static void initSubClasses()
+    {
+
     }
     
 }
 
 
+class subCat  : item
+{
+    public int parentItemId;
+    
+}

@@ -566,10 +566,6 @@ public partial class Form1
         reLoad.Show();
     }
 
-    private void invertInfoPanel()
-    {
-        infoPanel.Visible = infoPanel.Visible ? false : true;
-    }
     
     
 }

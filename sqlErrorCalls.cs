@@ -1,0 +1,87 @@
+﻿using System.Text.Json;
+namespace WorkCloneCS;
+
+static partial class SQL
+{
+    // only used in getCatagory when catch is called
+    private static catagory errorCallGC(Exception ex, int catagoryChosen)
+    {
+        Logger.Log("\ncouldn't connect so am resorting to backup\n");
+        Logger.Log(ex.Message);
+        Logger.Here();
+        if (catagoriesFromFile != null)
+        {
+            Logger.Log("tbf i think it worked just have a quick look tbf");
+            foreach (catagory cat in catagoriesFromFile)
+            {
+                Logger.Log($"catID {cat.catagoryId}, chosen cat: {catagoryChosen}");
+                if (cat.catagoryId == catagoryChosen) return cat;
+            }
+        }
+
+        Logger.Log("catagories file or cat doesnt exist so :(");
+        return null;
+    }
+
+    //only using in getRangeOfCatagoryID when catch is called
+    private static (int, int) errorCallCI(Exception ex)
+    {
+        int min = 0;
+        int max = 0;
+        Logger.Log(ex.Message);
+        List<int> d = new List<int>();
+        //couldnt connect or something so 
+        if (catagoriesFromFile != null)
+        {
+            foreach (catagory cat in catagoriesFromFile)
+            {
+                d.Add(cat.catagoryId);
+            }
+
+            min = d.Min();
+            max = d.Max();
+        }
+        // else basically means we are screwed icl
+        else
+        {
+            min = 0;
+            max = 0;
+        }
+
+        return (min, max);
+    }
+
+    //only used in getStaffData when catch is called
+    private static List<staff> errorCallSD(Exception ex)
+    {
+        Logger.Log(ex.Message);
+        Console.WriteLine("Error: " + ex.Message);
+        string file =
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";
+        return staffreturnthing(file);
+    }
+
+    private static List<staff> getStaffFromFile()
+    {
+        
+            if (!File.Exists(jsonstaffDir)) return null;
+            return JsonSerializer.Deserialize<List<staff>>(
+                    File.ReadAllText(jsonstaffDir));
+        
+    }
+    
+    private static void ErrorCallIS(Exception ex)
+    {
+        if (ex != null) Logger.Log(ex.Message);
+        if (!created)
+        {
+            created = true;
+            Task.Run(() => MessageBox.Show(
+                "it is recomened for you to go through the config settings," +
+                "\n you are currently using the backup database on your local device," +
+                "\n you will not be able to send an order through in this state"));
+        }
+    }
+
+    
+}
