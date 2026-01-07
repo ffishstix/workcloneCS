@@ -43,8 +43,8 @@ class category
     // there might not be certain properties from the database so i am just putting this here so i can 
     public bool connected { get; set; }
     public string catName { get; set; }
-    public int categoryId { get; set; }
-    public string categoryExtraInfo { get; set; }
+    public int catagoryId { get; set; }
+    public string catagoryExtraInfo { get; set; }
 
     public string catColour { get; set; }
     public List<item> items { get; set; }
@@ -63,9 +63,7 @@ public class item
     public List<string> containedAllergies  { get; set; }
     public bool hasSubItems { get; set; }
 
-    public int subCatId { get; set; }
-    public int leadsToCategoryId { get; set; }
-    public int subItemOrder { get; set; }
+    public List<dbSubCat> subItems { get; set; }
     
 
 
@@ -214,14 +212,38 @@ public class rowOfItem : item
 /// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
 ///
 
-class dbCategory
+class dbSubParent
+{
+    public int itemId { get; set;}
+    public string itemName { get; set; }
+    public int price { get; set; }
+    public string chosenColour { get; set; }
+    public int leadsToCategoryId { get; set; }
+    
+    
+    
+}
+
+class dbSubChild : dbSubParent
+{
+    public int subItemOrder { get; set; }
+    public int parentItemId { get; set; }
+    public int subCatId { get; set; }
+    public bool isLeaf { get; set; }
+    public bool isRequired { get; set; }
+}
+
+
+
+
+class dbCatagory
 {
     public List<int> itemIds;
     public string catName;
     public int catId;
     public string catColour;
 
-    public dbCategory()
+    public dbCatagory()
     {
         catId = 0;
         catName = "";
@@ -244,10 +266,11 @@ static class database
     private static SqlConnection connection;
 
     private static List<item> items;
-    private static List<dbCategory> categories;
+    private static List<dbCatagory> categories;
     private static bool DBExists;
     private static List<List<int>> catItemLinks;
     private static List<staff> staff;
+    private static List<orderLine> activeOrderLines;
 
 
     public static void initLocalDatabase()
@@ -255,9 +278,9 @@ static class database
         DBExists = databaseExists();
         if (DBExists) checkDBVNum();
         items = SQL.getAllItems();
-        categories = SQL.getAllCategories();
+        categories = SQL.getAllCatagories();
         catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and categories
-        updateCategories();
+        updateCatagories();
         staff = SQL.getStaffDataCloud();
 
 
@@ -287,28 +310,28 @@ static class database
 
     }
 
-    private static void updateCategories()
+    private static void updateCatagories()
     {
         if (categories == null)
         {
-            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
+            Logger.Log("updateCatagories(): categories is null (SQL.getAllCatagories returned null).");
             return;
         }
 
         if (items == null)
         {
-            Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
+            Logger.Log("updateCatagories(): items is null (SQL.getAllItems returned null).");
             return;
         }
 
         if (catItemLinks == null)
         {
-            Logger.Log("updateCategories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
+            Logger.Log("updateCatagories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
             return;
         }
 
-        var catById = new Dictionary<int, dbCategory>(categories.Count);
-        foreach (dbCategory cat in categories)
+        var catById = new Dictionary<int, dbCatagory>(categories.Count);
+        foreach (dbCatagory cat in categories)
         {
             cat.itemIds ??= new List<int>();
             catById[cat.catId] = cat;
@@ -324,9 +347,9 @@ static class database
                 continue;
 
             int itemId = link[1];
-            int categoryId = link[0];
+            int catagoryId = link[0];
 
-            if (!catById.TryGetValue(categoryId, out var cat))
+            if (!catById.TryGetValue(catagoryId, out var cat))
                 continue;
 
             if (!itemById.TryGetValue(itemId, out var it))
@@ -340,14 +363,19 @@ static class database
 
     private static void initSubClasses()
     {
-
+        
+        
     }
+    
+    
     
 }
 
 
-class subCat  : item
+public class dbSubCat : item
 {
-    public int parentItemId;
+    public int parentItemId { get; set;}
+    public bool isLeaf { get; set; }
+    public bool isRequired { get; set; }
     
 }
