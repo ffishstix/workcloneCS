@@ -20,6 +20,7 @@ static partial class SQL
     public static string dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
     public static string sqlDir = dir + "sql/";
     private static SqlConnection sqlCon;
+    
     public static void initSQL()
     {
         //database connection section
@@ -85,11 +86,6 @@ static partial class SQL
         initCompleted = true;
     }
     
-
-    
-
-
-
     public static (int, int) getRangeOfCatagoryID()
     {
         string query = "SELECT top 1 catagoryId " +
@@ -138,7 +134,6 @@ static partial class SQL
         return values;
 
     }
-
     
     public static List<category> pullCatFile()
     {
@@ -289,8 +284,6 @@ static partial class SQL
         
     }
     
-    
-
     public static List<staff> staffreturnthing(string file)
     {
         if (File.Exists(file)) {
@@ -302,6 +295,7 @@ static partial class SQL
 
         return null;
     }
+    
     public static int getHighestidFromTable(string tableName)
     {
         string sqlcommand = $"select max(Id) from {tableName}";
@@ -331,7 +325,6 @@ static partial class SQL
         
         
     }
-    
 
     public static List<item> getTableItems(int tableId)
     {
@@ -374,8 +367,6 @@ static partial class SQL
         }
         return items;
     }
-    
-
     
     public static void pushItemsToTables(table table, staff staff, int headerId, int orderId, int lineId) {
         
@@ -475,16 +466,13 @@ static partial class SQL
                 ordered = false,
                 containedAllergies = null,
                 hasSubItems = reader.GetInt32(6) > -1,
-                subCatId = reader.GetInt32(5),
-                subItemOrder = reader.GetInt32(7),
-                leadsToCategoryId = reader.GetInt32(6),
-                
             });
         }
         sqlCon.Close();
         
         return localItems;
     }
+    
 
     public static List<dbCatagory> getAllCatagories()
     {
@@ -524,10 +512,33 @@ static partial class SQL
         Logger.Log($"got {count} links");
         return itemCat; // this returns a list of categories that has a list of items that has the catagoryId and itemId in that order
     }
+
+    public static List<dbSubParent> getSubParentPairs()
+    {
+        
+        //this command gets all of the item Id's that has categories but isnt a category itself. 
+        string query = "select itemId, leadsToCategoryId from allItems where subCatID = -1 and leadsToCategoryId != -1";
+
+        string query2 = "select itemId, subCatId, leadsToCategoryId from allItems where subCatId != -1 and subItemOrder != -1";
+        
+        SqlCommand com = new SqlCommand(query, sqlCon);
+        sqlCon.Open();
+        SqlDataReader reader = com.ExecuteReader();
+        List<dbSubParent> lis = new List<dbSubParent>();
+        while (reader.Read())
+        {
+            
+            
+        }
+
+        return null;
+    }
     
     
     
     #endregion
+    
+    
     
 }
 

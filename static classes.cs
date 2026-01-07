@@ -63,9 +63,7 @@ public class item
     public List<string> containedAllergies  { get; set; }
     public bool hasSubItems { get; set; }
 
-    public int subCatId { get; set; }
-    public int leadsToCategoryId { get; set; }
-    public int subItemOrder { get; set; }
+    public List<dbSubCat> subItems { get; set; }
     
 
 
@@ -214,6 +212,30 @@ public class rowOfItem : item
 /// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
 ///
 
+class dbSubParent
+{
+    public int itemId { get; set;}
+    public string itemName { get; set; }
+    public int price { get; set; }
+    public string chosenColour { get; set; }
+    public int leadsToCategoryId { get; set; }
+    
+    
+    
+}
+
+class dbSubChild : dbSubParent
+{
+    public int subItemOrder { get; set; }
+    public int parentItemId { get; set; }
+    public int subCatId { get; set; }
+    public bool isLeaf { get; set; }
+    public bool isRequired { get; set; }
+}
+
+
+
+
 class dbCatagory
 {
     public List<int> itemIds;
@@ -248,6 +270,7 @@ static class database
     private static bool DBExists;
     private static List<List<int>> catItemLinks;
     private static List<staff> staff;
+    private static List<orderLine> activeOrderLines;
 
 
     public static void initLocalDatabase()
@@ -340,14 +363,19 @@ static class database
 
     private static void initSubClasses()
     {
-
+        
+        
     }
+    
+    
     
 }
 
 
-class subCat  : item
+public class dbSubCat : item
 {
-    public int parentItemId;
+    public int parentItemId { get; set;}
+    public bool isLeaf { get; set; }
+    public bool isRequired { get; set; }
     
 }
