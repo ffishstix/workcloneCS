@@ -32,7 +32,7 @@ class Form1 {
   - PricingBtn_Click(sender : object, e : EventArgs) : void
   - ConfigSideBtn_Click(sender : object, e : EventArgs) : void
   - syncBtn_Click(sender : object, e : EventArgs) : void
-  - addCatagory() : void
+  - addCategory() : void
   - LoadCategories() : Task
   - addItem(item : item) : void
   - EnableSwipeToDelete(row : rowOfItem) : void
@@ -123,8 +123,8 @@ class staff {
 class category {
   + connected : bool
   + catName : string
-  + catagoryId : int
-  + catagoryExtraInfo : string
+  + categoryId : int
+  + categoryExtraInfo : string
   + items : List<item>
 }
 
@@ -198,7 +198,7 @@ class tableNumberForm {
 
 class SQL {
   - {static} testFiles : bool
-  - {static} catagoriesFromFile : List<category>
+  - {static} categoriesFromFile : List<category>
   - {static} jsonDir : string
   - {static} jsonstaffDir : string
   - {static} created : bool
@@ -207,23 +207,23 @@ class SQL {
   + {static} initSQL() : void
   - {static} getStaffFromFile() : List<staff>
   - {static} ErrorCallIS(ex : Exception) : void
-  + {static} getRangeOfCatagoryID() : (int, int)
+  + {static} getRangeOfCategoryID() : (int, int)
   + {static} getStaffData() : List<staff>
   + {static} pullCatFile() : List<category>
-  + {static} getCatagory(catagoryChosen : int) : category
-  - {static} errorCallGC(ex : Exception, catagoryChosen : int) : category
+  + {static} getCategory(categoryChosen : int) : category
+  - {static} errorCallGC(ex : Exception, categoryChosen : int) : category
   - {static} errorCallCI(ex : Exception) : (int, int)
   - {static} errorCallSD(ex : Exception) : List<staff>
   + {static} staffreturnthing(file : string) : List<staff>
 }
 
 class sync {
-  + {static} catagoryIdRange : (int min, int max)
+  + {static} categoryIdRange : (int min, int max)
   + {static} allStaff : List<staff>
   + {static} categories : List<category>
   
   + {static} syncStaff() : void
-  + {static} syncCatagory() : void
+  + {static} syncCategory() : void
   + {static} checkCatFile() : bool
   + {static} getFiles() : void
   + {static} syncAll() : void

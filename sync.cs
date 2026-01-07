@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 namespace WorkCloneCS;
 class sync
 {
-    public static (int min, int max) catagoryIdRange { get; set; }
+    public static (int min, int max) categoryIdRange { get; set; }
     public static List<staff> allStaff { get; set; }
     public static List<category> categories { get; set; }
 
@@ -24,22 +24,22 @@ class sync
         } catch(Exception ex) { Logger.Log(ex.Message); }
     }
 
-    public static void syncCatagory()
+    public static void syncCategory()
     {
         Logger.Log("entered sync category");
         categories = new List<category>();
-        catagoryIdRange = SQL.getRangeOfCatagoryID();
-        Logger.Log(catagoryIdRange.Item1.ToString());
+        categoryIdRange = SQL.getRangeOfCategoryID();
+        Logger.Log(categoryIdRange.Item1.ToString());
         
-        Logger.Log($"max? {catagoryIdRange.min}, min? {catagoryIdRange.max}");
+        Logger.Log($"max? {categoryIdRange.min}, min? {categoryIdRange.max}");
         
         // Create a temporary list to store categories
         List<category> tempCategories = new List<category>();
         
         //categories section
-        for (int i = 1; i <= catagoryIdRange.max; i++)
+        for (int i = 1; i <= categoryIdRange.max; i++)
         {
-            var x = SQL.getCatagory(i);
+            var x = SQL.getCategory(i);
             if (x != null) tempCategories.Add(x);
             Logger.Log($"currently going through: {i}");
         }
@@ -59,13 +59,13 @@ class sync
 
     public static bool checkCatFile()
     {
-        string path = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/catagoryJson.txt";
+        string path = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workCloneCs/sql/categoryJson.txt";
         if (!File.Exists(path)) return false;
         try
         {
             string json = File.ReadAllText(path); // Read file contents
             List<category> fileJson = JsonSerializer.Deserialize<List<category>>(json); // Deserialize JSON text
-            if (fileJson[0].catagoryId == 0 || fileJson[0].catName == null || fileJson[0].items == null)
+            if (fileJson[0].categoryId == 0 || fileJson[0].catName == null || fileJson[0].items == null)
             {
                 return false;
             }
@@ -90,22 +90,22 @@ class sync
                 {
                     List<category> j = SQL.pullCatFile();
                     categories = j;
-                    int min = j[0].catagoryId;
-                    int max = j[0].catagoryId;
+                    int min = j[0].categoryId;
+                    int max = j[0].categoryId;
                     foreach (category cat in j)
                     {
-                        if (cat.catagoryId < min)
+                        if (cat.categoryId < min)
                         {
-                            min = cat.catagoryId;
+                            min = cat.categoryId;
                         }
 
-                        if (cat.catagoryId > max)
+                        if (cat.categoryId > max)
                         {
-                            max = cat.catagoryId;
+                            max = cat.categoryId;
                         }
                     }
 
-                    catagoryIdRange = (min, max);
+                    categoryIdRange = (min, max);
                 }
                 catch (Exception ex)
                 {
@@ -143,8 +143,8 @@ class sync
             syncStaff();
             Logger.Log("synced staff");
             
-            Logger.Log("just about to go into syncCatagory");
-            syncCatagory();
+            Logger.Log("just about to go into syncCategory");
+            syncCategory();
             Logger.Log("synced category");
             
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");

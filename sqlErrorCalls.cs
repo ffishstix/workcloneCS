@@ -3,19 +3,19 @@ namespace WorkCloneCS;
 
 static partial class SQL
 {
-    // only used in getCatagory when catch is called
-    private static category errorCallGC(Exception ex, int catagoryChosen)
+    // only used in getCategory when catch is called
+    private static category errorCallGC(Exception ex, int categoryChosen)
     {
         Logger.Log("\ncouldn't connect so am resorting to backup\n");
         Logger.Log(ex.Message);
         Logger.Here();
-        if (catagoriesFromFile != null)
+        if (categoriesFromFile != null)
         {
             Logger.Log("tbf i think it worked just have a quick look tbf");
-            foreach (category cat in catagoriesFromFile)
+            foreach (category cat in categoriesFromFile)
             {
-                Logger.Log($"catID {cat.catagoryId}, chosen cat: {catagoryChosen}");
-                if (cat.catagoryId == catagoryChosen) return cat;
+                Logger.Log($"catID {cat.categoryId}, chosen cat: {categoryChosen}");
+                if (cat.categoryId == categoryChosen) return cat;
             }
         }
 
@@ -23,7 +23,7 @@ static partial class SQL
         return null;
     }
 
-    //only using in getRangeOfCatagoryID when catch is called
+    //only using in getRangeOfCategoryID when catch is called
     private static (int, int) errorCallCI(Exception ex)
     {
         int min = 0;
@@ -31,11 +31,11 @@ static partial class SQL
         Logger.Log(ex.Message);
         List<int> d = new List<int>();
         //couldnt connect or something so 
-        if (catagoriesFromFile != null)
+        if (categoriesFromFile != null)
         {
-            foreach (category cat in catagoriesFromFile)
+            foreach (category cat in categoriesFromFile)
             {
-                d.Add(cat.catagoryId);
+                d.Add(cat.categoryId);
             }
 
             min = d.Min();

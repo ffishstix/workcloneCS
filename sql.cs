@@ -12,7 +12,7 @@ static partial class SQL
 
     private static bool testFiles = false;
     private static bool created = false;
-    private static List<category> catagoriesFromFile;
+    private static List<category> categoriesFromFile;
     private static string jsonDir;
     private static string jsonstaffDir;
     public static string connectionString;
@@ -25,9 +25,9 @@ static partial class SQL
         //database connection section
         dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
         if (!Directory.Exists(sqlDir)) Directory.CreateDirectory(sqlDir);
-        jsonDir = sqlDir + "catagoryJson.txt";
+        jsonDir = sqlDir + "categoryJson.txt";
         jsonstaffDir = sqlDir + "staff.txt";
-        catagoriesFromFile = pullCatFile();
+        categoriesFromFile = pullCatFile();
         if (!testFiles && connectionString == null)
         {
             try
@@ -90,11 +90,11 @@ static partial class SQL
 
 
 
-    public static (int, int) getRangeOfCatagoryID()
+    public static (int, int) getRangeOfCategoryID()
     {
-        string query = "SELECT top 1 catagoryId " +
+        string query = "SELECT top 1 categoryId " +
             "from categories " +
-            "order by catagoryId ";
+            "order by categoryId ";
         int min = -1;
         int max = -1;
         SqlCommand com = new SqlCommand(query + "desc ", sqlCon);
@@ -161,9 +161,9 @@ static partial class SQL
         return null;
     }
 
-    public static category getCatagory(int catagoryChosen)
+    public static category getCategory(int categoryChosen)
     {
-        category currentCatagory = new category();
+        category currentCategory = new category();
         List<item> values = new List<item>();
         string query = """
                        SELECT
@@ -174,17 +174,17 @@ static partial class SQL
                        	,ai.price
                        	,ISNULL(ai.chosenColour, 'grey') 
                        	,cat.catName
-                       	,cat.catagoryId
+                       	,cat.categoryId
                        	,ISNULL(cat.extraCatInfo, '') 
                        FROM
                        	allItems ai 
-                       	JOIN [foodCatagory] foo ON ai.itemID = foo.itemId 
-                       	JOIN [categories] cat ON cat.catagoryId = foo.catagoryId 
+                       	JOIN [foodCategory] foo ON ai.itemID = foo.itemId 
+                       	JOIN [categories] cat ON cat.categoryId = foo.categoryId 
                        	LEFT JOIN [allergyItem] ali ON ai.itemId = ali.itemId 
                        	LEFT JOIN [allergies] al ON ali.allergyId = al.allergyId 
                        WHERE
-                       		cat.catagoryId = @catagoryId 
-                       	AND cat.catagoryId IS NOT NULL 
+                       		cat.categoryId = @categoryId 
+                       	AND cat.categoryId IS NOT NULL 
                        	AND catName IS NOT NULL			
                        	AND itemName IS NOT NULL 		
                        	AND price IS NOT NULL 			
@@ -195,10 +195,10 @@ static partial class SQL
                        	,ai.price
                        	,ai.chosenColour
                        	,cat.catName
-                       	,cat.catagoryId
+                       	,cat.categoryId
                        	,cat.extraCatInfo 
                        ORDER BY
-                       	cat.catagoryId 
+                       	cat.categoryId 
                        
                        """;
         
@@ -218,9 +218,9 @@ static partial class SQL
                 string catExtraInfo = reader.IsDBNull(8) ? "" : reader.GetString(8);
                 
                 // Populate category details once
-                currentCatagory.catagoryId = catId;
-                currentCatagory.catName = catName;
-                currentCatagory.catagoryExtraInfo = catExtraInfo;
+                currentCategory.categoryId = catId;
+                currentCategory.catName = catName;
+                currentCategory.categoryExtraInfo = catExtraInfo;
 
                 // Split allergy string into a list
                 List<string> containedAllergies = new List<string>();
@@ -243,8 +243,8 @@ static partial class SQL
                 
             }
 
-            currentCatagory.items = values;
-            currentCatagory.connected = false;
+            currentCategory.items = values;
+            currentCategory.connected = false;
             try
             {
                 List<category> fileJson = new List<category>();
@@ -269,12 +269,12 @@ static partial class SQL
                 bool ah = false;
                 foreach (category cat in fileJson)
                 {
-                    if (cat != null && (cat.catName == currentCatagory.catName ||
-                                        cat.catagoryId == currentCatagory.catagoryId)) 
+                    if (cat != null && (cat.catName == currentCategory.catName ||
+                                        cat.categoryId == currentCategory.categoryId)) 
                         ah = true;
                 }
 
-                if (!ah) fileJson.Add(currentCatagory);
+                if (!ah) fileJson.Add(currentCategory);
                 string jsonStrings = JsonSerializer.Serialize(fileJson,
                     new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(jsonDir, jsonStrings);
@@ -284,8 +284,8 @@ static partial class SQL
                 Logger.Log($"error while storing items {ex.Message}");
             }
 
-            currentCatagory.connected = true;
-            return currentCatagory;
+            currentCategory.connected = true;
+            return currentCategory;
         
     }
     
@@ -486,16 +486,16 @@ static partial class SQL
         return localItems;
     }
 
-    public static List<dbCatagory> getAllCatagories()
+    public static List<dbCategory> getAllCategories()
     {
-        List<dbCatagory> cats = new List<dbCatagory>();
-        string command = "select catagoryId, catName, ISNULL(chosenColour, '') from categories";
+        List<dbCategory> cats = new List<dbCategory>();
+        string command = "select categoryId, catName, ISNULL(chosenColour, '') from categories";
         SqlCommand com = new SqlCommand(command, sqlCon);
         sqlCon.Open();
         using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
-            cats.Add(new dbCatagory()
+            cats.Add(new dbCategory()
             {
                 catId = reader.GetInt32(0),
                 catName = reader.GetString(1),
@@ -511,7 +511,7 @@ static partial class SQL
         
         int count = 0;
         List<List<int>> itemCat = new List<List<int>>();
-        SqlCommand com = new SqlCommand("select catagoryId, itemId from foodCatagory order by catagoryId asc", sqlCon);
+        SqlCommand com = new SqlCommand("select categoryId, itemId from foodCategory order by categoryId asc", sqlCon);
         sqlCon.Open();
         SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
@@ -522,7 +522,7 @@ static partial class SQL
         }
         sqlCon.Close();
         Logger.Log($"got {count} links");
-        return itemCat; // this returns a list of categories that has a list of items that has the catagoryId and itemId in that order
+        return itemCat; // this returns a list of categories that has a list of items that has the categoryId and itemId in that order
     }
     
     

@@ -19,7 +19,7 @@ public partial class Form1
 
     #region displayed categories code
 
-    private void addCatagory()
+    private void addCategory()
     {
         if (!IsHandleCreated) return;
         deleteChildbox();
@@ -60,7 +60,7 @@ public partial class Form1
         }
         catch (Exception ex)
         {
-            Logger.Log($"Error in addCatagory: {ex.Message}");
+            Logger.Log($"Error in addCategory: {ex.Message}");
         }
     }
 
@@ -90,7 +90,7 @@ public partial class Form1
             Logger.Log("Failed to load categories after timeout");
             tcs.SetResult(false);
         }
-        addCatagory();
+        addCategory();
         await tcs.Task;
     }
 
@@ -547,7 +547,7 @@ public partial class Form1
                     {
                         if (sync.categories != null && sync.categories.Count > 0)
                         {
-                            addCatagory();
+                            addCategory();
                             deleteAllItemsOrdered();
                         }
                         else

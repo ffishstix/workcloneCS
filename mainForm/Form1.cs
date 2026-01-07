@@ -56,7 +56,7 @@ public partial class Form1 : Form
     private void backBtn_Click(object sender, EventArgs e)
     {
         deleteChildbox();
-        addCatagory();
+        addCategory();
         allPannelsBlank();
     }
 
@@ -64,7 +64,7 @@ public partial class Form1 : Form
     
 
     //<summary>
-    //called when category clicked on, gets items from file called "{catagoryName}".txt -
+    //called when category clicked on, gets items from file called "{categoryName}".txt -
     //should probs change for an api call icl but you never know yk 
     // then just goes through each and adds each value and what not
     //
@@ -84,7 +84,7 @@ public partial class Form1 : Form
         }
         bool temp = !ConfigPannel.Visible;
         allPannelsBlank();
-        if (temp) addCatagory();
+        if (temp) addCategory();
         ConfigPannel.Visible = temp;
         ConfigPannel.BringToFront();
         
