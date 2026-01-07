@@ -43,8 +43,8 @@ class category
     // there might not be certain properties from the database so i am just putting this here so i can 
     public bool connected { get; set; }
     public string catName { get; set; }
-    public int catagoryId { get; set; }
-    public string catagoryExtraInfo { get; set; }
+    public int categoryId { get; set; }
+    public string categoryExtraInfo { get; set; }
 
     public string catColour { get; set; }
     public List<item> items { get; set; }
@@ -236,14 +236,14 @@ class dbSubChild : dbSubParent
 
 
 
-class dbCatagory
+class dbCategory
 {
     public List<int> itemIds;
     public string catName;
     public int catId;
     public string catColour;
 
-    public dbCatagory()
+    public dbCategory()
     {
         catId = 0;
         catName = "";
@@ -266,7 +266,7 @@ static class database
     private static SqlConnection connection;
 
     private static List<item> items;
-    private static List<dbCatagory> categories;
+    private static List<dbCategory> categories;
     private static bool DBExists;
     private static List<List<int>> catItemLinks;
     private static List<staff> staff;
@@ -278,9 +278,9 @@ static class database
         DBExists = databaseExists();
         if (DBExists) checkDBVNum();
         items = SQL.getAllItems();
-        categories = SQL.getAllCatagories();
+        categories = SQL.getAllCategories();
         catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and categories
-        updateCatagories();
+        updateCategories();
         staff = SQL.getStaffDataCloud();
 
 
@@ -310,28 +310,28 @@ static class database
 
     }
 
-    private static void updateCatagories()
+    private static void updateCategories()
     {
         if (categories == null)
         {
-            Logger.Log("updateCatagories(): categories is null (SQL.getAllCatagories returned null).");
+            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
             return;
         }
 
         if (items == null)
         {
-            Logger.Log("updateCatagories(): items is null (SQL.getAllItems returned null).");
+            Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
             return;
         }
 
         if (catItemLinks == null)
         {
-            Logger.Log("updateCatagories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
+            Logger.Log("updateCategories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
             return;
         }
 
-        var catById = new Dictionary<int, dbCatagory>(categories.Count);
-        foreach (dbCatagory cat in categories)
+        var catById = new Dictionary<int, dbCategory>(categories.Count);
+        foreach (dbCategory cat in categories)
         {
             cat.itemIds ??= new List<int>();
             catById[cat.catId] = cat;
@@ -347,9 +347,9 @@ static class database
                 continue;
 
             int itemId = link[1];
-            int catagoryId = link[0];
+            int categoryId = link[0];
 
-            if (!catById.TryGetValue(catagoryId, out var cat))
+            if (!catById.TryGetValue(categoryId, out var cat))
                 continue;
 
             if (!itemById.TryGetValue(itemId, out var it))
