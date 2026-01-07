@@ -25,15 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="TableForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="firstRun.code.cs">
-      <DependentUpon>firstRun.cs</DependentUpon>
-    </Compile>
-    <Compile Update="TableForm.code.cs">
-      <DependentUpon>TableForm.cs</DependentUpon>
-    </Compile>
     <Compile Update="sync.cs">
       <DependentUpon>static classes.cs</DependentUpon>
     </Compile>
@@ -58,6 +49,26 @@
     </Compile>
     <Compile Update="sqlErrorCalls.cs">
       <DependentUpon>sql.cs</DependentUpon>
+    </Compile>
+    <Compile Update="helper forms\firstRun.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="helper forms\firstRun.code.cs">
+      <DependentUpon>firstRun.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="helper forms\NameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="helper forms\TableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="helper forms\TableForm.code.cs">
+      <DependentUpon>TableForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="helper forms\tableNumberForm.cs">
+      <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
 
