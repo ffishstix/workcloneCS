@@ -12,7 +12,7 @@ static partial class SQL
 
     private static bool testFiles = false;
     private static bool created = false;
-    private static List<catagory> catagoriesFromFile;
+    private static List<category> catagoriesFromFile;
     private static string jsonDir;
     private static string jsonstaffDir;
     public static string connectionString;
@@ -38,6 +38,12 @@ static partial class SQL
                     .Build();
                 connectionString = configuration.GetConnectionString("DefaultConnection");
             }
+            
+            catch (System.IO.InvalidDataException ex)
+            {
+                Logger.Log($"couldnt access file and threw {ex.Message} most likely open in another aplication");
+            }
+            
             catch (Exception ex)
             {
                 created = true;
@@ -87,7 +93,7 @@ static partial class SQL
     public static (int, int) getRangeOfCatagoryID()
     {
         string query = "SELECT top 1 catagoryId " +
-            "from catagories " +
+            "from categories " +
             "order by catagoryId ";
         int min = -1;
         int max = -1;
@@ -134,14 +140,14 @@ static partial class SQL
     }
 
     
-    public static List<catagory> pullCatFile()
+    public static List<category> pullCatFile()
     {
         if (sync.checkCatFile())
         {
             try
             {
                 string json = File.ReadAllText(jsonDir); // Read file contents
-                List<catagory> fileJson = JsonSerializer.Deserialize<List<catagory>>(json); // Deserialize JSON text
+                List<category> fileJson = JsonSerializer.Deserialize<List<category>>(json); // Deserialize JSON text
                 Logger.Log("json was read and was valid");
                 return fileJson;
             }
@@ -155,9 +161,9 @@ static partial class SQL
         return null;
     }
 
-    public static catagory getCatagory(int catagoryChosen)
+    public static category getCatagory(int catagoryChosen)
     {
-        catagory currentCatagory = new catagory();
+        category currentCatagory = new category();
         List<item> values = new List<item>();
         string query = """
                        SELECT
@@ -173,7 +179,7 @@ static partial class SQL
                        FROM
                        	allItems ai 
                        	JOIN [foodCatagory] foo ON ai.itemID = foo.itemId 
-                       	JOIN [catagories] cat ON cat.catagoryId = foo.catagoryId 
+                       	JOIN [categories] cat ON cat.catagoryId = foo.catagoryId 
                        	LEFT JOIN [allergyItem] ali ON ai.itemId = ali.itemId 
                        	LEFT JOIN [allergies] al ON ali.allergyId = al.allergyId 
                        WHERE
@@ -241,7 +247,7 @@ static partial class SQL
             currentCatagory.connected = false;
             try
             {
-                List<catagory> fileJson = new List<catagory>();
+                List<category> fileJson = new List<category>();
 
                 if (File.Exists(jsonDir))
                 {
@@ -251,17 +257,17 @@ static partial class SQL
                     if (fileJson == null)
                     {
                         Logger.Log("file was null or weird so I'm starting again");
-                        fileJson = new List<catagory>();
+                        fileJson = new List<category>();
                     }
                 }
                 else
                 {
                     Logger.Log($"{jsonDir} doesn't exist, creating a new one");
-                    fileJson = new List<catagory>();
+                    fileJson = new List<category>();
                 }
 
                 bool ah = false;
-                foreach (catagory cat in fileJson)
+                foreach (category cat in fileJson)
                 {
                     if (cat != null && (cat.catName == currentCatagory.catName ||
                                         cat.catagoryId == currentCatagory.catagoryId)) 
@@ -483,7 +489,7 @@ static partial class SQL
     public static List<dbCatagory> getAllCatagories()
     {
         List<dbCatagory> cats = new List<dbCatagory>();
-        string command = "select catagoryId, catName, ISNULL(chosenColour, '') from catagories";
+        string command = "select catagoryId, catName, ISNULL(chosenColour, '') from categories";
         SqlCommand com = new SqlCommand(command, sqlCon);
         sqlCon.Open();
         using SqlDataReader reader = com.ExecuteReader();
@@ -516,7 +522,7 @@ static partial class SQL
         }
         sqlCon.Close();
         Logger.Log($"got {count} links");
-        return itemCat; // this returns a list of catagories that has a list of items that has the catagoryId and itemId in that order
+        return itemCat; // this returns a list of categories that has a list of items that has the catagoryId and itemId in that order
     }
     
     

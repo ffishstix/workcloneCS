@@ -21,7 +21,7 @@ class AbstractValidator<ConnectionSettings>
 class table
 class item
 class staff
-class catagory
+class category
 class rowOfItem
 class ConnectionSettings
 
@@ -61,7 +61,7 @@ NameForm --|> Form
 ' Other relationships stay the same
 Form1 "1" *-- "1" table : tableSelected
 Form1 "1" *-- "1" staff : currentStaff
-Form1 "1" *-- "*" catagory : cat
+Form1 "1" *-- "*" category : cat
 Form1 "1" *-- "*" item : itemsToBeOrdered
 Form1 ..> rowOfItem : «uses»
 Form1 ..> NameForm : «uses»
@@ -69,7 +69,7 @@ Form1 ..> TableForm : «uses»
 table "1" *-- "1" staff : openStaff
 table "1" *-- "*" item : ordered
 table "1" *-- "*" item : itemsToOrder
-catagory "1" *-- "*" item : items
+category "1" *-- "*" item : items
 NameForm "1" *-- "*" staff : x
 NameForm "1" *-- "1" staff : staffSelected
 FirstRunWindow "1" *-- "1" ConnectionSettingsValidator : _validator
@@ -91,7 +91,7 @@ end note
 rowOfItem --|> item
 
 ' Add relationships
-SQL ..> catagory : «uses»
+SQL ..> category : «uses»
 SQL ..> staff : «uses»
 SQL ..> table : «uses»
 SQL ..> item : «uses»
@@ -102,7 +102,7 @@ SQL ..> item : «uses»
 sync ..> SQL : «uses»
 sync ..> Logger : «uses»
 sync "1" *-- "*" staff : allStaff
-sync "1" *-- "*" catagory : catagories
+sync "1" *-- "*" category : categories
 Program ..> sync : «uses»
 
 note right of sync

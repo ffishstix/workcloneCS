@@ -10,7 +10,7 @@ class Form1 {
   - lineId : int
   - tableSelected : table
   - currentStaff : staff
-  - cat : List<catagory>
+  - cat : List<category>
   - itemsToBeOrdered : List<item>
   
   + Form1()
@@ -120,7 +120,7 @@ class staff {
   + Access : int
 }
 
-class catagory {
+class category {
   + connected : bool
   + catName : string
   + catagoryId : int
@@ -198,7 +198,7 @@ class tableNumberForm {
 
 class SQL {
   - {static} testFiles : bool
-  - {static} catagoriesFromFile : List<catagory>
+  - {static} catagoriesFromFile : List<category>
   - {static} jsonDir : string
   - {static} jsonstaffDir : string
   - {static} created : bool
@@ -209,9 +209,9 @@ class SQL {
   - {static} ErrorCallIS(ex : Exception) : void
   + {static} getRangeOfCatagoryID() : (int, int)
   + {static} getStaffData() : List<staff>
-  + {static} pullCatFile() : List<catagory>
-  + {static} getCatagory(catagoryChosen : int) : catagory
-  - {static} errorCallGC(ex : Exception, catagoryChosen : int) : catagory
+  + {static} pullCatFile() : List<category>
+  + {static} getCatagory(catagoryChosen : int) : category
+  - {static} errorCallGC(ex : Exception, catagoryChosen : int) : category
   - {static} errorCallCI(ex : Exception) : (int, int)
   - {static} errorCallSD(ex : Exception) : List<staff>
   + {static} staffreturnthing(file : string) : List<staff>
@@ -220,7 +220,7 @@ class SQL {
 class sync {
   + {static} catagoryIdRange : (int min, int max)
   + {static} allStaff : List<staff>
-  + {static} catagories : List<catagory>
+  + {static} categories : List<category>
   
   + {static} syncStaff() : void
   + {static} syncCatagory() : void

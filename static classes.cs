@@ -37,7 +37,7 @@ public class staff
     }
 }
 
-class catagory
+class category
 {
     // this is purely for purposes such as how in the locally saved files 
     // there might not be certain properties from the database so i am just putting this here so i can 
@@ -244,7 +244,7 @@ static class database
     private static SqlConnection connection;
 
     private static List<item> items;
-    private static List<dbCatagory> catagories;
+    private static List<dbCatagory> categories;
     private static bool DBExists;
     private static List<List<int>> catItemLinks;
     private static List<staff> staff;
@@ -255,8 +255,8 @@ static class database
         DBExists = databaseExists();
         if (DBExists) checkDBVNum();
         items = SQL.getAllItems();
-        catagories = SQL.getAllCatagories();
-        catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and catagories
+        categories = SQL.getAllCatagories();
+        catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and categories
         updateCatagories();
         staff = SQL.getStaffDataCloud();
 
@@ -289,9 +289,9 @@ static class database
 
     private static void updateCatagories()
     {
-        if (catagories == null)
+        if (categories == null)
         {
-            Logger.Log("updateCatagories(): catagories is null (SQL.getAllCatagories returned null).");
+            Logger.Log("updateCatagories(): categories is null (SQL.getAllCatagories returned null).");
             return;
         }
 
@@ -307,8 +307,8 @@ static class database
             return;
         }
 
-        var catById = new Dictionary<int, dbCatagory>(catagories.Count);
-        foreach (dbCatagory cat in catagories)
+        var catById = new Dictionary<int, dbCatagory>(categories.Count);
+        foreach (dbCatagory cat in categories)
         {
             cat.itemIds ??= new List<int>();
             catById[cat.catId] = cat;
@@ -335,7 +335,7 @@ static class database
             cat.itemIds.Add(it);
         }
 
-        Logger.Log("finished updating catagories");
+        Logger.Log("finished updating categories");
     }
 
     private static void initSubClasses()

@@ -4,7 +4,7 @@ namespace WorkCloneCS;
 static partial class SQL
 {
     // only used in getCatagory when catch is called
-    private static catagory errorCallGC(Exception ex, int catagoryChosen)
+    private static category errorCallGC(Exception ex, int catagoryChosen)
     {
         Logger.Log("\ncouldn't connect so am resorting to backup\n");
         Logger.Log(ex.Message);
@@ -12,14 +12,14 @@ static partial class SQL
         if (catagoriesFromFile != null)
         {
             Logger.Log("tbf i think it worked just have a quick look tbf");
-            foreach (catagory cat in catagoriesFromFile)
+            foreach (category cat in catagoriesFromFile)
             {
                 Logger.Log($"catID {cat.catagoryId}, chosen cat: {catagoryChosen}");
                 if (cat.catagoryId == catagoryChosen) return cat;
             }
         }
 
-        Logger.Log("catagories file or cat doesnt exist so :(");
+        Logger.Log("categories file or cat doesnt exist so :(");
         return null;
     }
 
@@ -33,7 +33,7 @@ static partial class SQL
         //couldnt connect or something so 
         if (catagoriesFromFile != null)
         {
-            foreach (catagory cat in catagoriesFromFile)
+            foreach (category cat in catagoriesFromFile)
             {
                 d.Add(cat.catagoryId);
             }

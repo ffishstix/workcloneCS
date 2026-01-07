@@ -25,7 +25,7 @@ public partial class Form1
         deleteChildbox();
 
         // Make sure we have the latest categories
-        cat = sync.catagories;
+        cat = sync.categories;
 
         if (cat == null || cat.Count == 0)
         {
@@ -80,7 +80,7 @@ public partial class Form1
 
         // Wait until categories are loaded or timeout
         sync.getFiles();
-        cat = sync.catagories;
+        cat = sync.categories;
         if (cat != null && cat.Count > 0)
         {
             tcs.SetResult(true);
@@ -96,7 +96,7 @@ public partial class Form1
 
     private void InitItemList(int e)
     {
-        List<item> catItems = sync.catagories[e].items;
+        List<item> catItems = sync.categories[e].items;
         if (catItems != null)
         {
             for (int i = 0; i < catItems.Count; i++)
@@ -526,12 +526,12 @@ public partial class Form1
                 // Wait for sync to complete
                 await Task.Run(async () =>
                 {
-                    sync.catagories = null;
+                    sync.categories = null;
                     sync.syncAll();
                     
                     // Wait for categories to be populated
                     int attempts = 0;
-                    while (attempts < 10 && (sync.catagories == null || sync.catagories.Count == 0))
+                    while (attempts < 10 && (sync.categories == null || sync.categories.Count == 0))
                     {
                         await Task.Delay(1000);
                         attempts++;
@@ -545,7 +545,7 @@ public partial class Form1
                 {
                     Invoke(new Action(() =>
                     {
-                        if (sync.catagories != null && sync.catagories.Count > 0)
+                        if (sync.categories != null && sync.categories.Count > 0)
                         {
                             addCatagory();
                             deleteAllItemsOrdered();
@@ -562,7 +562,7 @@ public partial class Form1
                 Logger.Log($"Error in ConfigSideBtn_Click: {ex.Message}");
             }
         };
-        Logger.Log("showed catagories");
+        Logger.Log("showed categories");
         reLoad.Show();
     }
 

@@ -13,7 +13,7 @@ class sync
 {
     public static (int min, int max) catagoryIdRange { get; set; }
     public static List<staff> allStaff { get; set; }
-    public static List<catagory> catagories { get; set; }
+    public static List<category> categories { get; set; }
 
     public static void syncStaff()
     {
@@ -26,17 +26,17 @@ class sync
 
     public static void syncCatagory()
     {
-        Logger.Log("entered sync catagory");
-        catagories = new List<catagory>();
+        Logger.Log("entered sync category");
+        categories = new List<category>();
         catagoryIdRange = SQL.getRangeOfCatagoryID();
         Logger.Log(catagoryIdRange.Item1.ToString());
         
         Logger.Log($"max? {catagoryIdRange.min}, min? {catagoryIdRange.max}");
         
         // Create a temporary list to store categories
-        List<catagory> tempCategories = new List<catagory>();
+        List<category> tempCategories = new List<category>();
         
-        //catagories section
+        //categories section
         for (int i = 1; i <= catagoryIdRange.max; i++)
         {
             var x = SQL.getCatagory(i);
@@ -45,12 +45,12 @@ class sync
         }
 
         // After collecting all categories, assign them to the main list
-        catagories = tempCategories;
+        categories = tempCategories;
         
         // Log the categories
-        if (catagories.Count > 1)
+        if (categories.Count > 1)
         {
-            foreach (catagory cat in catagories)
+            foreach (category cat in categories)
             {
                 Logger.Log($"{cat.catName}");
             }
@@ -64,7 +64,7 @@ class sync
         try
         {
             string json = File.ReadAllText(path); // Read file contents
-            List<catagory> fileJson = JsonSerializer.Deserialize<List<catagory>>(json); // Deserialize JSON text
+            List<category> fileJson = JsonSerializer.Deserialize<List<category>>(json); // Deserialize JSON text
             if (fileJson[0].catagoryId == 0 || fileJson[0].catName == null || fileJson[0].items == null)
             {
                 return false;
@@ -88,11 +88,11 @@ class sync
             {
                 try
                 {
-                    List<catagory> j = SQL.pullCatFile();
-                    catagories = j;
+                    List<category> j = SQL.pullCatFile();
+                    categories = j;
                     int min = j[0].catagoryId;
                     int max = j[0].catagoryId;
-                    foreach (catagory cat in j)
+                    foreach (category cat in j)
                     {
                         if (cat.catagoryId < min)
                         {
@@ -145,7 +145,7 @@ class sync
             
             Logger.Log("just about to go into syncCatagory");
             syncCatagory();
-            Logger.Log("synced catagory");
+            Logger.Log("synced category");
             
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
             int cloudV = SQL.getDatabaseVNum();

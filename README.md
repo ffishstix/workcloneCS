@@ -13,7 +13,7 @@ put simply a clone of a very popular pos system...
 - in the main window you have so so many choice:
 ---
 ### if you choose:
-- any catagory, the said items should show up with each items prefered colour (havent implemented chosen order yet although i could)
+- any category, the said items should show up with each items prefered colour (havent implemented chosen order yet although i could)
 - any item, the item should get added to the current sale board and can be edited further
 - button originally labed standard, that is the pricing option and can be used to modify every item selected however it isnt implemented
 - Name button, it takes you to a second menu asking for you to input your pin which returns the credentials and is used when pushing the food to the table (when i finally implement it)
@@ -21,7 +21,7 @@ put simply a clone of a very popular pos system...
 - on the bottom row:
 - Misc + Table + Final + Config, they bring up generic menus and it is pretty self explanatory explore it yourself it honestly isnt that dificult
 - however Order is where shit gets interesting as there is a bit more (janky) logic that goes into it, basically it should allow you to be able to see more items i use it at work a lot so i wanted it to be well implemented spoiler it isnt but that is besides the point. the main thing to take away is that it gives you better control of the items and more visibility.
-- back, pretty easily explained = you click on a catagory you click back and it goes back wow who would have thought!!!
+- back, pretty easily explained = you click on a category you click back and it goes back wow who would have thought!!!
 ---
 ## todo
 

@@ -12,7 +12,7 @@ rectangle NameForm
 rectangle Program
 rectangle SQL
 rectangle TableForm
-rectangle catagory
+rectangle category
 rectangle firstRun
 rectangle item
 rectangle rowOfItem
@@ -35,7 +35,7 @@ Form1                        -[#3574f0,plain]->>  Logger
 Form1                        -[#3574f0,plain]->>  NameForm                    
 Form1                        -[#3574f0,plain]->>  SQL                         
 Form1                        -[#3574f0,plain]->>  TableForm                   
-Form1                        -[#3574f0,plain]->>  catagory                    
+Form1                        -[#3574f0,plain]->>  category                    
 Form1                        -[#3574f0,plain]->>  item                        
 Form1                        -[#3574f0,plain]->>  rowOfItem                   
 Form1                        -[#5fad65,dotted]->>  rowOfItem                   
@@ -56,22 +56,22 @@ Program                      -[#3574f0,plain]->>  SQL
 Program                      -[#3574f0,plain]->>  firstRun                    
 Program                      -[#3574f0,plain]->>  sync                        
 SQL                          -[#3574f0,plain]->>  Logger                      
-SQL                          -[#955ae0,plain]->>  catagory                    
-SQL                          -[#3574f0,plain]->>  catagory                    
+SQL                          -[#955ae0,plain]->>  category                    
+SQL                          -[#3574f0,plain]->>  category                    
 SQL                          -[#3574f0,plain]->>  item                        
 SQL                          -[#3574f0,plain]->>  staff                       
 SQL                          -[#3574f0,plain]->>  sync                        
 SQL                          -[#3574f0,plain]->>  table                       
 TableForm                    -[#3574f0,plain]->>  Logger                      
 TableForm                    -[#3574f0,plain]->>  tableNumberForm             
-catagory                     -[#3574f0,plain]->>  item                        
+category                     -[#3574f0,plain]->>  item                        
 firstRun                     -[#3574f0,plain]->>  Logger                      
 rowOfItem                    -[#3574f0,plain]->>  item                        
 rowOfItem                    -[#5fad65,dotted]->>  item                        
 rowOfItem                    -[#24a394,dashed]-^  item                        
 sync                         -[#3574f0,plain]->>  Logger                      
 sync                         -[#3574f0,plain]->>  SQL                         
-sync                         -[#3574f0,plain]->>  catagory                    
+sync                         -[#3574f0,plain]->>  category                    
 sync                         -[#3574f0,plain]->>  staff                       
 table                        -[#3574f0,plain]->>  item                        
 table                        -[#955ae0,plain]->>  staff                       

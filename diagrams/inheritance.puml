@@ -11,7 +11,7 @@ class NameForm
 class SQL
 class table
 class staff
-class catagory
+class category
 class item
 class rowOfItem
 class tableForm

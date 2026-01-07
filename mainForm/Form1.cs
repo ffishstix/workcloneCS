@@ -17,11 +17,11 @@ public partial class Form1 : Form
     private int lineId = 1;
     public table tableSelected = new table();
     private staff currentStaff;
-    private List<catagory> cat = new();
+    private List<category> cat = new();
 
     public Form1()
     {
-        cat = sync.catagories;
+        cat = sync.categories;
         Logger.Log("inside the Form1 constructor");
         InitializeComponent();
         Logger.Log("initialized components");
@@ -32,7 +32,7 @@ public partial class Form1 : Form
         Logger.Log("started loading open tables");
         
         
-        Logger.Log("added catagories");
+        Logger.Log("added categories");
         Visible = true;
         Show();
     }
@@ -64,7 +64,7 @@ public partial class Form1 : Form
     
 
     //<summary>
-    //called when catagory clicked on, gets items from file called "{catagoryName}".txt -
+    //called when category clicked on, gets items from file called "{catagoryName}".txt -
     //should probs change for an api call icl but you never know yk 
     // then just goes through each and adds each value and what not
     //
