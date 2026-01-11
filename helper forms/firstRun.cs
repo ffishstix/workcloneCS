@@ -8,6 +8,8 @@ namespace WorkCloneCS
         private readonly ConnectionSettingsValidator _validator = new ConnectionSettingsValidator();
         private string lastWorkingConnection;
         public string connectionString;
+        private const int templatePort = 12346;
+        private const int defaultPort = 1433;
         private bool t;
         public FirstRunWindow(bool te = false)
         {
@@ -71,7 +73,7 @@ namespace WorkCloneCS
 
         private void RemoveTempTextPort(object sender, EventArgs e)
         {
-            if (PortTextBox.Text == "*12346")
+            if (PortTextBox.Text == $"*{templatePort}")
             {
                 PortTextBox.Text = "";
                 PortTextBox.ForeColor = Color.Black;
@@ -83,7 +85,7 @@ namespace WorkCloneCS
             if (string.IsNullOrEmpty(PortTextBox.Text))
             {
                 PortTextBox.ForeColor = Color.Gray;
-                PortTextBox.Text = "*12346";
+                PortTextBox.Text = $"*{templatePort}";
             }
         }
 

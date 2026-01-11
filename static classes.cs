@@ -379,3 +379,41 @@ public class dbSubCat : item
     public bool isRequired { get; set; }
     
 }
+
+public class basicJunctionTable
+{
+    public List<int> leftIds;
+    public List<int> rightIds;
+    public (int, List<int>) combined;
+    private string tableName;
+    private string leftCol;
+    private string rightCol;
+    private bool hasPopulated;
+    private bool hasFinished;
+    
+    basicJunctionTable()
+    {
+        
+    }
+
+    public void populateTable()
+    {
+        (leftIds, rightIds) = SQL.getJunctionTableValues(tableName, leftCol, rightCol);
+        
+        hasPopulated = true;
+    }
+
+    private void updateValue(List<int> moreIds, List<int> lessIds)
+    {
+        if (moreIds.Count < lessIds.Count)
+        {
+         updateValue(lessIds, moreIds);   
+        }
+        for(int i = 0; i < moreIds.Count; i++)
+        {
+            
+        }
+        
+    }
+    
+}

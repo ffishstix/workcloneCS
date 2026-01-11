@@ -533,8 +533,26 @@ static partial class SQL
 
         return null;
     }
-    
-    
+
+    public static (List<int>, List<int>) getJunctionTableValues(string tableName, string leftId, string rightId)
+    {
+        List<int> leftIds = new();
+        List<int> rightIds = new();
+        string query = $"""
+                     select {leftId}, {rightId} 
+                     from {tableName}
+                     """;
+        SqlCommand com = new SqlCommand(query, sqlCon);
+        sqlCon.Open();
+        SqlDataReader reader = com.ExecuteReader();
+        while (reader.Read())
+        {
+            leftIds.Add(reader.GetInt32(0));
+            rightIds.Add(reader.GetInt32(1));
+        }
+        sqlCon.Close();
+        return (leftIds, rightIds);
+    }
     
     #endregion
     

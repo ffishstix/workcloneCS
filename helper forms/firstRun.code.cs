@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentValidation.TestHelper;
 using FluentValidation;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WorkCloneCS
 {
@@ -67,7 +68,7 @@ namespace WorkCloneCS
                 Username = UserNameTextBox.Text,
                 Password = PasswordTextBox.Text
             };
-
+            if (settings.IP.IsNullOrEmpty()) settings.IP = defaultPort.ToString();
             // Validate each property individually
             var ipValidation = _validator.TestValidate(settings, options =>
                 options.IncludeProperties(x => x.IP));
@@ -128,10 +129,10 @@ namespace WorkCloneCS
 
             if (valid)
             {
-                connectionString = $"Server={IPTextBox.Text},{PortTextBox.Text};" +
-                                   $"Database={databaseTextBox.Text};" +
-                                   $"User Id={UserNameTextBox.Text};" +
-                                   $"Password={PasswordTextBox.Text};" +
+                connectionString = $"Server={settings.IP},{settings.Port};" +
+                                   $"Database={settings.Database};" +
+                                   $"User Id={settings.Username};" +
+                                   $"Password={settings.Password};" +
                                    $"Encrypt=False";
                 //now we try the connection
                 string allPat = @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
