@@ -91,6 +91,7 @@ partial class FirstRunWindow
         PasswordTextBox.Name = "PasswordTextBox";
         PasswordTextBox.Size = new System.Drawing.Size(177, 23);
         PasswordTextBox.TabIndex = 10;
+        PasswordTextBox.PasswordChar = '*';
         // 
         // CheckBtn
         // 

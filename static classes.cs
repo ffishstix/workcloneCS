@@ -271,16 +271,31 @@ static class database
     private static List<List<int>> catItemLinks;
     private static List<staff> staff;
     private static List<orderLine> activeOrderLines;
-
+    private static List<List<int>> allergyItemLinks;
 
     public static void initLocalDatabase()
     {
+
         DBExists = databaseExists();
         if (DBExists) checkDBVNum();
         items = SQL.getAllItems();
         categories = SQL.getAllCategories();
-        catItemLinks = SQL.getCatItemLinks(); // this is to compare the items and categories
+        catItemLinks = new basicJunctionTable
+        {
+            tableName = "foodCategory",
+            leftCol = "catId",
+            rightCol = "itemId"
+            
+        }.combined; // this is to compare the items and categories
         updateCategories();
+        allergyItemLinks = new basicJunctionTable
+        {
+            tableName = "allergyItem",
+            leftCol = "itemId",
+            rightCol = "allergyId"
+            
+        }.combined;
+        
         staff = SQL.getStaffDataCloud();
 
 
@@ -366,8 +381,12 @@ static class database
         
         
     }
-    
-    
+
+    //function to be called after all allergies and items have been initialised.
+    private static void updateItems()
+    {
+        
+    }
     
 }
 
@@ -384,16 +403,21 @@ public class basicJunctionTable
 {
     public List<int> leftIds;
     public List<int> rightIds;
-    public (int, List<int>) combined;
-    private string tableName;
-    private string leftCol;
-    private string rightCol;
+    public List<List<int>> combined;
+    public string tableName;
+    public string leftCol;
+    public string rightCol;
     private bool hasPopulated;
     private bool hasFinished;
     
-    basicJunctionTable()
+    public basicJunctionTable()
     {
-        
+        tableName = "";
+        leftCol = "";
+        rightCol = "";
+        hasPopulated = false;
+        hasFinished = false;
+        populateTable();
     }
 
     public void populateTable()
@@ -401,19 +425,24 @@ public class basicJunctionTable
         (leftIds, rightIds) = SQL.getJunctionTableValues(tableName, leftCol, rightCol);
         
         hasPopulated = true;
+        updateCombined(leftIds, rightIds);  
     }
 
-    private void updateValue(List<int> moreIds, List<int> lessIds)
+    private void updateCombined(List<int> moreIds, List<int> lessIds)
     {
         if (moreIds.Count < lessIds.Count)
         {
-         updateValue(lessIds, moreIds);   
+            updateCombined(lessIds, moreIds);   
         }
-        for(int i = 0; i < moreIds.Count; i++)
+
+        combined = new();
+        for(int i = 0; i < moreIds.Count; i++) combined.Add(new ());
+
+
+        for (int i = 0; i < moreIds.Count; i++)
         {
-            
+            combined[moreIds[i]].Add(lessIds[i]); 
         }
-        
     }
     
 }
