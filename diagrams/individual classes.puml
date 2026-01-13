@@ -129,10 +129,10 @@ class category {
 }
 
 class item {
-  + itemName : string
+  + Name : string
   + price : decimal
   + itemCount : int
-  + itemId : int
+  + Id : int
   + chosenColour : string
   + extraInfo : string
   + lineId : int

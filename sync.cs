@@ -150,16 +150,11 @@ class sync
             Logger.Log($"sync took {(DateTime.Now - start).TotalSeconds:F5} seconds");
             int cloudV = SQL.getDatabaseVNum();
             File.WriteAllText($@"{SQL.dir}\sql\DBvNum.txt", $"{cloudV}");
+            Logger.Log("db version updated in sync all");
         });
     }
 
-    public static void LoadTables()
-    {
-        (int min, int max) MainVisibleTableRange = (1, 98);
-        List<int> aditionalVisibleTableNums = [300, 500, 700, 800];
-        
-        
-    }
+
     
     
 }

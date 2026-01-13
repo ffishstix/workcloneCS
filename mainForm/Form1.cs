@@ -13,7 +13,7 @@ namespace WorkCloneCS;
 
 public partial class Form1 : Form
 {
-    private List<string> allergies = [];
+    private List<string> alergies; 
     private int lineId = 1;
     public table tableSelected = new table();
     private staff currentStaff;
@@ -21,6 +21,7 @@ public partial class Form1 : Form
 
     public Form1()
     {
+        foreach (allergy al in database.allergies) alergies.Add(al.Name);
         cat = sync.categories;
         Logger.Log("inside the Form1 constructor");
         InitializeComponent();

@@ -21,7 +21,11 @@ namespace WorkCloneCS
 
         public staff staffSelected = new staff
         {
-            Access = 0,
+            staffAccess = new()
+            {
+                Id = 0, 
+                Name = "",
+            },
             Name = "name",
             Id = 0
         };

@@ -13,6 +13,11 @@ public class table
     public int tableId { get; set; }
     public List<item> ordered { get; set; }
     public List<item> itemsToOrder { get; set; }
+
+    public bool paid { get; set; }
+    
+    
+
     public table()
     {
         tableId = 0;
@@ -23,17 +28,20 @@ public class table
 }
 
 
-public class staff
+public class staff : baseItem
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int Access { get; set; }
+    
+    public accessLevel staffAccess { get; set; }
 
     public staff()
     {
         Id = 0;
         Name = "";
-        Access = 0;
+        staffAccess = new accessLevel()
+        {
+            Id = 0,
+            Name = "",
+        };
     }
 }
 
@@ -50,17 +58,16 @@ class category
     public List<item> items { get; set; }
 }
 
-public class item
+public class item : baseItem
 {
-    public int itemId { get; set; }
-    public string itemName { get; set; }
+
     public string extraInfo { get; set; }
     public int itemCount { get; set; }
     public decimal price { get; set; }
     public string chosenColour { get; set; }
     public int lineId { get; set; }
     public bool ordered { get; set; }
-    public List<string> containedAllergies  { get; set; }
+    public List<allergy> allergies  { get; set; }
     public bool hasSubItems { get; set; }
 
     public List<dbSubCat> subItems { get; set; }
@@ -88,19 +95,19 @@ public class rowOfItem : item
 
     public rowOfItem()
     {
-        itemName = "litterallly anythingelse";
+        Name = "litterallly anythingelse";
         int countLabelWidth = 30;
         int priceLabelWidth = 60;
-        itemId = 0;
+        Id = 0;
         lineId = 0;
         price = 0;
         itemCount = 1;
         Tag = new item()
         {
             itemCount = itemCount,
-            itemName = itemName,
+            Name = Name,
             price = price,
-            itemId = itemId,
+            Id = Id,
             lineId = lineId,
             ordered = ordered
 
@@ -137,7 +144,7 @@ public class rowOfItem : item
 
         middle = new Label
         {
-            Text = itemName,
+            Text = Name,
             Height = rowHeight,
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
@@ -182,7 +189,7 @@ public class rowOfItem : item
     public void updateText()
     {
         left.Text = itemCount.ToString();
-        middle.Text = itemName;
+        middle.Text = Name;
         right.Text = (itemCount * price).ToString("c");
     }
 
@@ -214,8 +221,8 @@ public class rowOfItem : item
 
 class dbSubParent
 {
-    public int itemId { get; set;}
-    public string itemName { get; set; }
+    public int Id { get; set;}
+    public string Name { get; set; }
     public int price { get; set; }
     public string chosenColour { get; set; }
     public int leadsToCategoryId { get; set; }
@@ -227,7 +234,7 @@ class dbSubParent
 class dbSubChild : dbSubParent
 {
     public int subItemOrder { get; set; }
-    public int parentItemId { get; set; }
+    public int parentId { get; set; }
     public int subCatId { get; set; }
     public bool isLeaf { get; set; }
     public bool isRequired { get; set; }
@@ -238,7 +245,7 @@ class dbSubChild : dbSubParent
 
 class dbCategory
 {
-    public List<int> itemIds;
+    public List<int> Ids;
     public string catName;
     public int catId;
     public string catColour;
@@ -248,152 +255,34 @@ class dbCategory
         catId = 0;
         catName = "";
         catColour = "";
-        itemIds = new List<int>();
+        Ids = new List<int>();
     }
 }
 
-class orderLine
+public class orderLine : baseItem
 {
-    private int orderId;
-    private int itemId;
+    public int orderId;
+    public int itemId;
+
+}
+
+public class baseItem
+{
+    public int Id;
+    public string Name;
+}
+
+public class allergy : baseItem
+{
     
 }
 
 
-static class database
-{
-    public static readonly int databaseVersion;
-    private static SqlConnection connection;
-
-    private static List<item> items;
-    private static List<dbCategory> categories;
-    private static bool DBExists;
-    private static List<List<int>> catItemLinks;
-    private static List<staff> staff;
-    private static List<orderLine> activeOrderLines;
-    private static List<List<int>> allergyItemLinks;
-
-    public static void initLocalDatabase()
-    {
-
-        DBExists = databaseExists();
-        if (DBExists) checkDBVNum();
-        items = SQL.getAllItems();
-        categories = SQL.getAllCategories();
-        catItemLinks = new basicJunctionTable
-        {
-            tableName = "foodCategory",
-            leftCol = "catId",
-            rightCol = "itemId"
-            
-        }.combined; // this is to compare the items and categories
-        updateCategories();
-        allergyItemLinks = new basicJunctionTable
-        {
-            tableName = "allergyItem",
-            leftCol = "itemId",
-            rightCol = "allergyId"
-            
-        }.combined;
-        
-        staff = SQL.getStaffDataCloud();
-
-
-    }
-
-    private static bool databaseExists()
-    {
-        string dir = @$"{SQL.dir}sql/";
-        if (Directory.Exists(dir)) return File.Exists(dir + "DBvNum.txt");
-        Logger.Log($"static Classes databaseExists() {dir} directory doesnt exist");
-        return false;
-
-    }
-
-    private static void checkDBVNum()
-    {
-        int cloud = SQL.getDatabaseVNum();
-        int local = SQL.getLocalDBVNum();
-        if (local != cloud)
-        {
-            Logger.Log("local database version is different from cloud database version updating now");
-            sync.syncAll();
-        }
-        else Logger.Log("local database is up to date");
-
-
-
-    }
-
-    private static void updateCategories()
-    {
-        if (categories == null)
-        {
-            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
-            return;
-        }
-
-        if (items == null)
-        {
-            Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
-            return;
-        }
-
-        if (catItemLinks == null)
-        {
-            Logger.Log("updateCategories(): catItemLinks is null (SQL.getCatItemLinks returned null).");
-            return;
-        }
-
-        var catById = new Dictionary<int, dbCategory>(categories.Count);
-        foreach (dbCategory cat in categories)
-        {
-            cat.itemIds ??= new List<int>();
-            catById[cat.catId] = cat;
-        }
-
-        var itemById = new Dictionary<int, int>(items.Count);
-        foreach (item it in items)
-            itemById[it.itemId] = it.itemId;
-
-        foreach (var link in catItemLinks)
-        {
-            if (link == null || link.Count < 2)
-                continue;
-
-            int itemId = link[1];
-            int categoryId = link[0];
-
-            if (!catById.TryGetValue(categoryId, out var cat))
-                continue;
-
-            if (!itemById.TryGetValue(itemId, out var it))
-                continue;
-
-            cat.itemIds.Add(it);
-        }
-
-        Logger.Log("finished updating categories");
-    }
-
-    private static void initSubClasses()
-    {
-        
-        
-    }
-
-    //function to be called after all allergies and items have been initialised.
-    private static void updateItems()
-    {
-        
-    }
-    
-}
 
 
 public class dbSubCat : item
 {
-    public int parentItemId { get; set;}
+    public int parentId { get; set;}
     public bool isLeaf { get; set; }
     public bool isRequired { get; set; }
     
@@ -401,9 +290,9 @@ public class dbSubCat : item
 
 public class basicJunctionTable
 {
-    public List<int> leftIds;
+    public List<int> leftIds; 
     public List<int> rightIds;
-    public List<List<int>> combined;
+    public Dictionary<int, HashSet<int>> combined;
     public string tableName;
     public string leftCol;
     public string rightCol;
@@ -423,26 +312,73 @@ public class basicJunctionTable
     public void populateTable()
     {
         (leftIds, rightIds) = SQL.getJunctionTableValues(tableName, leftCol, rightCol);
-        
         hasPopulated = true;
-        updateCombined(leftIds, rightIds);  
+        updateCombined();  
     }
 
-    private void updateCombined(List<int> moreIds, List<int> lessIds)
+    private void updateCombined()
     {
-        if (moreIds.Count < lessIds.Count)
+        combined = new Dictionary<int, HashSet<int>>();
+
+        for (int i = 0; i < leftIds.Count; i++)
         {
-            updateCombined(lessIds, moreIds);   
-        }
+            int Id = leftIds[i];
+            int allergyId = rightIds[i];
 
-        combined = new();
-        for(int i = 0; i < moreIds.Count; i++) combined.Add(new ());
+            if (!combined.TryGetValue(Id, out var set))
+            {
+                set = new HashSet<int>();
+                combined[Id] = set;
+            }
 
-
-        for (int i = 0; i < moreIds.Count; i++)
-        {
-            combined[moreIds[i]].Add(lessIds[i]); 
+            set.Add(allergyId);
         }
     }
     
 }
+
+public class accessLevel : baseItem
+{
+    // still has Id
+    public bool canSendThroughItems;
+    public bool canDelete;
+    public bool canNoSale;
+    public bool canViewTables;
+
+    public accessLevel()
+    {
+        canSendThroughItems = false;
+        canDelete = false;
+        canNoSale = false;
+        canViewTables = false;
+    }
+}
+
+public class header : baseItem
+{
+    public DateTime sentDateTime;
+    public staff headerStaff;
+    public int tableId;
+    public int finished; // -1 not initialised, 0 not 1 finished 2 error
+
+    public header()
+    {
+        sentDateTime = DateTime.Now;
+        headerStaff = new()
+        {
+            Id = 0,
+            Name = ""
+        };
+        tableId = 0;
+        finished = -1;
+    }
+
+}
+
+public class order : baseItem
+{
+    public int headerId;
+    public header header;
+    public List<orderLine> orderLines;
+}
+    

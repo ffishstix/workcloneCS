@@ -122,11 +122,26 @@ public partial class Form1
             Color colour = Color.Gray;
             if (tag.chosenColour == "grey") colour = Color.Gray;
             else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
-            if (allergies != null) foreach (string s in allergies) if(tag.containedAllergies.Contains(s)) colour = Color.DarkRed;
-            
+            if (alergies != null && tag.allergies != null)
+            {
+                var tagAllergyNames = new HashSet<string>(
+                    tag.allergies.Select(a => a.Name),
+                    StringComparer.OrdinalIgnoreCase
+                );
+
+                foreach (string s in alergies)
+                {
+                    if (tagAllergyNames.Contains(s))
+                    {
+                        colour = Color.DarkRed;
+                        break;
+                    }
+                }
+            }
+
             Label item = new Label
             {
-                Text = tag.itemName,
+                Text = tag.Name,
                 Tag = tag,
                 AutoSize = false,
                 BackColor = colour,
@@ -177,10 +192,10 @@ public partial class Form1
         rowOfItem row = new rowOfItem()
         {
             
-            itemName = item.itemName,
+            Name = item.Name,
             price = item.price,
             itemCount = item.itemCount,
-            itemId = item.itemId,
+            Id = item.Id,
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
         };
@@ -240,7 +255,7 @@ public partial class Form1
                     }
                     else
                     {
-                        tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.itemName == row.itemName));
+                        tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.Name == row.Name));
                         refreshScrollPanel();
                     }
                     updateTotalPrice(-row.price);
@@ -250,7 +265,7 @@ public partial class Form1
                 {
                     row.itemCount++;
                     row.updateText();
-                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.itemName == row.itemName)-1].itemCount = row.itemCount;
+                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.Name == row.Name)-1].itemCount = row.itemCount;
                     //used to have refresh scoll pannel here lol absolutely no need
                     updateTotalItems(1);
                     updateTotalPrice(row.price);
@@ -498,7 +513,10 @@ public partial class Form1
             {
                 Id = 0,
                 Name = "name",
-                Access = 0
+                staffAccess = new()
+                {
+                    Id = 0
+                }
             };
             
         }
