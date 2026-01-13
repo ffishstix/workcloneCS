@@ -44,7 +44,7 @@ public partial class TableForm : Form
     private void openTableBtn_Click(object sender, EventArgs e)
     {
         if (tableSelected != 0) Close();
-        Logger.Log("openTableBtn clicked but there is no table actually selected so not closing :)");
+        Logger.Log("openTableBtn clicked but there is no table actually selected so not closing :) openTableBtn_Click bad message");
     }
 
     private void defaultTableBtn_Click(object sender, EventArgs e)

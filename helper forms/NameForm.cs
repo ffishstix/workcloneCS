@@ -44,11 +44,11 @@ namespace WorkCloneCS
             {
                 
                 this.Close();
-                Logger.Log("staff was null so closing window");
+                Logger.Log("staff was null so closing window NameForm");
             }
             else
             {
-                Logger.Log("staff be staffing icl ");
+                Logger.Log("staff be staffing icl NameForm (good message)");
                 sync.allStaff = x;
             }
             displayBtn.Text = "";

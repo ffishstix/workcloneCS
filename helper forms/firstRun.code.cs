@@ -33,7 +33,7 @@ namespace WorkCloneCS
             }
             catch (Exception ex)
             {
-                Logger.Log($"error while writing connection string to file {ex.Message}");
+                Logger.Log($"error while writing connection string to file {ex.Message} apply_Click_code");
 
             }
             Logger.Log("applying settings");
@@ -124,7 +124,7 @@ namespace WorkCloneCS
             {
                 anyErrors = string.Join("\n", errorMessages);
                 InfoLabel.Text = anyErrors;
-                Logger.Log(anyErrors);
+                Logger.Log(anyErrors + "  CheckBtn_Click_Code ");
             }
 
             if (valid)
@@ -136,7 +136,7 @@ namespace WorkCloneCS
                                    $"Encrypt=False";
                 //now we try the connection
                 string allPat = @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
-                Logger.Log(connectionString);
+                Logger.Log(connectionString + " to be removed in prod");
                 bool isAllCorrect = System.Text.RegularExpressions.Regex.IsMatch(connectionString, allPat);
                 if (isAllCorrect)
                 {

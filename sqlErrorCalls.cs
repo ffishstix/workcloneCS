@@ -6,7 +6,7 @@ static partial class SQL
     // only used in getCategory when catch is called
     private static category errorCallGC(Exception ex, int categoryChosen)
     {
-        Logger.Log("\ncouldn't connect so am resorting to backup\n");
+        Logger.Log("\ncouldn't connect so am resorting to backup errorCallGC  \n");
         Logger.Log(ex.Message);
         Logger.Here();
         if (categoriesFromFile != null)
@@ -19,7 +19,7 @@ static partial class SQL
             }
         }
 
-        Logger.Log("categories file or cat doesnt exist so :(");
+        Logger.Log("categories file or cat doesnt exist so :( errorcallGC ");
         return null;
     }
 
@@ -28,7 +28,7 @@ static partial class SQL
     {
         int min = 0;
         int max = 0;
-        Logger.Log(ex.Message);
+        Logger.Log($"{ex.Message} errorCallCI");
         List<int> d = new List<int>();
         //couldnt connect or something so 
         if (categoriesFromFile != null)
@@ -54,7 +54,7 @@ static partial class SQL
     //only used in getStaffData when catch is called
     private static List<staff> errorCallSD(Exception ex)
     {
-        Logger.Log(ex.Message);
+        Logger.Log($"{ex.Message} errorCallSD");
         Console.WriteLine("Error: " + ex.Message);
         string file =
             $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs/sql/staff.txt";

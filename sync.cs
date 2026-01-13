@@ -19,7 +19,7 @@ class sync
     {
         try
         {
-            allStaff = SQL.getStaffDataCloud();
+            database.updateStaff();
             Logger.Log("staff synced");
         } catch(Exception ex) { Logger.Log(ex.Message); }
     }

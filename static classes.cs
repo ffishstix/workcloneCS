@@ -245,7 +245,7 @@ class dbSubChild : dbSubParent
 
 class dbCategory
 {
-    public List<int> Ids;
+    public List<int> itemIds;
     public string catName;
     public int catId;
     public string catColour;
@@ -255,7 +255,7 @@ class dbCategory
         catId = 0;
         catName = "";
         catColour = "";
-        Ids = new List<int>();
+        itemIds = new List<int>();
     }
 }
 
@@ -299,14 +299,14 @@ public class basicJunctionTable
     private bool hasPopulated;
     private bool hasFinished;
     
-    public basicJunctionTable()
+    public basicJunctionTable(string TableName, string LeftCol, string RightCol)
     {
-        tableName = "";
-        leftCol = "";
-        rightCol = "";
+        tableName = TableName;
+        leftCol = LeftCol;
+        rightCol = RightCol;
         hasPopulated = false;
         hasFinished = false;
-        populateTable();
+        if(leftCol != "" && rightCol != "") populateTable();
     }
 
     public void populateTable()

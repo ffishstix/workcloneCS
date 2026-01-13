@@ -17,12 +17,13 @@ public partial class Form1 : Form
     private int lineId = 1;
     public table tableSelected = new table();
     private staff currentStaff;
-    private List<category> cat = new();
+    private List<dbCategory> cat = new();
 
     public Form1()
     {
-        foreach (allergy al in database.allergies) alergies.Add(al.Name);
-        cat = sync.categories;
+        
+        foreach (allergy al in database.allergies.Values) alergies.Add(al.Name);
+        cat = database.getCategories();
         Logger.Log("inside the Form1 constructor");
         InitializeComponent();
         Logger.Log("initialized components");
@@ -37,6 +38,13 @@ public partial class Form1 : Form
         Visible = true;
         Show();
     }
+    
+    
+    protected void OnFormClosing(FormClosingEventArgs e)
+    {
+        base.OnFormClosing(e);
+        database.saveLocalDatabase();
+    } 
     
     
     

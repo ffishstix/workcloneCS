@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WorkCloneCS;
 
 public partial class Form1
@@ -25,11 +27,11 @@ public partial class Form1
         deleteChildbox();
 
         // Make sure we have the latest categories
-        cat = sync.categories;
+        cat = database.getCategories();
 
         if (cat == null || cat.Count == 0)
         {
-            Logger.Log("Categories list is null or empty");
+            Logger.Log("Categories list is null or empty (add category)");
             return;
         }
 
@@ -73,6 +75,13 @@ public partial class Form1
         InitItemList((int)((Control)sender).Tag);
     }
     
+    private void loadCategories()
+    {
+        List<dbCategory> cats = database.getCategories();
+        
+    }
+    
+    
     private async Task LoadCategories()
     {
         // Create a TaskCompletionSource to wait for categories
@@ -80,14 +89,14 @@ public partial class Form1
 
         // Wait until categories are loaded or timeout
         sync.getFiles();
-        cat = sync.categories;
+        cat = database.getCategories();
         if (cat != null && cat.Count > 0)
         {
             tcs.SetResult(true);
         }
         else
         {
-            Logger.Log("Failed to load categories after timeout");
+            Logger.Log("Failed to load categories after timeout LoadCategories");
             tcs.SetResult(false);
         }
         addCategory();
@@ -459,7 +468,7 @@ public partial class Form1
                             addItem(item);
                         }
                     }  
-                    else Logger.Log("empty table loaded");
+                    else Logger.Log("empty table loaded tableBtn_Click_Code");
                
                 }
             
@@ -570,7 +579,7 @@ public partial class Form1
                         }
                         else
                         {
-                            Logger.Log("Failed to load categories after config update");
+                            Logger.Log("Failed to load categories after config update ConfigSideBtn_Click_Code" );
                         }
                     }));
                 }

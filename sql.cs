@@ -19,7 +19,6 @@ static partial class SQL
     public static bool initCompleted = false;
     public static string dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
     public static string sqlDir = dir + "sql/";
-    private static SqlConnection sqlCon;
     public static bool initStarted = false;
     
     public static void initSQL()
@@ -43,9 +42,9 @@ static partial class SQL
                 connectionString = configuration.GetConnectionString("DefaultConnection");
             }
             
-            catch (System.IO.InvalidDataException ex)
+            catch (InvalidDataException ex)
             {
-                Logger.Log($"couldnt access file and threw {ex.Message} most likely open in another aplication");
+                Logger.Log($"couldnt access file and threw {ex.Message} most likely open in another aplication in init sql");
             }
             
             catch (Exception ex)
@@ -60,34 +59,27 @@ static partial class SQL
 
         if (connectionString == null) ErrorCallIS(null);
         else {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            SqlConnection sqlCon = new SqlConnection(connectionString);
+            try
             {
-                try
-                {
-                    connection.Open();
-                    Logger.Log("connected to database");
-                    connection.Close();
-                
-                }
-                catch (Exception ex)
-                {
-                    ErrorCallIS(ex);
-
-                }
+                sqlCon.Open();
+                Logger.Log("connected to database");
+                sqlCon.Close();
             }
-
+            catch (Exception ex) { ErrorCallIS(ex); }
         }
         
         //staff section
         sync.allStaff = getStaffFromFile();
         if (sync.allStaff == null)
         {
-            Logger.Log("staff didnt staff");
+            Logger.Log("staff didnt staff after sync.allStaff= getStaffFromFile");
         }
-
-        sqlCon = new SqlConnection(connectionString);
+        
         initCompleted = true;
         initStarted = true;
+        Logger.Log("init sql completed");
+        
     }
     
     public static (int, int) getRangeOfCategoryID()
@@ -97,12 +89,13 @@ static partial class SQL
             "order by categoryId ";
         int min = -1;
         int max = -1;
-        SqlCommand com = new SqlCommand(query + "desc ", sqlCon);
-        SqlCommand com2 = new SqlCommand(query + "asc ", sqlCon); 
-        sqlCon.Open();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query + "desc ", con);
+        using SqlCommand com2 = new SqlCommand(query + "asc ", con); 
+        con.Open();
         object? descResult = com.ExecuteScalar();
         object? ascResult = com2.ExecuteScalar();
-        sqlCon.Close();
+        con.Close();
         if (descResult != null || descResult != DBNull.Value) max = Convert.ToInt32(descResult);
         if (ascResult != null || ascResult != DBNull.Value) min = Convert.ToInt32(ascResult);
 
@@ -114,14 +107,16 @@ static partial class SQL
     {
         List<staff> staffs = new();
         string query = """
-                       select id, name, accessLevel, canSendThroughItems, 
+                       select id, name, staff.accessLevel, canSendThroughItems, 
                               canDelete, canNoSale, canViewTables
                        from staff inner join accessAlowances 
                        on staff.accessLevel = accessAlowances.accessLevel
                        order by id asc
                        """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             staffs.Add(new staff()
@@ -139,7 +134,7 @@ static partial class SQL
                 });
         }
 
-        sqlCon.Close();
+        con.Close();
 
         return staffs;
 
@@ -157,9 +152,10 @@ static partial class SQL
                        """;
         List<staff> values= new List<staff>();
         if (connectionString == null) return null;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        sqlCon.Open();
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query, con);
+        con.Open();
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             Logger.Here();
@@ -177,7 +173,7 @@ static partial class SQL
             });
         }
 
-        sqlCon.Close();
+        con.Close();
         if (values.Count == 0) return null;
         return values;
 
@@ -196,11 +192,11 @@ static partial class SQL
             }
             catch (Exception ex)
             {
-                Logger.Log($"pullCatFile() failed: {ex.Message}");
+                Logger.Log($"pullCatFile() doesn't exist or is null/corrupt pullcatfile failed: {ex.Message}");
                 return null;
             }
         }
-        Logger.Log(jsonDir + " doesn't exist or is null/corrupt");
+        Logger.Log("sync.CheckCatFile failed: pullCatFile() ");
         return null;
     }
 
@@ -208,45 +204,45 @@ static partial class SQL
     {
         category currentCategory = new category();
         List<item> values = new List<item>();
-        string query = """
+        string query = $"""
                        SELECT
-                       	 ai.Id
-                       	,ai.Name
-                       	,ISNULL(STRING_AGG(al.allergyName, ', '), '') as allergies
-                       	,ISNULL(ai.extraInfo, '') 
-                       	,ai.price
-                       	,ISNULL(ai.chosenColour, 'grey') 
-                       	,cat.catName
-                       	,cat.categoryId
-                       	,ISNULL(cat.extraCatInfo, '') 
+                           ai.itemId
+                            ,ai.itemName
+                            ,ISNULL(STRING_AGG(al.allergyName, ', '), '') as allergies
+                            ,ISNULL(ai.extraInfo, '')
+                            ,ai.price
+                            ,ISNULL(ai.chosenColour, 'grey')
+                            ,cat.catName
+                            ,cat.categoryId
+                            ,ISNULL(cat.extraCatInfo, '')
                        FROM
-                       	allItems ai 
-                       	JOIN [foodCategory] foo ON ai.Id = foo.Id 
-                       	JOIN [categories] cat ON cat.categoryId = foo.categoryId 
-                       	LEFT JOIN [allergyItem] ali ON ai.Id = ali.Id 
-                       	LEFT JOIN [allergies] al ON ali.allergyId = al.allergyId 
+                           allItems ai
+                               JOIN [foodCategory] foo ON ai.itemId = foo.itemId
+                               JOIN [categories] cat ON cat.categoryId = foo.categoryId
+                               LEFT JOIN [allergyItem] ali ON ai.itemId = ali.itemId
+                               LEFT JOIN [allergies] al ON ali.allergyId = al.allergyId
                        WHERE
-                       		cat.categoryId = @categoryId 
-                       	AND cat.categoryId IS NOT NULL 
-                       	AND catName IS NOT NULL			
-                       	AND Name IS NOT NULL 		
-                       	AND price IS NOT NULL 			
+                           cat.categoryId = {categoryChosen} 
+                         AND cat.categoryId IS NOT NULL
+                         AND catName IS NOT NULL
+                         AND itemName IS NOT NULL
+                         AND price IS NOT NULL
                        GROUP BY
-                       	 ai.Id
-                       	,ai.Name
-                       	,ai.extraInfo
-                       	,ai.price
-                       	,ai.chosenColour
-                       	,cat.catName
-                       	,cat.categoryId
-                       	,cat.extraCatInfo 
+                           ai.itemId
+                               ,ai.itemName
+                               ,ai.extraInfo
+                               ,ai.price
+                               ,ai.chosenColour
+                               ,cat.catName
+                               ,cat.categoryId
+                               ,cat.extraCatInfo
                        ORDER BY
-                       	cat.categoryId 
-                       
+                           cat.categoryId 
                        """;
-        
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query, con);
+        con.Open();
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
             {
                 
@@ -254,7 +250,7 @@ static partial class SQL
                 string Name = reader.GetString(1);
                 string allergyString = reader.IsDBNull(2) ? "" : reader.GetString(2);
                 string extraInfo = reader.IsDBNull(3) ? "" : reader.GetString(3);
-                decimal price = reader.GetDecimal(4);
+                decimal price = reader.GetInt32(4);
                 string chosenColour = reader.GetString(5);
                 string catName = reader.GetString(6);
                 int catId = reader.GetInt32(7);
@@ -285,51 +281,51 @@ static partial class SQL
                 });
                 
             }
+        con.Close();
+        currentCategory.items = values;
+        currentCategory.connected = false;
+        try
+        {
+            List<category> fileJson = new List<category>();
 
-            currentCategory.items = values;
-            currentCategory.connected = false;
-            try
+            if (File.Exists(jsonDir))
             {
-                List<category> fileJson = new List<category>();
+                Logger.Here();
+                fileJson = pullCatFile();
 
-                if (File.Exists(jsonDir))
+                if (fileJson == null)
                 {
-                    Logger.Here();
-                    fileJson = pullCatFile();
-
-                    if (fileJson == null)
-                    {
-                        Logger.Log("file was null or weird so I'm starting again");
-                        fileJson = new List<category>();
-                    }
-                }
-                else
-                {
-                    Logger.Log($"{jsonDir} doesn't exist, creating a new one");
+                    Logger.Log("file was null or weird so I'm starting again getCategory in the logging");
                     fileJson = new List<category>();
                 }
-
-                bool ah = false;
-                foreach (category cat in fileJson)
-                {
-                    if (cat != null && (cat.catName == currentCategory.catName ||
-                                        cat.categoryId == currentCategory.categoryId)) 
-                        ah = true;
-                }
-
-                if (!ah) fileJson.Add(currentCategory);
-                string jsonStrings = JsonSerializer.Serialize(fileJson,
-                    new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(jsonDir, jsonStrings);
             }
-            catch (Exception ex)
+            else
             {
-                Logger.Log($"error while storing items {ex.Message}");
+                Logger.Log($"{jsonDir} doesn't exist, creating a new one");
+                fileJson = new List<category>();
             }
 
-            currentCategory.connected = true;
-            return currentCategory;
-        
+            bool ah = false;
+            foreach (category cat in fileJson)
+            {
+                if (cat != null && (cat.catName == currentCategory.catName ||
+                                    cat.categoryId == currentCategory.categoryId)) 
+                    ah = true;
+            }
+
+            if (!ah) fileJson.Add(currentCategory);
+            string jsonStrings = JsonSerializer.Serialize(fileJson,
+                new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(jsonDir, jsonStrings);
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error while storing items {ex.Message}");
+        }
+
+        currentCategory.connected = true;
+        return currentCategory;
+    
     }
     
     public static List<staff> staffreturnthing(string file)
@@ -347,10 +343,11 @@ static partial class SQL
     public static int getHighestidFromTable(string tableName)
     {
         string sqlcommand = $"select max(Id) from {tableName}";
-        SqlCommand com = new SqlCommand(sqlcommand, sqlCon);
-        sqlCon.Open();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(sqlcommand, con);
+        con.Open();
         object? result = com.ExecuteScalar();
-        sqlCon.Close();
+        con.Close();
         int x = -1;
         if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
         return x;
@@ -358,12 +355,13 @@ static partial class SQL
 
     private static void modifyTableSql(string sqlCommand)
     {
-        SqlCommand sql = new SqlCommand(sqlCommand, sqlCon);
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand sql = new SqlCommand(sqlCommand, con);
         try
         {
-            sqlCon.Open();
+            con.Open();
             sql.ExecuteNonQuery();
-            sqlCon.Close();
+            con.Close();
             Logger.Log($"Executed {sqlCommand} successfully");
         }
         catch (Exception ex)
@@ -391,9 +389,10 @@ static partial class SQL
                         AND allItems.Id IS NOT NULL;
                       """;
         List<item> items = new List<item>();
-        sqlCon.Open();
-        SqlCommand sql = new SqlCommand(sqlCommand, sqlCon);
-        SqlDataReader reader = sql.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand sql = new SqlCommand(sqlCommand, con);
+        using SqlDataReader reader = sql.ExecuteReader();
         while (reader.Read())
         {
             if (reader.GetInt32(0) == null)
@@ -414,7 +413,7 @@ static partial class SQL
             Logger.Log("item added to list");
         }
 
-        sqlCon.Close();
+        con.Close();
         return items;
     }
     
@@ -469,11 +468,11 @@ static partial class SQL
                             where class = 0
                             and name = N'DatabaseVersion'
                             ";
-        
-        SqlCommand com = new SqlCommand(sqlCommand, sqlCon);
-        sqlCon.Open();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(sqlCommand, con);
+        con.Open();
         object? result = com.ExecuteScalar(); 
-        sqlCon.Close();
+        con.Close();
         if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
         
         return x;
@@ -496,12 +495,13 @@ static partial class SQL
     {
         List<item> localItems = new List<item>();
         string query = """
-                       select Id, Name, price, chosenColour, 
+                       select itemId, itemName, price, chosenColour, 
                               extraInfo, subCatId, leadsToCategoryId, subItemOrder 
                        from allItems
                        """;
-        using var cmd = new SqlCommand(query, sqlCon);
-        sqlCon.Open();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand cmd = new SqlCommand(query, con);
+        con.Open();
         using SqlDataReader reader = cmd.ExecuteReader();
         while (reader.Read())
         {
@@ -518,7 +518,7 @@ static partial class SQL
                 hasSubItems = reader.GetInt32(6) > -1,
             });
         }
-        sqlCon.Close();
+        con.Close();
         
         return localItems;
     }
@@ -528,8 +528,9 @@ static partial class SQL
     {
         List<dbCategory> cats = new List<dbCategory>();
         string command = "select categoryId, catName, ISNULL(chosenColour, '') from categories";
-        SqlCommand com = new SqlCommand(command, sqlCon);
-        sqlCon.Open();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(command, con);
+        con.Open();
         using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
@@ -540,29 +541,10 @@ static partial class SQL
                 catColour = reader.GetString(2)
             });
         }
-        sqlCon.Close();
+        con.Close();
         return cats;
     }
-
-    public static List<List<int>> getCatItemLinks()
-    {
-        
-        int count = 0;
-        List<List<int>> itemCat = new List<List<int>>();
-        SqlCommand com = new SqlCommand("select categoryId, Id from foodCategory order by categoryId asc", sqlCon);
-        sqlCon.Open();
-        SqlDataReader reader = com.ExecuteReader();
-        while (reader.Read())
-        {
-            count++;
-            while (itemCat.Count <= reader.GetInt32(0)) itemCat.Add(new List<int>());
-            itemCat[reader.GetInt32(0)].Add(reader.GetInt32(1));
-        }
-        sqlCon.Close();
-        Logger.Log($"got {count} links");
-        return itemCat; // this returns a list of categories that has a list of items that has the categoryId and Id in that order
-    }
-
+    
     public static List<dbSubParent> getSubParentPairs()
     {
         
@@ -570,10 +552,10 @@ static partial class SQL
         string query = "select Id, leadsToCategoryId from allItems where subCatID = -1 and leadsToCategoryId != -1";
 
         string query2 = "select Id, subCatId, leadsToCategoryId from allItems where subCatId != -1 and subItemOrder != -1";
-        
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        sqlCon.Open();
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query, con);
+        con.Open();
+        using SqlDataReader reader = com.ExecuteReader();
         List<dbSubParent> lis = new List<dbSubParent>();
         while (reader.Read())
         {
@@ -581,7 +563,7 @@ static partial class SQL
             
         }
 
-        sqlCon.Close();
+        con.Close();
 
         return null;
     }
@@ -591,19 +573,20 @@ static partial class SQL
         List<int> leftIds = new();
         List<int> rightIds = new();
         string query = $"""
-                     select {leftId}, {rightId} 
-                     from {tableName}
+                     select {leftId}, {rightId}  
+                     from {tableName} 
                      order by {leftId} asc
                      """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        sqlCon.Open();
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query, con);
+        con.Open();
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             leftIds.Add(reader.GetInt32(0));
             rightIds.Add(reader.GetInt32(1));
         }
-        sqlCon.Close();
+        con.Close();
         return (leftIds, rightIds);
     }
     
@@ -616,8 +599,10 @@ static partial class SQL
                        from allergies
                        order by allergyId asc
                        """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        using SqlCommand com = new SqlCommand(query, con);
+        con.Open();
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             allergies.Add(new allergy()
@@ -626,7 +611,7 @@ static partial class SQL
                 Name = reader.GetString(1)
             });
         }
-        sqlCon.Close();
+        con.Close();
         return allergies;
     }
 
@@ -639,8 +624,11 @@ static partial class SQL
                 where Id >= 0
                 order by Id asc
                 """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             headers.Add(new header()
@@ -657,7 +645,7 @@ static partial class SQL
             });
         }
 
-        sqlCon.Close();
+        con.Close();
         return headers;
     }
 
@@ -670,8 +658,11 @@ static partial class SQL
                        where headerId >= 0
                        order by Id asc
                        """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             orders.Add(new order()
@@ -681,9 +672,8 @@ static partial class SQL
             });
         }
 
-        sqlCon.Close();
+        con.Close();
         return orders;
-
     }
 
     public static List<orderLine> getOrderLines()
@@ -694,8 +684,10 @@ static partial class SQL
                        from orderLine
                        order by Id asc
                        """;
-        SqlCommand com = new SqlCommand(query, sqlCon);
-        SqlDataReader reader = com.ExecuteReader();
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
             orderLines.Add(new orderLine()
@@ -706,21 +698,45 @@ static partial class SQL
             });
         }
 
-        sqlCon.Close();
+        con.Close();
         return orderLines;
     }
 
-    public static List<table> getTables()
+    public static (List<int> orderId, List<int> tableId) getTables()
     {
+        (List<int> orderId, List<int> tableId) tables = new();
         string query = """
-                       select 
+                       select orders.Id, headers.tableNumber
+                       from orders, headers
+                       where headers.Id = orders.headerId
+                       order by tableNumber asc
                        """;
-        return null;
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using SqlDataReader reader = com.ExecuteReader();
+        try
+        {
+            while (reader.Read())
+            {
+                tables.orderId.Add(reader.GetInt32(0));
+                tables.tableId.Add(reader.GetInt32(1));
+            }
+            con.Close();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error in getTables in SQL {ex}");
+        }
+
+        if( tables.tableId.Count != tables.orderId.Count) 
+            Logger.Log("the amount of tableId's and orderId's dont " +
+                "match which means something went aabsolutely fucky wucky but oh well");
+        return tables;
     }
     
-
-    #endregion
     
+    #endregion
     
     
 }
