@@ -41,7 +41,7 @@ static class database
     private static bool DBExists;
     private static int localVNum; // this is the variable gotten from local file
                                    // and updated when sync occurs.
-    static readonly JsonSerializerOptions SnapshotJsonOptions = new()
+    private static readonly JsonSerializerOptions SnapshotJsonOptions = new()
     {
     WriteIndented = true,
     ReferenceHandler = ReferenceHandler.Preserve,
@@ -53,7 +53,7 @@ static class database
     ReadCommentHandling = JsonCommentHandling.Disallow
     };
     //table sql results
-    public static Dictionary<int, allergy> allergies;
+    public static Dictionary<int, allergy> allergies {get; private set;}
     private static Dictionary<int, item> items;
     private static Dictionary<int, dbCategory> categories;
     private static Dictionary<int, header> headers;
