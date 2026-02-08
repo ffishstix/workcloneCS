@@ -38,6 +38,7 @@ static class database
     // local database variables
     public static int cloudVNum;
     private const bool extraSafe = true;
+    public static bool pullCloudStarted = false;
     private static bool DBExists;
     private static int localVNum; // this is the variable gotten from local file
                                    // and updated when sync occurs.
@@ -69,8 +70,11 @@ static class database
     #endregion
     
     #region functions
-    public static void pullCloudDatabase()
+    public static bool pullCloudDatabase()
     {
+        if (pullCloudStarted) return false;
+        pullCloudStarted = true;
+        
         while (!SQL.initCompleted)
         {
             
@@ -102,6 +106,7 @@ static class database
 
         DBExists = true;
         saveLocalDatabase();
+        return true;
     }
 
     public static List<dbCategory> getCategories()
@@ -110,7 +115,6 @@ static class database
         foreach (dbCategory cat in categories.Values) cats.Add(cat);
         return cats;
     }
-    
     
     public static void updateStaff()
     {
@@ -125,24 +129,29 @@ static class database
         
         
     }
+
+    public static item getItemFromId(int itemId)
+    {
+        if (items == null) return null;
+        return items[itemId];
+    }
     
     public static void saveLocalDatabase()
     {
-        if (cloudVNum != SQL.getDatabaseVNum() || cloudVNum != localVNum) pullCloudDatabase();
         if (!( // this is ensuring that all possible vairables are assigned
                 cloudVNum == null || cloudVNum == new int() ||
-            DBExists == false ||
-            allergies == null || allergies == new Dictionary<int, allergy>() ||
-            items == null || items == new Dictionary<int, item>() ||
-            categories == null || categories == new Dictionary<int, dbCategory>() ||
-            headers == null || headers == new Dictionary<int, header>() ||
-            orderLines == null || orderLines == new Dictionary<int, List<orderLine>>() ||
-            orders == null || orderLines == new Dictionary<int, List<orderLine>>() ||
-            staff == null || staff == new Dictionary<int, staff>() ||
-            //tables == null || tables == new Dictionary<int, table>() to be added
-            catItemLinks == null || catItemLinks == new Dictionary<int, HashSet<int>>() ||
-            allergyItemLinks == null || allergyItemLinks == new Dictionary<int, HashSet<int>>() ||
-            localVNum == null || localVNum == new int()
+                DBExists == false ||
+                allergies == null || allergies == new Dictionary<int, allergy>() ||
+                items == null || items == new Dictionary<int, item>() ||
+                categories == null || categories == new Dictionary<int, dbCategory>() ||
+                headers == null || headers == new Dictionary<int, header>() ||
+                orderLines == null || orderLines == new Dictionary<int, List<orderLine>>() ||
+                orders == null || orderLines == new Dictionary<int, List<orderLine>>() ||
+                staff == null || staff == new Dictionary<int, staff>() ||
+                //tables == null || tables == new Dictionary<int, table>() to be added
+                catItemLinks == null || catItemLinks == new Dictionary<int, HashSet<int>>() ||
+                allergyItemLinks == null || allergyItemLinks == new Dictionary<int, HashSet<int>>() ||
+                localVNum == null || localVNum == new int()
 
             ))
         {
@@ -239,25 +248,28 @@ static class database
 
     private static void updateCategories()
     {
-        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
-        catItemLinks = new basicJunctionTable 
-        (
-            "foodCategory", 
-            "categoryId", 
-            "itemId"
-        ).combined;
-        if (categories == null)
-        {
-            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
-            return;
-        }
-
         if (items == null)
         {
             Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
             return;
         }
-
+        
+        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
+        if (categories == null)
+        {
+            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
+            return;
+        }
+        basicJunctionTable t  = new basicJunctionTable 
+        (
+            "foodCategory", 
+            "categoryId", 
+            "itemId"
+        );
+        t.populateTable();
+        catItemLinks = t.combined;
+        
+        
         if (catItemLinks == null)
         {
             Logger.Log("updateCategories(): catItemLinks is null.");
@@ -303,11 +315,13 @@ static class database
     {
         items = SQL.getAllItems().ToDictionary(i => i.Id);
         allergies = SQL.getAllergies().ToDictionary(a => a.Id);
-        allergyItemLinks = new basicJunctionTable(
+        basicJunctionTable t = new basicJunctionTable(
             "allergyItem",
             "itemId",
             "allergyId"
-        ).combined;
+        );
+        t.populateTable();
+        allergyItemLinks = t.combined;
         
         foreach (item it in items.Values)
         {

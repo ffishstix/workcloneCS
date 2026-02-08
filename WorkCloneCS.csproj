@@ -73,6 +73,9 @@
     <Compile Update="database.cs">
       <DependentUpon>static classes.cs</DependentUpon>
     </Compile>
+    <Compile Update="mainForm\allergies.code.cs">
+      <DependentUpon>allergies.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
