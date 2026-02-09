@@ -353,7 +353,7 @@ static partial class SQL
         return x;
     }
 
-    private static void modifyTableSql(string sqlCommand)
+    private static void modifyTableSql(string sqlCommand, string functionCalling ="null")
     {
         using SqlConnection con = new SqlConnection(connectionString);
         using SqlCommand sql = new SqlCommand(sqlCommand, con);
@@ -366,7 +366,7 @@ static partial class SQL
         }
         catch (Exception ex)
         {
-            Logger.Log($"error in modifyTableSql with {sqlCommand} {ex}"); 
+            Logger.Log($"error in modifyTableSql called by {functionCalling} with {sqlCommand} {ex}"); 
         }
         
         
@@ -375,18 +375,18 @@ static partial class SQL
     public static List<item> getTableItems(int tableId)
     {
         string sqlCommand = $"""
-                      SELECT allItems.Id, allItems.Name, allItems.Price,
-                             ISNULL(allItems.chosenColour, 'grey') as chosenColour, ISNULL(allItems.extraInfo, '') as extraInfo
-                      FROM workclonecs.dbo.headers AS headers
-                               LEFT JOIN workclonecs.dbo.orders AS orders ON
-                          (orders.headerId = headers.Id)
-                               LEFT JOIN workclonecs.dbo.orderLine AS orderLines
-                                         ON (orderLines.orderId = orders.Id)
-                               LEFT JOIN workclonecs.dbo.allItems AS allItems
-                                         ON (allItems.Id = orderLines.Id)
-                      WHERE (headers.finished = 0)
-                        AND (headers.tableNumber) = {tableId}
-                        AND allItems.Id IS NOT NULL;
+                           select
+                               ai.itemid,
+                           from tables as tb
+                                    inner join tableorder as tor
+                                               on tor.tableid = tb.tableid
+                                    inner join orders
+                                               on tor.orderid = orders.id
+                                    inner join orderline as ol
+                                               on orders.id = ol.orderid
+                                    inner join allitems as ai
+                                               on ol.itemid = ai.itemid
+                           where tb.tableid = {tableId}
                       """;
         List<item> items = new List<item>();
         using SqlConnection con = new SqlConnection(connectionString);
@@ -400,16 +400,8 @@ static partial class SQL
                 Logger.Log("table is null");
                 return null;
             }
-
-            items.Add(new item
-            {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                price = reader.GetInt32(2) / 100,
-                chosenColour = reader.GetString(3),
-                extraInfo = reader.GetString(4),
-                itemCount = 1
-            });
+            item i = database.getItemFromId(reader.GetInt32(0));
+            if (i != null) items.Add(i);
             Logger.Log("item added to list");
         }
 
@@ -428,18 +420,26 @@ static partial class SQL
             table.tableId = 4000;
             // this is specifically for when using the till and you dont want to have to add a table number
         }
-        //header table
-        string command = $"insert into headers(Id, staffId, tableNumber) values({headerId}, {staff.Id}, {table.tableId})";
-        modifyTableSql(command);
-        //order table
-        command = $"insert into orders(Id, headerId) values ({orderId}, {headerId})";
+
+        string[] singleLineCommands = [
+            $"insert into headers(Id, staffId, tableNumber) " +
+            $"values({headerId}, {staff.Id}, {table.tableId})",
+            
+            $"insert into orders(Id, headerId) " +
+            $"values ({orderId}, {headerId})",
+            
+            $"insert into tableOrder " +
+            $"values ({table.tableId}, {orderId})",
+        ];
+
+        foreach(string s in singleLineCommands) modifyTableSql(s, "pushItemsToTables");
         
-        modifyTableSql(command);
+        
         //orderLine table
         foreach (item item in table.itemsToOrder)
         {
-            command = $"insert into orderLine(Id, orderId, Id) values({lineId++}, {orderId}, {item.Id})";
-            modifyTableSql(command);
+            string command = $"insert into orderLine(Id, orderId, Id) values({lineId++}, {orderId}, {item.Id})";
+            modifyTableSql(command, "pushItemsToTables later on");
             Logger.Log("added item");
         }
         Logger.Log("end of items being ordered");

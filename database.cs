@@ -14,6 +14,7 @@ static class database
     // local database variables
     public static int cloudVNum;
     private const bool extraSafe = true;
+    public static bool pullCloudStarted = false;
     private static bool DBExists;
     private static int localVNum; // this is the variable gotten from local file
                                    // and updated when sync occurs.
@@ -45,8 +46,11 @@ static class database
     #endregion
     
     #region functions
-    public static void pullCloudDatabase()
+    public static bool pullCloudDatabase()
     {
+        if (pullCloudStarted) return false;
+        pullCloudStarted = true;
+        
         while (!SQL.initCompleted)
         {
             
@@ -272,6 +276,12 @@ static class database
         
         
     }
+
+    public static item getItemFromId(int itemId)
+    {
+        if (items == null) return null;
+        return items[itemId];
+    }
     
     public static void saveLocalDatabase(bool allowCloudRefresh = true)
     {
@@ -443,25 +453,28 @@ static class database
 
     private static void updateCategories()
     {
-        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
-        catItemLinks = new basicJunctionTable 
-        (
-            "foodCategory", 
-            "categoryId", 
-            "itemId"
-        ).combined;
-        if (categories == null)
-        {
-            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
-            return;
-        }
-
         if (items == null)
         {
             Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
             return;
         }
-
+        
+        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
+        if (categories == null)
+        {
+            Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
+            return;
+        }
+        basicJunctionTable t  = new basicJunctionTable 
+        (
+            "foodCategory", 
+            "categoryId", 
+            "itemId"
+        );
+        t.populateTable();
+        catItemLinks = t.combined;
+        
+        
         if (catItemLinks == null)
         {
             Logger.Log("updateCategories(): catItemLinks is null.");
@@ -507,11 +520,13 @@ static class database
     {
         items = SQL.getAllItems().ToDictionary(i => i.Id);
         allergies = SQL.getAllergies().ToDictionary(a => a.Id);
-        allergyItemLinks = new basicJunctionTable(
+        basicJunctionTable t = new basicJunctionTable(
             "allergyItem",
             "itemId",
             "allergyId"
-        ).combined;
+        );
+        t.populateTable();
+        allergyItemLinks = t.combined;
         
         foreach (item it in items.Values)
         {

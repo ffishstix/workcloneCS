@@ -69,7 +69,7 @@ public partial class Form1 : Form
     private void backBtn_Click(object sender, EventArgs e)
     {
         deleteChildbox();
-        addCategory();
+        addCategories();
         allPannelsBlank();
     }
 
@@ -97,7 +97,7 @@ public partial class Form1 : Form
         }
         bool temp = !ConfigPannel.Visible;
         allPannelsBlank();
-        if (temp) addCategory();
+        if (temp) addCategories();
         ConfigPannel.Visible = temp;
         ConfigPannel.BringToFront();
         

@@ -21,7 +21,7 @@ public partial class Form1
 
     #region displayed categories code
 
-    private void addCategory()
+    private void addCategories()
     {
         if (!IsHandleCreated) return;
         deleteChildbox();
@@ -32,7 +32,7 @@ public partial class Form1
             Logger.Log("Categories list is null or empty (add category)");
             return;
         }
-
+        
         try
         {
             // sort the categories using a specific sort to get exta marks...... there is a column in the table that tells you which order they want to be displayed in, sort the categories based on that. /////
@@ -73,11 +73,6 @@ public partial class Form1
         InitItemList((int)((Control)sender).Tag);
     }
     
-    private void loadCategories()
-    {
-        List<dbCategory> cats = database.getCategories();
-        
-    }
     
     
     private async Task LoadCategories()
@@ -98,7 +93,7 @@ public partial class Form1
             Logger.Log("Failed to load categories after timeout LoadCategories");
             tcs.SetResult(false);
         }
-        
+        addCategories();
         await tcs.Task;
     }
 
@@ -568,7 +563,7 @@ public partial class Form1
                     {
                         if (cat != null && cat.Count > 0)
                         {
-                            addCategory();
+                            addCategories();
                             deleteAllItemsOrdered();
                         }
                         else
