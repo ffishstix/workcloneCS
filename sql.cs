@@ -470,10 +470,18 @@ static partial class SQL
                             ";
         using SqlConnection con = new SqlConnection(connectionString);
         using SqlCommand com = new SqlCommand(sqlCommand, con);
-        con.Open();
-        object? result = com.ExecuteScalar(); 
-        con.Close();
-        if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
+        try
+        {
+            con.Open();
+            object? result = com.ExecuteScalar();
+            if (result != null || result != DBNull.Value) x = Convert.ToInt32(result);
+            con.Close();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error in getDatabaseVNum {ex.Message}");
+
+        }
         
         return x;
     }

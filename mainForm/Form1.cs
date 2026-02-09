@@ -21,8 +21,12 @@ public partial class Form1 : Form
 
     public Form1()
     {
-        
-        foreach (allergy al in database.allergies.Values) alergies.Add(al.Name);
+        alergies = new List<string>();
+        database.tryLoadLocalDatabase();
+        if (database.allergies != null)
+        {
+            foreach (allergy al in database.allergies.Values) alergies.Add(al.Name);
+        }
         cat = database.getCategories();
         Logger.Log("inside the Form1 constructor");
         InitializeComponent();
@@ -43,7 +47,7 @@ public partial class Form1 : Form
     protected void OnFormClosing(FormClosingEventArgs e)
     {
         base.OnFormClosing(e);
-        database.saveLocalDatabase();
+        database.saveLocalDatabase(false);
     } 
     
     
@@ -203,7 +207,7 @@ public partial class Form1 : Form
     {
         try
         {
-            sync.syncAll();
+            database.tryLoadLocalDatabase();
             SignOffBtn_Click(null, null);
         }
         catch (Exception ex)

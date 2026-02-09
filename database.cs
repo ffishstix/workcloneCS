@@ -6,30 +6,6 @@ namespace WorkCloneCS;
 
 
 
-class dbSnapShot
-{
-    
-    // meta
-    public int cloudVNum { get; set; }
-    public bool DBExists { get; set; }
-    public int localVNum { get; set; }
-
-    // tables
-    public Dictionary<int, allergy> allergies { get; set; }
-    public Dictionary<int, item> items { get; set; }
-    public Dictionary<int, dbCategory> categories { get; set; }
-    public Dictionary<int, header> headers { get; set; }
-    public Dictionary<int, order> orders { get; set; }
-    public Dictionary<int, List<orderLine>> orderLines { get; set; }
-    public Dictionary<int, staff> staff { get; set; }
-    public Dictionary<int, table> tables { get; set; }
-
-    // link tables
-    public Dictionary<int, HashSet<int>> catItemLinks { get; set; }
-    public Dictionary<int, HashSet<int>> allergyItemLinks { get; set; }
-    
-
-}
 
 static class database
 {
@@ -77,11 +53,15 @@ static class database
             if (!SQL.initStarted) SQL.initSQL();
             else Thread.Sleep(10000); // i chose 10 seconds cus that is reasonable for a database
         }
-        localVNum = SQL.getLocalDBVNum(); 
+        
+        cloudVNum = SQL.getDatabaseVNum();
+        saveLocalDbVNum(cloudVNum);
+        localVNum = SQL.getLocalDBVNum();
         //local Database Variables
         DBExists = databaseExists();
-        checkDBVNum();
+        if(DBExists) checkDBVNum();
         
+        staff = SQL.getStaff().ToDictionary(s => s.Id);    
         
         headers = SQL.getHeaders().ToDictionary(h => h.Id);
         
@@ -100,15 +80,182 @@ static class database
         // in theory this should be all of the data from the database
         //that you can grab and assign.
 
-        DBExists = true;
+        
         saveLocalDatabase();
+        DBExists = true;
     }
 
+    private static void saveLocalDbVNum(int n)
+    {
+        try 
+        {
+            File.WriteAllText(SQL.sqlDir + "DBvNum.txt"  , $"{n}");
+        } catch (Exception ex)
+        {
+            Logger.Log($"exception in saveLocalDbVNum {ex.Message}");
+        }
+    }
+    
+    
     public static List<dbCategory> getCategories()
     {
+        ensureLocalDatabaseLoaded();
         List<dbCategory> cats = new();
+        if (categories == null) return cats;
         foreach (dbCategory cat in categories.Values) cats.Add(cat);
         return cats;
+    }
+    
+    public static List<staff> getStaffList()
+    {
+        ensureLocalDatabaseLoaded();
+        List<staff> list = new();
+        if (staff == null) return list;
+        foreach (staff s in staff.Values) list.Add(s);
+        return list;
+    }
+
+    public static List<item> getCategoryItems(int categoryId)
+    {
+        ensureLocalDatabaseLoaded();
+        List<item> result = new();
+        if (categories == null || items == null) return result;
+        if (!categories.TryGetValue(categoryId, out var cat) || cat.itemIds == null) return result;
+
+        foreach (int itemId in cat.itemIds)
+        {
+            if (!items.TryGetValue(itemId, out var it)) continue;
+            result.Add(cloneItemForOrder(it));
+        }
+        return result;
+    }
+
+    public static List<item> getTableItems(int tableId)
+    {
+        ensureLocalDatabaseLoaded();
+        List<item> result = new();
+        if (headers == null || orders == null || orderLines == null || items == null) return result;
+
+        foreach (header h in headers.Values)
+        {
+            if (h.tableId != tableId || h.finished != 0) continue;
+
+            foreach (order o in orders.Values)
+            {
+                if (o.headerId != h.Id) continue;
+                if (!orderLines.TryGetValue(o.Id, out var lines) || lines == null) continue;
+
+                foreach (orderLine line in lines)
+                {
+                    if (!items.TryGetValue(line.itemId, out var it)) continue;
+                    item copy = cloneItemForOrder(it);
+                    copy.lineId = line.Id;
+                    result.Add(copy);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static void addTableOrder(table table, staff staffMember)
+    {
+        if (table == null || staffMember == null)
+        {
+            Logger.Log("addTableOrder called with null table or staff");
+            return;
+        }
+
+        ensureLocalDatabaseLoaded();
+        headers ??= new Dictionary<int, header>();
+        orders ??= new Dictionary<int, order>();
+        orderLines ??= new Dictionary<int, List<orderLine>>();
+
+        if (table.tableId < 1) table.tableId = 4000;
+
+        int headerId = getNextId(headers);
+        int orderId = getNextId(orders);
+        int lineId = getNextOrderLineId();
+
+        header newHeader = new()
+        {
+            Id = headerId,
+            sentDateTime = DateTime.Now,
+            headerStaff = staffMember,
+            tableId = table.tableId,
+            finished = 0
+        };
+        headers[headerId] = newHeader;
+
+        order newOrder = new()
+        {
+            Id = orderId,
+            headerId = headerId,
+            header = newHeader
+        };
+        orders[orderId] = newOrder;
+
+        List<orderLine> lines = new();
+        if (table.itemsToOrder != null)
+        {
+            foreach (item it in table.itemsToOrder)
+            {
+                lines.Add(new orderLine
+                {
+                    Id = lineId++,
+                    orderId = orderId,
+                    itemId = it.Id
+                });
+            }
+        }
+        orderLines[orderId] = lines;
+        newOrder.orderLines = lines;
+
+        saveLocalDatabase(false);
+    }
+
+    public static void setConnectionString(string value)
+    {
+        SQL.connectionString = value;
+    }
+
+    public static async Task<(bool ok, string errorMessage)> tryOpenConnectionAsync(string connectionString)
+    {
+        try
+        {
+            using SqlConnection conn = new SqlConnection(connectionString);
+            await conn.OpenAsync();
+            return (true, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
+    public static bool tryLoadLocalDatabase()
+    {
+        string path = SQL.sqlDir + "database.json";
+        if (!File.Exists(path))
+        {
+            Logger.Log($"local database file missing: {path}");
+            pullCloudDatabase();
+            return true;
+        }
+        else
+        {
+            try
+            {
+                loadLocalDatabase();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"failed to load local database: {ex.Message}");
+                return false;
+            }
+        }
+        
     }
     
     
@@ -126,9 +273,10 @@ static class database
         
     }
     
-    public static void saveLocalDatabase()
+    public static void saveLocalDatabase(bool allowCloudRefresh = true)
     {
-        if (cloudVNum != SQL.getDatabaseVNum() || cloudVNum != localVNum) pullCloudDatabase();
+        int temp = SQL.getDatabaseVNum();
+        if (allowCloudRefresh && (cloudVNum != temp || cloudVNum != localVNum)) pullCloudDatabase();
         if (!( // this is ensuring that all possible vairables are assigned
                 cloudVNum == null || cloudVNum == new int() ||
             DBExists == false ||
@@ -139,7 +287,7 @@ static class database
             orderLines == null || orderLines == new Dictionary<int, List<orderLine>>() ||
             orders == null || orderLines == new Dictionary<int, List<orderLine>>() ||
             staff == null || staff == new Dictionary<int, staff>() ||
-            //tables == null || tables == new Dictionary<int, table>() to be added
+            //tables == null || tables == new Dictionary<int, table>() ||
             catItemLinks == null || catItemLinks == new Dictionary<int, HashSet<int>>() ||
             allergyItemLinks == null || allergyItemLinks == new Dictionary<int, HashSet<int>>() ||
             localVNum == null || localVNum == new int()
@@ -164,8 +312,64 @@ static class database
         Logger.Log("database failed to save a variable isnt initialised correctly");
     }
 
+    private static bool ensureLocalDatabaseLoaded()
+    {
+        if (allergies != null &&
+            items != null &&
+            categories != null &&
+            headers != null &&
+            orders != null &&
+            orderLines != null &&
+            staff != null &&
+            catItemLinks != null &&
+            allergyItemLinks != null)
+        {
+            return true;
+        }
+
+        return tryLoadLocalDatabase();
+    }
+
+    private static item cloneItemForOrder(item source)
+    {
+        return new item
+        {
+            Id = source.Id,
+            Name = source.Name,
+            extraInfo = source.extraInfo,
+            itemCount = 1,
+            price = source.price,
+            chosenColour = source.chosenColour,
+            ordered = source.ordered,
+            allergies = source.allergies == null ? null : new List<allergy>(source.allergies),
+            hasSubItems = source.hasSubItems,
+            subItems = source.subItems
+        };
+    }
+
+    private static int getNextId<T>(Dictionary<int, T> dict)
+    {
+        if (dict == null || dict.Count == 0) return 1;
+        return dict.Keys.Max() + 1;
+    }
+
+    private static int getNextOrderLineId()
+    {
+        if (orderLines == null || orderLines.Count == 0) return 1;
+        int maxId = 0;
+        foreach (List<orderLine> lines in orderLines.Values)
+        {
+            foreach (orderLine line in lines)
+            {
+                if (line.Id > maxId) maxId = line.Id;
+            }
+        }
+        return maxId + 1;
+    }
+
     public static void loadLocalDatabase()
     {
+        
         dbSnapShot snap = JsonSerializer.Deserialize<dbSnapShot>(
             File.ReadAllText(SQL.sqlDir + "database.json"), SnapshotJsonOptions);
         cloudVNum = snap.cloudVNum;

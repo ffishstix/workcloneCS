@@ -245,6 +245,7 @@ class dbSubChild : dbSubParent
 
 class dbCategory
 {
+    
     public List<int> itemIds;
     public string catName;
     public int catId;
@@ -382,3 +383,29 @@ public class order : baseItem
     public List<orderLine> orderLines;
 }
     
+
+
+class dbSnapShot
+{
+    
+    // meta
+    public int cloudVNum { get; set; }
+    public bool DBExists { get; set; }
+    public int localVNum { get; set; }
+
+    // tables
+    public Dictionary<int, allergy> allergies { get; set; }
+    public Dictionary<int, item> items { get; set; }
+    public Dictionary<int, dbCategory> categories { get; set; }
+    public Dictionary<int, header> headers { get; set; }
+    public Dictionary<int, order> orders { get; set; }
+    public Dictionary<int, List<orderLine>> orderLines { get; set; }
+    public Dictionary<int, staff> staff { get; set; }
+    public Dictionary<int, table> tables { get; set; }
+
+    // link tables
+    public Dictionary<int, HashSet<int>> catItemLinks { get; set; }
+    public Dictionary<int, HashSet<int>> allergyItemLinks { get; set; }
+    
+
+}

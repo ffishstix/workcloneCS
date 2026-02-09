@@ -1,10 +1,20 @@
 ﻿namespace WorkCloneCS;
 
-class Logger
+static class Logger
 {
-    private static readonly string logFilePath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\log.txt";
+    private static readonly string logFilePath =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "workclonecs", "log.txt");
     private static int logCount;
     private static readonly object _lock = new object();
+
+    static Logger()
+    {
+        var logDir = Path.GetDirectoryName(logFilePath);
+        if (!string.IsNullOrWhiteSpace(logDir))
+        {
+            Directory.CreateDirectory(logDir);
+        }
+    }
 
     public static void Here()
     {

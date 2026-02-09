@@ -37,8 +37,8 @@ namespace WorkCloneCS
 
             }
             Logger.Log("applying settings");
-            SQL.connectionString = lastWorkingConnection;
-            sync.syncAll();
+            database.setConnectionString(lastWorkingConnection);
+            database.pullCloudDatabase();
             if (!t)
             {
                 Form1 form1 = new Form1();
@@ -140,22 +140,18 @@ namespace WorkCloneCS
                 bool isAllCorrect = System.Text.RegularExpressions.Regex.IsMatch(connectionString, allPat);
                 if (isAllCorrect)
                 {
-                    try
+                    var (ok, errorMessage) = await database.tryOpenConnectionAsync(connectionString);
+                    if (ok)
                     {
-                        using (SqlConnection conn = new SqlConnection(connectionString))
-                        {
-                            await conn.OpenAsync();
-                            InfoLabel.Text = "connection successful";
-                            Logger.Log("connection successful");
-                            lastWorkingConnection = connectionString;
-                            LastBtn.Visible = false;
-                        }
-
+                        InfoLabel.Text = "connection successful";
+                        Logger.Log("connection successful");
+                        lastWorkingConnection = connectionString;
+                        LastBtn.Visible = false;
                     }
-                    catch (Exception ex)
+                    else
                     {
                         InfoLabel.Text = "failed to connect to database";
-                        Logger.Log($"user inputted invalid string {ex.Message}, {connectionString}");
+                        Logger.Log($"user inputted invalid string {errorMessage}, {connectionString}");
                         valid = false;
                         connectionString = "";
                         if (lastWorkingConnection != null)

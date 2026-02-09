@@ -14,7 +14,7 @@ namespace WorkCloneCS
             Task.Run(() =>
             {
                 SQL.initSQL();
-                database.loadLocalDatabase();
+                database.tryLoadLocalDatabase();
             });
 
             if (!deepDebugging)
