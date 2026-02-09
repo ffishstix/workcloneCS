@@ -25,9 +25,7 @@ public partial class Form1
     {
         if (!IsHandleCreated) return;
         deleteChildbox();
-
-        // Make sure we have the latest categories
-        cat = database.getCategories();
+        
 
         if (cat == null || cat.Count == 0)
         {
@@ -83,10 +81,11 @@ public partial class Form1
         var tcs = new TaskCompletionSource<bool>();
 
         // Wait until categories are loaded or timeout
-        sync.getFiles();
         cat = database.getCategories();
+        alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
         if (cat != null && cat.Count > 0)
         {
+            addCategory();
             tcs.SetResult(true);
         }
         else
@@ -100,7 +99,13 @@ public partial class Form1
 
     private void InitItemList(int e)
     {
-        List<item> catItems = sync.categories[e].items;
+        if (cat == null || e < 0 || e >= cat.Count)
+        {
+            Logger.Log("InitItemList called with invalid category index");
+            return;
+        }
+
+        List<item> catItems = database.getCategoryItems(cat[e].catId);
         if (catItems != null)
         {
             for (int i = 0; i < catItems.Count; i++)
@@ -454,7 +459,7 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = SQL.getTableItems(tableSelected.tableId); //pulls all items on a table
+                    List<item> items = database.getTableItems(tableSelected.tableId); //pulls all items on a table
                     if (items != null)
                     {
                         tableSelected.ordered = items;
@@ -496,12 +501,9 @@ public partial class Form1
         rightLabel.Text = "Price: £0.00";
         rightLabel.Tag = 0m;
         Logger.Log(
-            "probs best to ignore the last one however i am now going to try and call the sql to inser the values, " +
+            "probs best to ignore the last one however i am now going to try and update the local database, " +
             "still not sure what to do with no table number tbh");
-        int headerId = SQL.getHighestidFromTable("headers") + 1;
-        int orderId = SQL.getHighestidFromTable("orders") + 1;
-        int lineId = SQL.getHighestidFromTable("orderLine") + 1;
-        SQL.pushItemsToTables(tableSelected, currentStaff, headerId, orderId, lineId);
+        database.addTableOrder(tableSelected, currentStaff);
         tableSelected = new table();
         tableBtn.Text = "Table";
         tableSelected.itemsToOrder.Clear();
@@ -545,20 +547,12 @@ public partial class Form1
                 allPannelsBlank();
                 deleteChildbox();
                 
-                // Wait for sync to complete
-                await Task.Run(async () =>
+                // Wait for local database to load
+                await Task.Run(() =>
                 {
-                    sync.categories = null;
-                    sync.syncAll();
-                    
-                    // Wait for categories to be populated
-                    int attempts = 0;
-                    while (attempts < 10 && (sync.categories == null || sync.categories.Count == 0))
-                    {
-                        await Task.Delay(1000);
-                        attempts++;
-                        Logger.Log($"Waiting for categories, attempt {attempts}");
-                    }
+                    database.tryLoadLocalDatabase();
+                    cat = database.getCategories();
+                    alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
                 });
                 
 
@@ -567,7 +561,7 @@ public partial class Form1
                 {
                     Invoke(new Action(() =>
                     {
-                        if (sync.categories != null && sync.categories.Count > 0)
+                        if (cat != null && cat.Count > 0)
                         {
                             addCategories();
                             deleteAllItemsOrdered();

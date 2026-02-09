@@ -35,12 +35,9 @@ namespace WorkCloneCS
             currentID = 0;
             InitializeComponent();
             timeSinceLastClick = DateTime.MinValue;
-            x = sync.allStaff;
-            if (x == null)
-            {
-                x = SQL.getStaffDataCloud();
-            }
-            if (x == null)
+            database.tryLoadLocalDatabase();
+            x = database.getStaffList();
+            if (x == null || x.Count == 0)
             {
                 
                 this.Close();
@@ -49,7 +46,6 @@ namespace WorkCloneCS
             else
             {
                 Logger.Log("staff be staffing icl NameForm (good message)");
-                sync.allStaff = x;
             }
             displayBtn.Text = "";
         }
