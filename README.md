@@ -43,9 +43,9 @@ put simply a clone of a very popular pos system...
 
 - bit far out:
   - [ ] add the ordering system
-  - [x] add a way to push orders to the table
+  - [ ] add a way to push orders to the table
   - [x] including the databases to go along with it
-  - [ ] add a quick website to view the ordering system
+  - [x] add a quick website to view the ordering system
   - [x] add allergies database with a connected info button to each item with an allergy connected 
   - [ ] make an admin form where you can set prices for different products this could be by pulling all items from the database looking at it through a list then selecting the one you want and at the backend it makes the SQL code tbf could be an idea 
   - [ ] with the last option add standard deviation and mean of prices so that you can get extra marks for it 
