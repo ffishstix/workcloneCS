@@ -12,16 +12,16 @@ static class database
     #region variables
     
     // local database variables
-    public static int cloudVNum;
+    public static bool isConnectedToRemoteServer = false;
+    public static int cloudVNum = 0;
     private const bool extraSafe = true;
     public static bool pullCloudStarted = false;
-    private static bool DBExists;
-    private static int localVNum; // this is the variable gotten from local file
+    public static bool DBExists = false;
+    private static int localVNum = -1; // this is the variable gotten from local file
                                    // and updated when sync occurs.
     private static readonly JsonSerializerOptions SnapshotJsonOptions = new()
     {
     WriteIndented = true,
-    ReferenceHandler = ReferenceHandler.Preserve,
     PropertyNameCaseInsensitive = false,
     IncludeFields = false,
     DefaultIgnoreCondition = JsonIgnoreCondition.Never,
@@ -29,35 +29,58 @@ static class database
     AllowTrailingCommas = false,
     ReadCommentHandling = JsonCommentHandling.Disallow
     };
-    //table sql results
-    public static Dictionary<int, allergy> allergies {get; private set;}
-    private static Dictionary<int, item> items;
-    private static Dictionary<int, dbCategory> categories;
-    private static Dictionary<int, header> headers;
-    private static Dictionary<int, List<orderLine>> orderLines;
-    private static Dictionary<int, order> orders;
-    private static Dictionary<int, staff> staff;
     
-    private static Dictionary<int, table> tables; //future shizzle
+    //table sql results
+    public static Dictionary<int, allergy> allergies { get; private set; } = new();
+    private static Dictionary<int, item> items = new();
+    private static Dictionary<int, dbCategory> categories = new();
+    private static Dictionary<int, header> headers = new();
+    private static Dictionary<int, List<orderLine>> orderLines = new();
+    private static Dictionary<int, order> orders = new();
+    private static Dictionary<int, staff> staff = new();
+    
+    private static Dictionary<int, table> tables = new(); //future shizzle
     
     //links
-    private static Dictionary<int, HashSet<int>> catItemLinks;
-    private static Dictionary<int, HashSet<int>> allergyItemLinks;
+    private static Dictionary<int, HashSet<int>> catItemLinks = new();
+    private static Dictionary<int, HashSet<int>> allergyItemLinks = new();
     #endregion
     
     #region functions
+    
+    
+    public static accessLevel getAccessLevelFromId(int Id)
+    {
+         accessLevel acc = staff[Id].staffAccess;
+         if (acc == new accessLevel())
+         {
+             return SQL.getAccessLevelFromId(Id);
+         }
+        
+         return acc;
+
+    }
+    
+    
+    
     public static bool pullCloudDatabase()
     {
-        if (pullCloudStarted) return false;
-        pullCloudStarted = true;
-        
-        while (!SQL.initCompleted)
+        SQL.checkDBConnection();
+
+        if (!isConnectedToRemoteServer)
+        {
+            Logger.Log("this function should not have been called " +
+                       "as there is no connection to the database");
+            return false;
+        }
+        while (!SQL.initCompleted && !pullCloudStarted)
         {
             
             if (!SQL.initStarted) SQL.initSQL();
             else Thread.Sleep(10000); // i chose 10 seconds cus that is reasonable for a database
         }
-        
+        if (pullCloudStarted) return false;
+        pullCloudStarted = true;
         cloudVNum = SQL.getDatabaseVNum();
         saveLocalDbVNum(cloudVNum);
         localVNum = SQL.getLocalDBVNum();
@@ -66,16 +89,18 @@ static class database
         if(DBExists) checkDBVNum();
         
         staff = SQL.getStaff().ToDictionary(s => s.Id);    
-        
         headers = SQL.getHeaders().ToDictionary(h => h.Id);
-        
         orders = SQL.getOrders().ToDictionary(o => o.Id);
         orderLines = SQL.getOrderLines().
             GroupBy(ol => ol.orderId)
             .ToDictionary(g => g.Key, g => g.ToList());
-        
-        
+        // following code must be written in this order to avoid null references.
+        items = SQL.getAllItems().ToDictionary(i => i.Id);
+        allergies = SQL.getAllergies().ToDictionary(a => a.Id);
         updateItems();
+        
+        // categories section, must be placed under updateItems.
+        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
         updateCategories();
         
         //links linear (access-->staff-->header-->orders<--orderLine<--item
@@ -84,9 +109,10 @@ static class database
         // in theory this should be all of the data from the database
         //that you can grab and assign.
 
-        
+        pullCloudStarted = false;
         saveLocalDatabase();
         DBExists = true;
+        return true;
     }
 
     private static void saveLocalDbVNum(int n)
@@ -105,7 +131,7 @@ static class database
     {
         ensureLocalDatabaseLoaded();
         List<dbCategory> cats = new();
-        if (categories == null) return cats;
+        if (categories == new Dictionary<int, dbCategory>()) return SQL.getAllCategories();
         foreach (dbCategory cat in categories.Values) cats.Add(cat);
         return cats;
     }
@@ -114,7 +140,7 @@ static class database
     {
         ensureLocalDatabaseLoaded();
         List<staff> list = new();
-        if (staff == null) return list;
+        if (staff == new Dictionary<int, staff>()) return SQL.getStaff();
         foreach (staff s in staff.Values) list.Add(s);
         return list;
     }
@@ -123,8 +149,8 @@ static class database
     {
         ensureLocalDatabaseLoaded();
         List<item> result = new();
-        if (categories == null || items == null) return result;
-        if (!categories.TryGetValue(categoryId, out var cat) || cat.itemIds == null) return result;
+        if (categories == new Dictionary<int, dbCategory>() || items == new Dictionary<int, item>()) return result;
+        if (!categories.TryGetValue(categoryId, out var cat) || cat.itemIds == new List<int>()) return result;
 
         foreach (int itemId in cat.itemIds)
         {
@@ -134,23 +160,27 @@ static class database
         return result;
     }
 
-    public static List<item> getTableItems(int tableId)
+    public static table getTableItems(int tableId)
     {
         ensureLocalDatabaseLoaded();
         List<item> result = new();
-        if (headers == null || orders == null || orderLines == null || items == null) return result;
-
+        if (headers == new Dictionary<int, header>() || 
+            orders == new Dictionary<int, order>() || 
+            orderLines == new Dictionary<int, List<orderLine>>() || 
+            items == new Dictionary<int, item>()) 
+            return new ();
+        headers.Values.ToList();
+        staff openStaff = new staff();
         foreach (header h in headers.Values)
         {
-            if (h.tableId != tableId || h.finished != 0) continue;
-
             foreach (order o in orders.Values)
             {
                 if (o.headerId != h.Id) continue;
                 if (!orderLines.TryGetValue(o.Id, out var lines) || lines == null) continue;
-
+                if (openStaff == new staff()) openStaff = h.headerStaff; 
                 foreach (orderLine line in lines)
                 {
+                    
                     if (!items.TryGetValue(line.itemId, out var it)) continue;
                     item copy = cloneItemForOrder(it);
                     copy.lineId = line.Id;
@@ -159,12 +189,18 @@ static class database
             }
         }
 
-        return result;
+        table table = new table()
+        {
+            ordered = result,
+            openStaff = openStaff,
+            tableId = tableId
+        };
+        return table;
     }
 
     public static void addTableOrder(table table, staff staffMember)
     {
-        if (table == null || staffMember == null)
+        if (table == new table() || staffMember == new staff())
         {
             Logger.Log("addTableOrder called with null table or staff");
             return;
@@ -200,7 +236,7 @@ static class database
         orders[orderId] = newOrder;
 
         List<orderLine> lines = new();
-        if (table.itemsToOrder != null)
+        if (table.itemsToOrder != new List<item>())
         {
             foreach (item it in table.itemsToOrder)
             {
@@ -243,22 +279,21 @@ static class database
         if (!File.Exists(path))
         {
             Logger.Log($"local database file missing: {path}");
-            pullCloudDatabase();
+            
+            return pullCloudDatabase();
+        }
+        try
+        {
+            loadLocalDatabase();
+            DBExists = true;
             return true;
         }
-        else
+        catch (Exception ex)
         {
-            try
-            {
-                loadLocalDatabase();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"failed to load local database: {ex.Message}");
-                return false;
-            }
+            Logger.Log($"failed to load local database: {ex.Message}");
+            return false;
         }
+        
         
     }
     
@@ -279,30 +314,33 @@ static class database
 
     public static item getItemFromId(int itemId)
     {
-        if (items == null) return null;
+        if (items == new Dictionary<int, item>()) return new ();
         return items[itemId];
     }
     
+    
+    //<summary>
+    // checks all variables are not null then stores them. 
+    // specifically in json format.
+    // </summary>
+    
     public static void saveLocalDatabase(bool allowCloudRefresh = true)
     {
+        if (!DBExists) Logger.Log("db file doesnt exist however i am creating one");
         int temp = SQL.getDatabaseVNum();
         if (allowCloudRefresh && (cloudVNum != temp || cloudVNum != localVNum)) pullCloudDatabase();
         if (!( // this is ensuring that all possible vairables are assigned
-                cloudVNum == null || cloudVNum == new int() ||
-            DBExists == false ||
-            allergies == null || allergies == new Dictionary<int, allergy>() ||
-            items == null || items == new Dictionary<int, item>() ||
-            categories == null || categories == new Dictionary<int, dbCategory>() ||
-            headers == null || headers == new Dictionary<int, header>() ||
-            orderLines == null || orderLines == new Dictionary<int, List<orderLine>>() ||
-            orders == null || orderLines == new Dictionary<int, List<orderLine>>() ||
-            staff == null || staff == new Dictionary<int, staff>() ||
+            cloudVNum == 0 || localVNum == -1 ||
+            allergies == new Dictionary<int, allergy>() ||
+            items == new Dictionary<int, item>() ||
+            categories == new Dictionary<int, dbCategory>() ||
+            headers == new Dictionary<int, header>() ||
+            orderLines == new Dictionary<int, List<orderLine>>() ||
+            orderLines == new Dictionary<int, List<orderLine>>() ||
+            staff == new Dictionary<int, staff>() ||
             //tables == null || tables == new Dictionary<int, table>() ||
-            catItemLinks == null || catItemLinks == new Dictionary<int, HashSet<int>>() ||
-            allergyItemLinks == null || allergyItemLinks == new Dictionary<int, HashSet<int>>() ||
-            localVNum == null || localVNum == new int()
-
-            ))
+            catItemLinks == new Dictionary<int, HashSet<int>>() ||
+            allergyItemLinks == new Dictionary<int, HashSet<int>>()))
         {
             Logger.Log("all checks are valid can begin to serialise and save datbase saveLocalDatabase()");
             dbSnapShot snap = getDatabaseSnapShot();
@@ -324,19 +362,17 @@ static class database
 
     private static bool ensureLocalDatabaseLoaded()
     {
-        if (allergies != null &&
-            items != null &&
-            categories != null &&
-            headers != null &&
-            orders != null &&
-            orderLines != null &&
-            staff != null &&
-            catItemLinks != null &&
-            allergyItemLinks != null)
-        {
+        if (allergies != new Dictionary<int, allergy>() &&
+            items != new Dictionary<int, item>() &&
+            categories != new Dictionary<int, dbCategory>() &&
+            headers != new Dictionary<int, header>() &&
+            orders != new Dictionary<int, order>() &&
+            orderLines != new Dictionary<int, List<orderLine>>() &&
+            staff != new Dictionary<int, staff>() &&
+            catItemLinks != new Dictionary<int, HashSet<int>>() &&
+            allergyItemLinks != new Dictionary<int, HashSet<int>>())
+        
             return true;
-        }
-
         return tryLoadLocalDatabase();
     }
 
@@ -365,7 +401,7 @@ static class database
 
     private static int getNextOrderLineId()
     {
-        if (orderLines == null || orderLines.Count == 0) return 1;
+        if (orderLines.Count == 0) return 1;
         int maxId = 0;
         foreach (List<orderLine> lines in orderLines.Values)
         {
@@ -377,26 +413,6 @@ static class database
         return maxId + 1;
     }
 
-    public static void loadLocalDatabase()
-    {
-        
-        dbSnapShot snap = JsonSerializer.Deserialize<dbSnapShot>(
-            File.ReadAllText(SQL.sqlDir + "database.json"), SnapshotJsonOptions);
-        cloudVNum = snap.cloudVNum;
-        DBExists = snap.DBExists;
-        localVNum = snap.localVNum;
-        allergies = snap.allergies;
-        items = snap.items;
-        categories = snap.categories;
-        headers = snap.headers;
-        orders = snap.orders;
-        orderLines = snap.orderLines;
-        staff = snap.staff;
-        tables = snap.tables;
-        catItemLinks = snap.catItemLinks;
-        allergyItemLinks = snap.allergyItemLinks;
-        Logger.Log("database loaded successfully");
-    }
     
     private static void getTables()
     {
@@ -437,15 +453,14 @@ static class database
             {
                 
                 Logger.Log("local database version is different from cloud database version updating now");
-                sync.syncAll();
-                syncCount++;
-                cloudVNum = SQL.getDatabaseVNum();
-                localVNum = SQL.getLocalDBVNum();
+                if (pullCloudDatabase())
+                {
+                    Logger.Log("updateSuccessFul");
+                    break;
+                }
+
+                Logger.Log("if you see this message twice something has gone wrong");
             }
-        
-        Logger.Log("local database is up to date");
-        Logger.Log($"it took {syncCount} syncs to update if this number " +
-                   $"is more than one your system is being updated very often");
 
 
 
@@ -453,18 +468,18 @@ static class database
 
     private static void updateCategories()
     {
-        if (items == null)
+        if (items == new Dictionary<int, item>())
         {
             Logger.Log("updateCategories(): items is null (SQL.getAllItems returned null).");
             return;
         }
         
-        categories = SQL.getAllCategories().ToDictionary(c => c.catId);
-        if (categories == null)
+        if (categories == new Dictionary<int, dbCategory>())
         {
             Logger.Log("updateCategories(): categories is null (SQL.getAllCategories returned null).");
             return;
         }
+        
         basicJunctionTable t  = new basicJunctionTable 
         (
             "foodCategory", 
@@ -475,7 +490,7 @@ static class database
         catItemLinks = t.combined;
         
         
-        if (catItemLinks == null)
+        if (catItemLinks == new Dictionary<int, HashSet<int>>())
         {
             Logger.Log("updateCategories(): catItemLinks is null.");
             return;
@@ -518,8 +533,7 @@ static class database
     //function to be called after all allergies and items have been initialised.
     private static void updateItems()
     {
-        items = SQL.getAllItems().ToDictionary(i => i.Id);
-        allergies = SQL.getAllergies().ToDictionary(a => a.Id);
+        
         basicJunctionTable t = new basicJunctionTable(
             "allergyItem",
             "itemId",
@@ -571,6 +585,28 @@ static class database
             catItemLinks = database.catItemLinks,
             allergyItemLinks = database.allergyItemLinks
         };
+    }
+
+    
+    public static void loadLocalDatabase()
+    {
+        
+        dbSnapShot snap = JsonSerializer.Deserialize<dbSnapShot>(
+            File.ReadAllText(SQL.sqlDir + "database.json"), SnapshotJsonOptions);
+        cloudVNum = snap.cloudVNum;
+        DBExists = true;
+        localVNum = snap.localVNum;
+        allergies = snap.allergies;
+        items = snap.items;
+        categories = snap.categories;
+        headers = snap.headers;
+        orders = snap.orders;
+        orderLines = snap.orderLines;
+        staff = snap.staff;
+        tables = snap.tables;
+        catItemLinks = snap.catItemLinks;
+        allergyItemLinks = snap.allergyItemLinks;
+        Logger.Log("database loaded successfully");
     }
 
     

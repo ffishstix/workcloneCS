@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkCloneCS;
 
@@ -44,7 +43,7 @@ public partial class Form1
                     {
                         Text = category.catName,
                         AutoSize = false,
-                        BackColor = Color.Gray,
+                        BackColor = Color.FromName(category.catColour),
                         Width = (catPan.Width / 8) - 2,
                         Height = 50,
                         TextAlign = ContentAlignment.MiddleCenter,
@@ -82,10 +81,11 @@ public partial class Form1
 
         // Wait until categories are loaded or timeout
         cat = database.getCategories();
+        Logger.Log("got categories");
         alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
         if (cat != null && cat.Count > 0)
         {
-            addCategory();
+            addCategories();
             tcs.SetResult(true);
         }
         else
@@ -189,9 +189,10 @@ public partial class Form1
         miscPanel.Visible = false;
     }
 
-    
-    
 
+
+    private int globalLineId = 0; 
+        
     private void addItem(item item)
     {
         priceTotal += item.price;
@@ -205,6 +206,7 @@ public partial class Form1
             price = item.price,
             itemCount = item.itemCount,
             Id = item.Id,
+            lineId = globalLineId++,
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
         };
@@ -259,12 +261,10 @@ public partial class Form1
                     {
                         row.itemCount--;
                         row.updateText();
-                        
-
                     }
                     else
                     {
-                        tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.Name == row.Name));
+                        tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.lineId == row.lineId));
                         refreshScrollPanel();
                     }
                     updateTotalPrice(-row.price);
@@ -274,7 +274,7 @@ public partial class Form1
                 {
                     row.itemCount++;
                     row.updateText();
-                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.Name == row.Name)-1].itemCount = row.itemCount;
+                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.lineId == row.lineId)].itemCount = row.itemCount;
                     //used to have refresh scoll pannel here lol absolutely no need
                     updateTotalItems(1);
                     updateTotalPrice(row.price);
@@ -352,12 +352,11 @@ public partial class Form1
     {
         foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
         createScrollPanel();
-        if (tableSelected.ordered.Count != 0)
+        if (tableSelected.ordered.Count != 0 || tableSelected.itemsToOrder.Count != 0)
         {
             List<item> combinedItems = tableSelected.ordered;
-            if (tableSelected.itemsToOrder.Count != 0) foreach (item itemt in tableSelected.itemsToOrder) combinedItems.Append(itemt);
-            
-            if (combinedItems != null)
+            combinedItems.AddRange(tableSelected.itemsToOrder);
+            if (combinedItems.Count != 0)
             {
                 
                 foreach (item item in combinedItems)
@@ -443,8 +442,16 @@ public partial class Form1
 
     private void tableBtn_Click_Code(object sender, EventArgs e)
     {
-        if (currentStaff == null) Logger.Log("staff is null inside tableBtn_Click_Code");
-        if (tableSelected == null) Logger.Log("tableSelected is null inside tableBtn_Click_Code");
+        if (currentStaff == null || currentStaff.Id == new staff().Id)
+        {
+            Logger.Log("staff is null inside tableBtn_Click_Code");
+            NameForm name = new();
+            name.ShowDialog();
+            
+            updateCurrentStaff(name.staffSelected);
+        }
+
+        if (currentStaff == null || currentStaff.Id == 0) return;
         if (currentStaff.Id != 0 && tableSelected != null)
         {
             if (tableSelected.tableId == 0)
@@ -459,8 +466,8 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = database.getTableItems(tableSelected.tableId); //pulls all items on a table
-                    if (items != null)
+                    List<item> items = database.getTableItems(tableSelected.tableId).ordered; //pulls all items on a table
+                    if (items != null || items == new List<item>())
                     {
                         tableSelected.ordered = items;
                         foreach (item item in items)
@@ -490,6 +497,22 @@ public partial class Form1
         }
 
     }
+
+    private void updateCurrentStaff(staff staff)
+    {
+        if (staff == new staff())
+        {
+            nameBtn.Text = "Name";
+            nameBtn.Tag = new staff();
+            return; 
+        }
+    
+        if (staff.staffAccess == new accessLevel()) staff.staffAccess = database.getAccessLevelFromId(staff.Id);
+        currentStaff = staff;
+        nameBtn.Text = staff.Name;
+        nameBtn.Tag = staff;
+        
+    }
     
     private void sentToTable()
     {
@@ -512,26 +535,9 @@ public partial class Form1
     private void nameBtn_Click_Code(object sender, EventArgs e)
     {
         NameForm name = new NameForm();
-        if (name != null && ! name.IsDisposed)  name.ShowDialog();
-        if (name.staffSelected == null)
-        {
-            currentStaff = new staff()
-            {
-                Id = 0,
-                Name = "name",
-                staffAccess = new()
-                {
-                    Id = 0
-                }
-            };
-            
-        }
-        else
-        {
-            currentStaff = name.staffSelected;
-        }
-        nameBtn.Tag = currentStaff;
-        nameBtn.Text = currentStaff.Name.ToUpper();
+        if (name != null && !name.IsDisposed)  name.ShowDialog();
+        updateCurrentStaff(name.staffSelected);
+        
         
         Logger.Log($"user: {currentStaff.Name} just logged in with id: {currentStaff.Id}");
         

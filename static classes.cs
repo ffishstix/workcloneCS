@@ -13,9 +13,8 @@ public class table
     public int tableId { get; set; }
     public List<item> ordered { get; set; }
     public List<item> itemsToOrder { get; set; }
-
-    public bool paid { get; set; }
     
+    public int priceTotal { get; private set; }
     
 
     public table()
@@ -24,6 +23,22 @@ public class table
         openStaff = new staff();
         ordered = new List<item>();
         itemsToOrder = new List<item>();
+        updatePriceTotal();
+    }
+
+    public void updatePriceTotal()
+    {
+        int temp = 0;
+        List<item> tempItems = new List<item>();
+        tempItems.AddRange(itemsToOrder);
+        tempItems.AddRange(ordered);
+        
+        foreach (item i in tempItems)
+        {
+            temp += (int)(i.price * 100);
+        }
+
+        priceTotal = temp;
     }
 }
 
@@ -75,8 +90,6 @@ public class item : baseItem
 
 
 }
-
-
 
 public class rowOfItem : item
 {
@@ -246,10 +259,10 @@ class dbSubChild : dbSubParent
 class dbCategory
 {
     
-    public List<int> itemIds;
-    public string catName;
-    public int catId;
-    public string catColour;
+    public List<int> itemIds { get; set; }
+    public string catName { get; set; }
+    public int catId { get; set; }
+    public string catColour { get; set; }
 
     public dbCategory()
     {
@@ -262,15 +275,15 @@ class dbCategory
 
 public class orderLine : baseItem
 {
-    public int orderId;
-    public int itemId;
+    public int orderId{ get; set; } 
+    public int itemId{ get; set; }
 
 }
 
 public class baseItem
 {
-    public int Id;
-    public string Name;
+    public int Id { get; set; }
+    public string Name { get; set; }
 }
 
 public class allergy : baseItem
@@ -291,14 +304,14 @@ public class dbSubCat : item
 
 public class basicJunctionTable
 {
-    public List<int> leftIds; 
-    public List<int> rightIds;
-    public Dictionary<int, HashSet<int>> combined;
-    public string tableName;
-    public string leftCol;
-    public string rightCol;
-    private bool hasPopulated;
-    private bool hasFinished;
+    public List<int> leftIds{ get; set; } 
+    public List<int> rightIds{ get; set; }
+    public Dictionary<int, HashSet<int>> combined{ get; set; }
+    public string tableName{ get; set; }
+    public string leftCol{ get; set; }
+    public string rightCol{ get; set; }
+    private bool hasPopulated{ get; set; }
+    private bool hasFinished{ get; set; }
     
     public basicJunctionTable(string TableName, string LeftCol, string RightCol)
     {
@@ -341,10 +354,10 @@ public class basicJunctionTable
 public class accessLevel : baseItem
 {
     // still has Id
-    public bool canSendThroughItems;
-    public bool canDelete;
-    public bool canNoSale;
-    public bool canViewTables;
+    public bool canSendThroughItems{ get; set; }
+    public bool canDelete{ get; set; }
+    public bool canNoSale{ get; set; }
+    public bool canViewTables{ get; set; }
 
     public accessLevel()
     {
@@ -357,10 +370,10 @@ public class accessLevel : baseItem
 
 public class header : baseItem
 {
-    public DateTime sentDateTime;
-    public staff headerStaff;
-    public int tableId;
-    public int finished; // -1 not initialised, 0 not 1 finished 2 error
+    public DateTime sentDateTime{ get; set; } 
+    public staff headerStaff{ get; set; }
+    public int tableId{ get; set; }
+    public int finished{ get; set; } // -1 not initialised, 0 not 1 finished 2 error
 
     public header()
     {
@@ -378,9 +391,9 @@ public class header : baseItem
 
 public class order : baseItem
 {
-    public int headerId;
-    public header header;
-    public List<orderLine> orderLines;
+    public int headerId{ get; set; }
+    public header header{ get; set; }
+    public List<orderLine> orderLines{ get; set; }
 }
     
 

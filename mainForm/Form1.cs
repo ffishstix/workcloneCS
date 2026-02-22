@@ -15,9 +15,9 @@ public partial class Form1 : Form
 {
     private List<string> alergies; 
     private int lineId = 1;
-    public table tableSelected = new table();
-    private staff currentStaff;
-    private List<dbCategory> cat = new();
+    public table tableSelected = new ();
+    private staff currentStaff = new ();
+    private List<dbCategory> cat = new ();
 
     public Form1()
     {
@@ -44,7 +44,7 @@ public partial class Form1 : Form
     }
     
     
-    protected void OnFormClosing(FormClosingEventArgs e)
+    protected override void OnFormClosing(FormClosingEventArgs e)
     {
         base.OnFormClosing(e);
         database.saveLocalDatabase(false);
@@ -54,6 +54,19 @@ public partial class Form1 : Form
     
     private void generalItem_Click(object sender, EventArgs e)
     {
+        
+        if (currentStaff == new staff() || currentStaff.Id == 0)
+        {
+            NameForm name = new();
+            name.ShowDialog();
+            updateCurrentStaff(name.staffSelected);
+            
+        }
+        if (currentStaff == new staff() || currentStaff.Id == 0)
+        {
+            MessageBox.Show("you need to log in to select an item");
+            return;
+        }
         item item = (item)((Control)sender).Tag;
         item.lineId = lineId++;
         tableSelected.itemsToOrder.Add(item);
@@ -105,17 +118,8 @@ public partial class Form1 : Form
 
     private void SignOffBtn_Click(object sender, EventArgs e)
     {
-        tableSelected = new table()
-        {
-            tableId = 0
-        }; // currently not working and i honestly dont know why good luck future me ;0
-        currentStaff = new staff()
-        {
-            Id = 24,
-            Name = "fin"
-        };
-        nameBtn.Text = "name";
-        nameBtn.Tag = currentStaff;
+        tableSelected = new table(); // currently not working and i honestly dont know why good luck future me ;0
+        updateCurrentStaff(new staff());
         deleteAllItemsOrdered();
         allPannelsBlank();
         LoadCategories();
@@ -168,7 +172,13 @@ public partial class Form1 : Form
 
     private void tableBtn_Click(object sender, EventArgs e)
     {
-        tableBtn_Click_Code(sender, e);
+        if (database.isConnectedToRemoteServer) tableBtn_Click_Code(sender, e);
+        else
+        {
+            Logger.Log("you are not connected to the database and so you cannot access tabnles");
+            MessageBox.Show("you are not connected to the database please contact the IT admin");
+        }
+        
 
     }
 
@@ -192,10 +202,7 @@ public partial class Form1 : Form
 
     private void PricingBtn_Click(object sender, EventArgs e)
     {
-        MessageBox.Show("basically this is a thing but is honestly never used" +
-            "\n in practice i have never ever pressed this button" +
-            "\n and it is something you would only ever change on the tills anyways sooo" +
-            "\n return not implemented lol");
+        MessageBox.Show("unfortunately this is not developed so far");
     }
 
     private void ConfigSideBtn_Click(object sender, EventArgs e)

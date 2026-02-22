@@ -23,6 +23,7 @@ static partial class SQL
     
     public static void initSQL()
     {
+        if (initStarted) return;
         initStarted = true;
         initCompleted = false;
         //database connection section
@@ -58,20 +59,10 @@ static partial class SQL
         }
 
         if (connectionString == null) ErrorCallIS(null);
-        else {
-            SqlConnection sqlCon = new SqlConnection(connectionString);
-            try
-            {
-                sqlCon.Open();
-                Logger.Log("connected to database");
-                sqlCon.Close();
-            }
-            catch (Exception ex) { ErrorCallIS(ex); }
-        }
+        else checkDBConnection();
         
         //staff section
-        sync.allStaff = getStaffFromFile();
-        if (sync.allStaff == null)
+        if (database.getStaffList() == new List<staff>())
         {
             Logger.Log("staff didnt staff after sync.allStaff= getStaffFromFile");
         }
@@ -81,28 +72,26 @@ static partial class SQL
         Logger.Log("init sql completed");
         
     }
-    
-    public static (int, int) getRangeOfCategoryID()
+
+    public static bool checkDBConnection()
     {
-        string query = "SELECT top 1 categoryId " +
-            "from categories " +
-            "order by categoryId ";
-        int min = -1;
-        int max = -1;
-        using SqlConnection con = new SqlConnection(connectionString);
-        using SqlCommand com = new SqlCommand(query + "desc ", con);
-        using SqlCommand com2 = new SqlCommand(query + "asc ", con); 
-        con.Open();
-        object? descResult = com.ExecuteScalar();
-        object? ascResult = com2.ExecuteScalar();
-        con.Close();
-        if (descResult != null || descResult != DBNull.Value) max = Convert.ToInt32(descResult);
-        if (ascResult != null || ascResult != DBNull.Value) min = Convert.ToInt32(ascResult);
-
-
-        return (min, max);
+        bool connected = false;
+        SqlConnection sqlCon = new SqlConnection(connectionString);
+        try
+        {
+            sqlCon.Open();
+            Logger.Log("connected to database");
+            sqlCon.Close();
+            
+            connected = true;
+        }
+        catch (Exception ex) { ErrorCallIS(ex); }
+        connected = false;
+        database.isConnectedToRemoteServer = connected;
+        return connected;
     }
-
+    
+    
     public static List<staff> getStaff()
     {
         List<staff> staffs = new();
@@ -137,6 +126,30 @@ static partial class SQL
         con.Close();
 
         return staffs;
+
+    }
+
+    public static accessLevel getAccessLevelFromId(int Id)
+    {
+        string query = $"""
+                       select canSendThroughItems, canDelete, canNoSale, canViewTables
+                       from accessAlowances, staff
+                       where accessAlowances.accessLevel = staff.AccessLevel
+                       and staff.id = {Id}
+                       """;
+        using SqlConnection con = new SqlConnection(connectionString);
+        con.Open();
+        using SqlCommand com = new SqlCommand(query, con);
+        using  SqlDataReader reader = com.ExecuteReader();
+        reader.Read();
+        return new()
+        {
+            canSendThroughItems = reader.GetBoolean(0),
+            canDelete = reader.GetBoolean(1),
+            canNoSale = reader.GetBoolean(2),
+            canViewTables = reader.GetBoolean(3)
+        };
+
 
     }
     
@@ -181,7 +194,7 @@ static partial class SQL
     
     public static List<category> pullCatFile()
     {
-        if (sync.checkCatFile())
+        if (database.DBExists)
         {
             try
             {
@@ -376,7 +389,7 @@ static partial class SQL
     {
         string sqlCommand = $"""
                            select
-                               ai.itemid,
+                               ai.itemid
                            from tables as tb
                                     inner join tableorder as tor
                                                on tor.tableid = tb.tableid
@@ -535,7 +548,7 @@ static partial class SQL
     public static List<dbCategory> getAllCategories()
     {
         List<dbCategory> cats = new List<dbCategory>();
-        string command = "select categoryId, catName, ISNULL(chosenColour, '') from categories";
+        string command = "select categoryId, catName, ISNULL(chosenColour, 'grey') from categories order by categoryId asc";
         using SqlConnection con = new SqlConnection(connectionString);
         using SqlCommand com = new SqlCommand(command, con);
         con.Open();
@@ -557,9 +570,9 @@ static partial class SQL
     {
         
         //this command gets all of the item Id's that has categories but isnt a category itself. 
-        string query = "select Id, leadsToCategoryId from allItems where subCatID = -1 and leadsToCategoryId != -1";
+        string query = "select itemId, leadsToCategoryId from allItems where subCatID = -1 and leadsToCategoryId != -1";
 
-        string query2 = "select Id, subCatId, leadsToCategoryId from allItems where subCatId != -1 and subItemOrder != -1";
+        string query2 = "select itemId, subCatId, leadsToCategoryId from allItems where subCatId != -1 and subItemOrder != -1";
         using SqlConnection con = new SqlConnection(connectionString);
         using SqlCommand com = new SqlCommand(query, con);
         con.Open();
@@ -639,6 +652,15 @@ static partial class SQL
         using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
+            int temp1 = reader.GetInt32(0);
+            DateTime temp2 = reader.GetDateTime(1);
+            staff temp3 = new()
+            {
+                Id = reader.GetInt32(2)
+            };
+            int temp4 = reader.GetInt32(3);
+            int temp5 = reader.GetInt32(4);
+            
             headers.Add(new header()
             {
                 Id = reader.GetInt32(0),
