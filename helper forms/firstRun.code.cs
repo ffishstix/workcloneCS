@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using FluentValidation.TestHelper;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 using FluentValidation;
-using Microsoft.Data.SqlClient;
+using FluentValidation.TestHelper;
 using Microsoft.IdentityModel.Tokens;
 
 namespace WorkCloneCS
@@ -15,6 +10,12 @@ namespace WorkCloneCS
     {
         private void Apply_Click_Code(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(lastWorkingConnection))
+            {
+                InfoLabel.Text = "Please check a valid connection before applying.";
+                return;
+            }
+
             File.Create(firstRun.basestr + "/ranbefore.txt").Dispose();
             try
             {
@@ -34,21 +35,14 @@ namespace WorkCloneCS
             catch (Exception ex)
             {
                 Logger.Log($"error while writing connection string to file {ex.Message} apply_Click_code");
-
             }
+
             Logger.Log("applying settings");
             database.setConnectionString(lastWorkingConnection);
             database.pullCloudDatabase();
-            if (!t)
-            {
-                Form1 form1 = new Form1();
-                form1.Show();
-                Hide();
-            }
-
-            else Close();
+            Close();
         }
-    
+
         private async void CheckBtn_Click_Code(object obj, EventArgs e)
         {
             InfoLabel.Text = "Checking connection string";
@@ -81,7 +75,7 @@ namespace WorkCloneCS
             var passValidation = _validator.Validate(settings, options =>
                 options.IncludeProperties(x => x.Password));
 
-            
+
             var errorMessages = new List<string>();
 
             // Check each validation result and update colors/messages
@@ -135,9 +129,10 @@ namespace WorkCloneCS
                                    $"Password={settings.Password};" +
                                    $"Encrypt=False";
                 //now we try the connection
-                string allPat = @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
+                string allPat =
+                    @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
                 Logger.Log(connectionString + " to be removed in prod");
-                bool isAllCorrect = System.Text.RegularExpressions.Regex.IsMatch(connectionString, allPat);
+                bool isAllCorrect = Regex.IsMatch(connectionString, allPat);
                 if (isAllCorrect)
                 {
                     var (ok, errorMessage) = await database.tryOpenConnectionAsync(connectionString);
@@ -160,7 +155,6 @@ namespace WorkCloneCS
                                        "so gonna give option to return");
                             LastBtn.Visible = true;
                         }
-
                     }
                 }
 
@@ -181,7 +175,7 @@ namespace WorkCloneCS
             CancelBtn.Visible = true;
             ApplyBtn.Visible = valid;
         }
-    
+
         private void LastBtn_Click_Code(object sender, EventArgs e)
         {
             IPTextBox.Text = lastWorkingConnection.Split(';')[0].Split('=')[1].Split(',')[0];
@@ -193,9 +187,11 @@ namespace WorkCloneCS
             connectionString = lastWorkingConnection;
         }
     }
+
     public class firstRun
     {
-        public static string basestr = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs";
+        public static string basestr =
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/workclonecs";
 
 
         public static bool ranBefore()
@@ -205,15 +201,16 @@ namespace WorkCloneCS
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(basestr + "/sql"));
             }
+
             if (Directory.Exists(basestr + "/sql"))
             {
                 try
                 {
-                    if (File.Exists(basestr + "/ranbefore.txt") && File.Exists(basestr + "/sql/ConnectionStringsConfiguration.json"))
+                    if (File.Exists(basestr + "/ranbefore.txt") &&
+                        File.Exists(basestr + "/sql/ConnectionStringsConfiguration.json"))
                     {
                         return true;
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -226,7 +223,6 @@ namespace WorkCloneCS
                 {
                     Directory.CreateDirectory(basestr + "/sql");
                     Logger.Log("created sql folder");
-
                 }
                 catch (Exception ex)
                 {
@@ -236,8 +232,6 @@ namespace WorkCloneCS
 
             Logger.Log("program hasnt ran before");
             return false;
-
-
         }
     }
 }

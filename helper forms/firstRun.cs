@@ -1,8 +1,5 @@
-﻿using System.Text.RegularExpressions;
-namespace WorkCloneCS
+﻿namespace WorkCloneCS
 {
-
-
     public partial class FirstRunWindow : Form
     {
         private readonly ConnectionSettingsValidator _validator = new ConnectionSettingsValidator();
@@ -10,16 +7,16 @@ namespace WorkCloneCS
         public string connectionString;
         private const int templatePort = 12346;
         private const int defaultPort = 1433;
-        private bool t;
+        private bool dontcallDefaultForm;
+
         public FirstRunWindow(bool te = false)
         {
-            t = te;
+            dontcallDefaultForm = te;
             InitializeComponent();
             extraInitShit();
-            
         }
-        
-        
+
+
         private void CancelBtn_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -32,7 +29,7 @@ namespace WorkCloneCS
 
         private void CheckBtn_Click(object sender, EventArgs e)
         {
-           CheckBtn_Click_Code(sender, e);
+            CheckBtn_Click_Code(sender, e);
         }
 
         private void RemoveTempTextId(object sender, EventArgs e)
@@ -54,13 +51,13 @@ namespace WorkCloneCS
         }
 
         private void RemoveTempTextIP(object sender, EventArgs e)
-    {
-        if (IPTextBox.Text == "*bd.fishstix.uk")
         {
-            IPTextBox.Text = "";
-            IPTextBox.ForeColor = Color.Black;
+            if (IPTextBox.Text == "*bd.fishstix.uk")
+            {
+                IPTextBox.Text = "";
+                IPTextBox.ForeColor = Color.Black;
+            }
         }
-    }
 
         private void AddTempTextIP(object sender, EventArgs e)
         {
@@ -106,7 +103,7 @@ namespace WorkCloneCS
                 databaseTextBox.Text = "*workclonecs";
             }
         }
-        
+
 
         private void RemoveTempTextPassword(object sender, EventArgs e)
         {
@@ -131,10 +128,5 @@ namespace WorkCloneCS
         {
             LastBtn_Click_Code(sender, e);
         }
-
-
-
     }
-    
-
 }

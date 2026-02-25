@@ -1,7 +1,3 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-
 namespace WorkCloneCS
 {
     internal static class Program
@@ -14,40 +10,34 @@ namespace WorkCloneCS
         [STAThread]
         static void Main()
         {
-
-
-
-            Task.Run(() =>
-            {
-                SQL.initSQL();
-                database.tryLoadLocalDatabase();
-            });
-
+            ApplicationConfiguration.Initialize();
 
             if (!firstRun.ranBefore())
             {
-                ApplicationConfiguration.Initialize();
-                FirstRunWindow firstRunWindow = new FirstRunWindow();
-                Application.Run(firstRunWindow);
+                Application.Run(new FirstRunWindow());
+
+                // User closed first-run without saving valid settings.
+                if (!firstRun.ranBefore())
+                {
+                    Logger.Log("first-run configuration not completed; exiting.");
+                    return;
+                }
             }
-            else
-            {
-                ApplicationConfiguration.Initialize();
-                Application.Run(new Form1());
-            }
+
+            SQL.initSQL();
+            database.tryLoadLocalDatabase();
+
+            Application.Run(new Form1());
+
 
             Logger.Log("exiting program, last line of code\n\n\n");
-            
-            do { Thread.Sleep(100);} 
-            while (!SQL.initCompleted);
+
+            do
+            {
+                Thread.Sleep(100);
+            } while (!SQL.initCompleted);
 
             Logger.Log(SQL.getDatabaseVNum().ToString());
-
-
-            
-
         }
-
     }
 }
-

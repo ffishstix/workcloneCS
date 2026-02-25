@@ -1,16 +1,16 @@
-
 namespace WorkCloneCS;
 
 public partial class Form1
 {
     #region default code
+
     // <summary>
     // this is the default generated code with each form and is not important
     // </summary>
     private void Form1_Load(object sender, EventArgs e)
     {
-
     }
+
     private void formClosing(object sender, FormClosingEventArgs e)
     {
         Application.Exit();
@@ -24,14 +24,14 @@ public partial class Form1
     {
         if (!IsHandleCreated) return;
         deleteChildbox();
-        
+
 
         if (cat == null || cat.Count == 0)
         {
             Logger.Log("Categories list is null or empty (add category)");
             return;
         }
-        
+
         try
         {
             // sort the categories using a specific sort to get exta marks...... there is a column in the table that tells you which order they want to be displayed in, sort the categories based on that. /////
@@ -64,16 +64,18 @@ public partial class Form1
     }
 
 
-    private void deleteChildbox() { if (catPan != null) catPan.Controls.Clear(); }
-    
+    private void deleteChildbox()
+    {
+        if (catPan != null) catPan.Controls.Clear();
+    }
+
     private void catClick(object sender, EventArgs e)
     {
         deleteChildbox();
         InitItemList((int)((Control)sender).Tag);
     }
-    
-    
-    
+
+
     private async Task LoadCategories()
     {
         // Create a TaskCompletionSource to wait for categories
@@ -93,6 +95,7 @@ public partial class Form1
             Logger.Log("Failed to load categories after timeout LoadCategories");
             tcs.SetResult(false);
         }
+
         addCategories();
         await tcs.Task;
     }
@@ -115,15 +118,15 @@ public partial class Form1
                     item item = catItems[i];
                     item.lineId = lineId++;
                     addLabel(item);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Logger.Log($"error in InitItemList: {ex.Message}    {e}");
                 }
-                
             }
         }
     }
-    
+
     private void addLabel(item tag)
     {
         try
@@ -159,7 +162,6 @@ public partial class Form1
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 12, FontStyle.Regular),
                 Margin = new Padding(1)
-            
             };
             allergyToolTip.SetToolTip(item, "item contains selected allergies");
             item.Click += generalItem_Click;
@@ -170,18 +172,13 @@ public partial class Form1
         {
             Logger.Log($"got an error inside addLabel which is called by InitItemList: {ex.Message}");
         }
-        
     }
-    
+
     #endregion
 
-    
-    
-    
-    
+
     private void allPannelsBlank()
     {
-        
         ConfigPannel.Visible = false;
         finalPanel.Visible = false;
         tablePanel.Visible = false;
@@ -190,6 +187,7 @@ public partial class Form1
     }
 
     private rowOfItem selectedRow = null;
+
     private void selectRow(rowOfItem row)
     {
         if (selectedRow != null)
@@ -206,8 +204,8 @@ public partial class Form1
         selectedRow.rowPannel.Invalidate();
     }
 
-    private int globalLineId = 0; 
-        
+    private int globalLineId = 0;
+
     private void addItem(item item, bool autoScrollToBottom = true)
     {
         priceTotal += item.price;
@@ -216,7 +214,6 @@ public partial class Form1
         int priceLabelWidth = 60;
         rowOfItem row = new rowOfItem()
         {
-            
             Name = item.Name,
             price = item.price,
             itemCount = item.itemCount,
@@ -225,9 +222,9 @@ public partial class Form1
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
         };
-        
+
         row.updateText();
-        if (! item.ordered) EnableSwipeToDelete(row);
+        if (!item.ordered) EnableSwipeToDelete(row);
         row.SetHeight(rowHeight);
         row.Middle.Click += (s, e) => selectRow(row);
         scrollPanel.SuspendLayout();
@@ -236,10 +233,11 @@ public partial class Form1
         {
             scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
         }
+
         scrollPanel.ResumeLayout();
     }
 
-    
+
     private void EnableSwipeToDelete(rowOfItem row)
     {
         Point mouseDownLocation = Point.Empty;
@@ -286,6 +284,7 @@ public partial class Form1
                         tableSelected.itemsToOrder.Remove(tableSelected.itemsToOrder.Find(x => x.lineId == row.lineId));
                         refreshScrollPanel();
                     }
+
                     updateTotalPrice(-row.price);
                     updateTotalItems(-1);
                 }
@@ -293,12 +292,11 @@ public partial class Form1
                 {
                     row.itemCount++;
                     row.updateText();
-                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.lineId == row.lineId)].itemCount = row.itemCount;
+                    tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.lineId == row.lineId)]
+                        .itemCount = row.itemCount;
                     //used to have refresh scoll pannel here lol absolutely no need
                     updateTotalItems(1);
                     updateTotalPrice(row.price);
-
-
                 }
 
                 row.Middle.BackColor = SystemColors.Control;
@@ -307,9 +305,7 @@ public partial class Form1
             {
                 MessageBox.Show($"it is null here is the thing innit: {rowPannel.Controls}");
             }
-
         };
-
     }
 
     private void updateTotalItems(int number)
@@ -341,11 +337,11 @@ public partial class Form1
 
         panel1.Controls.Add(scrollPanel);
     }
-    
+
     private void InitFoodList()
     {
         createScrollPanel();
-        
+
 
         // Sample data - to be changed
         leftLabel.Tag = 0;
@@ -366,7 +362,7 @@ public partial class Form1
         rightLabel.Tag = 0m;
         rightLabel.Text = "Price: 0.00";
     }
-    
+
     private void refreshScrollPanel()
     {
         if (scrollPanel == null || scrollPanel.IsDisposed)
@@ -389,7 +385,8 @@ public partial class Form1
             {
                 foreach (item existingItem in tableSelected.ordered)
                 {
-                    if (currentScrollPanel.InvokeRequired) currentScrollPanel.Invoke((MethodInvoker)(() => addItem(existingItem, false)));
+                    if (currentScrollPanel.InvokeRequired)
+                        currentScrollPanel.Invoke((MethodInvoker)(() => addItem(existingItem, false)));
                     else addItem(existingItem, false);
                 }
             }
@@ -398,7 +395,8 @@ public partial class Form1
             {
                 foreach (item queuedItem in tableSelected.itemsToOrder)
                 {
-                    if (currentScrollPanel.InvokeRequired) currentScrollPanel.Invoke((MethodInvoker)(() => addItem(queuedItem, false)));
+                    if (currentScrollPanel.InvokeRequired)
+                        currentScrollPanel.Invoke((MethodInvoker)(() => addItem(queuedItem, false)));
                     else addItem(queuedItem, false);
                 }
             }
@@ -406,14 +404,11 @@ public partial class Form1
 
         currentScrollPanel.ResumeLayout();
         currentScrollPanel.PerformLayout();
-        
     }
-    
-    
 
 
     //add all of the items made clickeable that all take them to the gereralItem_Click()
-    
+
 
     private int maximiseSelectPanel()
     {
@@ -431,6 +426,7 @@ public partial class Form1
                 }
             }
         }
+
         return panel1Height;
     }
 
@@ -450,6 +446,7 @@ public partial class Form1
                 }
             }
         }
+
         return panel1Height;
     }
 
@@ -461,7 +458,7 @@ public partial class Form1
         panel1.Height = catpanHeight;
         catPan.Height = panel1Height;
     }
-    
+
     private void orderBtn_Click_Code(object sender, EventArgs e)
     {
         bool temp = orderPanel.Visible;
@@ -469,14 +466,13 @@ public partial class Form1
         orderPanel.Visible = !temp;
         orderPanel.BringToFront();
         int panel1Height;
-        
+
         if (temp) panel1Height = maximiseSelectPanel();
 
         else panel1Height = minimiseSelectPanel();
 
 
         finallyPanelCode(panel1Height);
-
     }
 
     private void tableBtn_Click_Code(object sender, EventArgs e)
@@ -486,7 +482,7 @@ public partial class Form1
             Logger.Log("staff is null inside tableBtn_Click_Code");
             NameForm name = new();
             name.ShowDialog();
-            
+
             updateCurrentStaff(name.staffSelected);
         }
 
@@ -497,7 +493,7 @@ public partial class Form1
             {
                 //select table logic displaying if it is open currently
                 //probs sql db of currently open tables with the items stored on it
-            
+
                 TableForm table = new TableForm();
                 table.ShowDialog();
                 if (table.tableSelected != 0)
@@ -505,7 +501,8 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = database.getTableItems(tableSelected.tableId).ordered; //pulls all items on a table
+                    List<item> items = database.getTableItems(tableSelected.tableId)
+                        .ordered; //pulls all items on a table
                     if (items != null || items == new List<item>())
                     {
                         tableSelected.ordered = items;
@@ -513,28 +510,28 @@ public partial class Form1
                         {
                             addItem(item);
                         }
-                    }  
+                    }
                     else Logger.Log("empty table loaded tableBtn_Click_Code");
-               
                 }
-            
+
                 return;
             }
 
             if (tableSelected.itemsToOrder != null)
             {
-                sentToTable();
+                sendToTable();
                 refreshScrollPanel();
                 return;
             }
-            Logger.Log("had a table open and then closed it but didnt send any orders through so just continuing anyways");
+
+            Logger.Log(
+                "had a table open and then closed it but didnt send any orders through so just continuing anyways");
         }
         else
         {
             MessageBox.Show("No Staff selected");
             Logger.Log("pressed table button without being logged in please log in to continue");
         }
-
     }
 
     private void updateCurrentStaff(staff staff)
@@ -543,43 +540,55 @@ public partial class Form1
         {
             nameBtn.Text = "Name";
             nameBtn.Tag = new staff();
-            return; 
+            return;
         }
-    
+
         if (staff.staffAccess == new accessLevel()) staff.staffAccess = database.getAccessLevelFromId(staff.Id);
         currentStaff = staff;
         nameBtn.Text = staff.Name;
         nameBtn.Tag = staff;
-        
     }
-    
-    private void sentToTable()
+
+    private void sendToTable()
     {
-        tableSelected.itemsToOrder = tableSelected.itemsToOrder;
-        Logger.Log("sent through all items and cleared them");
+        if (tableSelected == null || tableSelected.itemsToOrder == null || tableSelected.itemsToOrder.Count == 0)
+        {
+            Logger.Log("sendToTable() called with no queued items.");
+            return;
+        }
+
+        if (currentStaff == null || currentStaff.Id == 0)
+        {
+            Logger.Log("sendToTable() aborted because no staff is selected.");
+            return;
+        }
+
+        int headerId = Math.Max(1, SQL.getHighestidFromTable("headers") + 1);
+        int orderId = Math.Max(1, SQL.getHighestidFromTable("orders") + 1);
+        int lineId = Math.Max(1, SQL.getHighestidFromTable("orderLine") + 1);
+
+        SQL.pushItemsToTables(tableSelected, currentStaff, headerId, orderId, lineId);
+        database.addTableOrder(tableSelected, currentStaff);
+
         refreshScrollPanel();
         leftLabel.Text = "Items: 0";
         leftLabel.Tag = 0;
-        rightLabel.Text = "Price: £0.00";
+        rightLabel.Text = "Price: 0.00";
         rightLabel.Tag = 0m;
-        Logger.Log(
-            "probs best to ignore the last one however i am now going to try and update the local database, " +
-            "still not sure what to do with no table number tbh");
-        database.addTableOrder(tableSelected, currentStaff);
+
         tableSelected = new table();
         tableBtn.Text = "Table";
-        tableSelected.itemsToOrder.Clear();
+        Logger.Log("sent through all items and cleared them");
     }
 
     private void nameBtn_Click_Code(object sender, EventArgs e)
     {
         NameForm name = new NameForm();
-        if (name != null && !name.IsDisposed)  name.ShowDialog();
+        if (name != null && !name.IsDisposed) name.ShowDialog();
         updateCurrentStaff(name.staffSelected);
-        
-        
+
+
         Logger.Log($"user: {currentStaff.Name} just logged in with id: {currentStaff.Id}");
-        
     }
 
     private void ConfigSideBtn_Click_Code(object sender, EventArgs e)
@@ -591,7 +600,7 @@ public partial class Form1
             {
                 allPannelsBlank();
                 deleteChildbox();
-                
+
                 // Wait for local database to load
                 await Task.Run(() =>
                 {
@@ -599,7 +608,7 @@ public partial class Form1
                     cat = database.getCategories();
                     alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
                 });
-                
+
 
                 // Update UI on the main thread
                 if (IsHandleCreated)
@@ -613,7 +622,7 @@ public partial class Form1
                         }
                         else
                         {
-                            Logger.Log("Failed to load categories after config update ConfigSideBtn_Click_Code" );
+                            Logger.Log("Failed to load categories after config update ConfigSideBtn_Click_Code");
                         }
                     }));
                 }
@@ -626,9 +635,4 @@ public partial class Form1
         Logger.Log("showed categories");
         reLoad.Show();
     }
-
-    
-    
 }
-
-
