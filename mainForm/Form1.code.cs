@@ -174,11 +174,11 @@ public partial class Form1
     }
     
     #endregion
-    
-    
-    
-    
 
+    
+    
+    
+    
     private void allPannelsBlank()
     {
         
@@ -189,11 +189,26 @@ public partial class Form1
         miscPanel.Visible = false;
     }
 
+    private rowOfItem selectedRow = null;
+    private void selectRow(rowOfItem row)
+    {
+        if (selectedRow != null)
+        {
+            selectedRow.rowPannel.BackColor = SystemColors.Control;
+            selectedRow.rowPannel.Padding = new Padding(0);
+            selectedRow.rowPannel.Invalidate();
+        }
 
+        selectedRow = row;
+
+        selectedRow.rowPannel.Padding = new Padding(2);
+        selectedRow.rowPannel.BackColor = Color.LightBlue;
+        selectedRow.rowPannel.Invalidate();
+    }
 
     private int globalLineId = 0; 
         
-    private void addItem(item item)
+    private void addItem(item item, bool autoScrollToBottom = true)
     {
         priceTotal += item.price;
         int rowHeight = 40;
@@ -206,7 +221,7 @@ public partial class Form1
             price = item.price,
             itemCount = item.itemCount,
             Id = item.Id,
-            lineId = globalLineId++,
+            lineId = item.lineId != 0 ? item.lineId : globalLineId++,
             chosenColour = item.chosenColour,
             extraInfo = item.extraInfo,
         };
@@ -214,9 +229,13 @@ public partial class Form1
         row.updateText();
         if (! item.ordered) EnableSwipeToDelete(row);
         row.SetHeight(rowHeight);
+        row.Middle.Click += (s, e) => selectRow(row);
         scrollPanel.SuspendLayout();
         scrollPanel.Controls.Add(row.rowPannel);
-        scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
+        if (autoScrollToBottom)
+        {
+            scrollPanel.VerticalScroll.Value = scrollPanel.VerticalScroll.Maximum;
+        }
         scrollPanel.ResumeLayout();
     }
 
@@ -350,23 +369,43 @@ public partial class Form1
     
     private void refreshScrollPanel()
     {
-        foreach (Control ctrl in panel1.Controls) ctrl.Dispose();
-        createScrollPanel();
+        if (scrollPanel == null || scrollPanel.IsDisposed)
+        {
+            createScrollPanel();
+        }
+
+        if (scrollPanel == null)
+        {
+            return;
+        }
+
+        FlowLayoutPanel currentScrollPanel = scrollPanel;
+        currentScrollPanel.SuspendLayout();
+        currentScrollPanel.Controls.Clear();
+
         if (tableSelected.ordered.Count != 0 || tableSelected.itemsToOrder.Count != 0)
         {
-            List<item> combinedItems = tableSelected.ordered;
-            combinedItems.AddRange(tableSelected.itemsToOrder);
-            if (combinedItems.Count != 0)
+            if (tableSelected.ordered.Count != 0)
             {
-                
-                foreach (item item in combinedItems)
+                foreach (item existingItem in tableSelected.ordered)
                 {
-                    if (scrollPanel.InvokeRequired) scrollPanel.Invoke((MethodInvoker)(() => addItem(item)));
-                    else addItem(item);
+                    if (currentScrollPanel.InvokeRequired) currentScrollPanel.Invoke((MethodInvoker)(() => addItem(existingItem, false)));
+                    else addItem(existingItem, false);
                 }
-                scrollPanel.PerformLayout();
+            }
+
+            if (tableSelected.itemsToOrder.Count != 0)
+            {
+                foreach (item queuedItem in tableSelected.itemsToOrder)
+                {
+                    if (currentScrollPanel.InvokeRequired) currentScrollPanel.Invoke((MethodInvoker)(() => addItem(queuedItem, false)));
+                    else addItem(queuedItem, false);
+                }
             }
         }
+
+        currentScrollPanel.ResumeLayout();
+        currentScrollPanel.PerformLayout();
         
     }
     

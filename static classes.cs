@@ -93,9 +93,10 @@ public class item : baseItem
 
 public class rowOfItem : item
 {
+    private const char hoverChar = 'Ξ';
     private int rowHeight = 40;
     private Label left, middle, right;
-
+    private List<string> messages = new List<string>();
     private item Tag;
     public int lineId;
     public int maxWidth = 850;
@@ -115,6 +116,7 @@ public class rowOfItem : item
         lineId = 0;
         price = 0;
         itemCount = 1;
+        
         Tag = new item()
         {
             itemCount = itemCount,
@@ -126,7 +128,7 @@ public class rowOfItem : item
 
         };
 
-
+ 
         rowPannel = new()
         {
             Height = rowHeight,
@@ -205,7 +207,31 @@ public class rowOfItem : item
         middle.Text = Name;
         right.Text = (itemCount * price).ToString("c");
     }
-
+    
+    
+    public void addMessage(string m)
+    {
+        messages.Append(m);
+        if (m.Trim().Length == 0) return;
+        if (messages.Count < 1)
+        {
+            Logger.Log("adding first message");
+            middle.Text += hoverChar;
+        }
+        ToolTip t = new();
+        string tips = "";
+        foreach (string s in messages)
+        {
+            tips += "\n" + s;
+        }
+        t.SetToolTip(middle, tips);
+        
+        
+    }
+    
+    
+    
+    
     public void Dispose()
     {
         foreach (Control control in rowPannel.Controls)

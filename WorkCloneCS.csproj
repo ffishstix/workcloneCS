@@ -1,78 +1,82 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>AnyCPU;x86</Platforms>
-    <Deterministic>false</Deterministic>
-    <Version>1.0.*</Version>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
-    <FileVersion>1.0.*</FileVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWindowsForms>true</UseWindowsForms>
 
-  <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="12.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-preview.4.25258.110" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.4.25258.110" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0-preview.4.25258.110" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0-preview.4.25258.110"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.4.25258.110"/>
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-  </ItemGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
 
-  <ItemGroup>
-    <Compile Update="sql.cs">
-      <DependentUpon>static classes.cs</DependentUpon>
-    </Compile>
-    <Compile Update="logger.cs">
-      <DependentUpon>static classes.cs</DependentUpon>
-    </Compile>
-    <Compile Update="connection.cs">
-      <DependentUpon>static classes.cs</DependentUpon>
-    </Compile>
-    <Compile Update="mainForm\Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="mainForm\Form1.code.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="mainForm\allergies.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="sqlErrorCalls.cs">
-      <DependentUpon>sql.cs</DependentUpon>
-    </Compile>
-    <Compile Update="helper forms\firstRun.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="helper forms\firstRun.code.cs">
-      <DependentUpon>firstRun.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="helper forms\NameForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="helper forms\TableForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="helper forms\TableForm.code.cs">
-      <DependentUpon>TableForm.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="helper forms\tableNumberForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="database.cs">
-      <DependentUpon>static classes.cs</DependentUpon>
-    </Compile>
-    <Compile Update="mainForm\allergies.code.cs">
-      <DependentUpon>allergies.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
+        <!-- Publishing -->
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+        <!-- Optional -->
+        <Platforms>AnyCPU;x86</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="12.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-preview.4.25258.110" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.4.25258.110" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0-preview.4.25258.110" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.0-preview.4.25258.110"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.4.25258.110"/>
+        <PackageReference Include="System.Collections" Version="4.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="sql.cs">
+            <DependentUpon>static classes.cs</DependentUpon>
+        </Compile>
+        <Compile Update="logger.cs">
+            <DependentUpon>static classes.cs</DependentUpon>
+        </Compile>
+        <Compile Update="connection.cs">
+            <DependentUpon>static classes.cs</DependentUpon>
+        </Compile>
+        <Compile Update="mainForm\Form1.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="mainForm\Form1.code.cs">
+            <DependentUpon>Form1.cs</DependentUpon>
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="mainForm\allergies.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="sqlErrorCalls.cs">
+            <DependentUpon>sql.cs</DependentUpon>
+        </Compile>
+        <Compile Update="helper forms\firstRun.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="helper forms\firstRun.code.cs">
+            <DependentUpon>firstRun.cs</DependentUpon>
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="helper forms\NameForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="helper forms\TableForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="helper forms\TableForm.code.cs">
+            <DependentUpon>TableForm.cs</DependentUpon>
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="helper forms\tableNumberForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="database.cs">
+            <DependentUpon>static classes.cs</DependentUpon>
+        </Compile>
+        <Compile Update="mainForm\allergies.code.cs">
+            <DependentUpon>allergies.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
 </Project>

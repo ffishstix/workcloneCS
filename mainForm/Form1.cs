@@ -33,11 +33,8 @@ public partial class Form1 : Form
         Logger.Log("initialized components");
         InitFoodList();
         Logger.Log("initialized food list");
-        Task.Run(async () => {
-            await LoadCategories(); });
+        Task.Run(async () => { await LoadCategories(); });
         Logger.Log("started loading open tables");
-        
-        
         Logger.Log("added categories");
         Visible = true;
         Show();
@@ -49,6 +46,23 @@ public partial class Form1 : Form
         base.OnFormClosing(e);
         database.saveLocalDatabase(false);
     } 
+    
+    private static item cloneItemForOrder(item source)
+    {
+        return new item
+        {
+            Id = source.Id,
+            Name = source.Name,
+            extraInfo = source.extraInfo,
+            itemCount = source.itemCount > 0 ? source.itemCount : 1,
+            price = source.price,
+            chosenColour = source.chosenColour,
+            ordered = false,
+            hasSubItems = source.hasSubItems,
+            allergies = source.allergies != null ? new List<allergy>(source.allergies) : new List<allergy>(),
+            subItems = source.subItems != null ? new List<dbSubCat>(source.subItems) : new List<dbSubCat>()
+        };
+    }
     
     
     
@@ -67,15 +81,20 @@ public partial class Form1 : Form
             MessageBox.Show("you need to log in to select an item");
             return;
         }
-        item item = (item)((Control)sender).Tag;
-        item.lineId = lineId++;
-        tableSelected.itemsToOrder.Add(item);
+        if (sender is not Control clickedControl || clickedControl.Tag is not item selectedItem)
+        {
+            Logger.Log("generalItem_Click called without a valid item tag");
+            return;
+        }
+
+        item queuedItem = cloneItemForOrder(selectedItem);
+        queuedItem.lineId = lineId++;
+        tableSelected.itemsToOrder.Add(queuedItem);
         
-        //updating middle row shizzle
-        leftLabel.Tag = (int)leftLabel.Tag + 1;
-        leftLabel.Text = leftLabel.Tag.ToString();
-        updateTotalPrice(item.price);
-        refreshScrollPanel();
+        // Append the new row directly; no full panel rebuild needed.
+        addItem(queuedItem);
+        updateTotalItems(1);
+        updateTotalPrice(queuedItem.price);
     }
 
     //in the bottom right
