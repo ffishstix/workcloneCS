@@ -208,7 +208,8 @@ partial class FirstRunWindow
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox PasswordTextBox;
         private Container components;
-        private void extraInitShit()
+        
+        private void extraInitLogic()
         {
 
             Logger.Log("first run window created (extraInitShit)");

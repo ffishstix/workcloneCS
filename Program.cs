@@ -31,13 +31,6 @@ namespace WorkCloneCS
 
 
             Logger.Log("exiting program, last line of code\n\n\n");
-
-            do
-            {
-                Thread.Sleep(100);
-            } while (!SQL.initCompleted);
-
-            Logger.Log(SQL.getDatabaseVNum().ToString());
         }
     }
 }

@@ -7,13 +7,13 @@
         public string connectionString;
         private const int templatePort = 12346;
         private const int defaultPort = 1433;
-        private bool dontcallDefaultForm;
+        private bool dontCallDefaultForm;
 
         public FirstRunWindow(bool te = false)
         {
-            dontcallDefaultForm = te;
+            dontCallDefaultForm = te;
             InitializeComponent();
-            extraInitShit();
+            extraInitLogic();
         }
 
 

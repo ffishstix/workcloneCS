@@ -177,6 +177,7 @@ static class database
         staff openStaff = new staff();
         foreach (header h in headers.Values)
         {
+            if (h.tableId != tableId) continue;
             foreach (order o in orders.Values)
             {
                 if (o.headerId != h.Id) continue;
