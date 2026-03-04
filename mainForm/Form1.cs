@@ -74,7 +74,7 @@ public partial class Form1 : Form
 
         if (!currentStaff.staffAccess.canSendThroughItems)
         {
-            MessageBox.Show("you do not have the required permissions to send through items")
+            MessageBox.Show("you do not have the required permissions to send through items");
             return;
         }
 
