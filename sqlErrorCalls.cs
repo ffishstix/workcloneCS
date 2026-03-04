@@ -8,7 +8,7 @@ static partial class SQL
     {
         Logger.Log("\ncouldn't connect so am resorting to backup errorCallGC  \n");
         Logger.Log(ex.Message);
-        Logger.Here();
+        
         if (categoriesFromFile != null)
         {
             Logger.Log("tbf i think it worked just have a quick look tbf");

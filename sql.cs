@@ -165,7 +165,6 @@ static partial class SQL
         using SqlDataReader reader = com.ExecuteReader();
         while (reader.Read())
         {
-            Logger.Here();
             int id = reader.GetInt32(0);
             string name = reader.GetString(1);
             int access = reader.GetInt32(2);
@@ -295,7 +294,6 @@ static partial class SQL
 
             if (File.Exists(jsonDir))
             {
-                Logger.Here();
                 fileJson = pullCatFile();
 
                 if (fileJson == null)

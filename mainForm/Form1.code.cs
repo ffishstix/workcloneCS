@@ -96,7 +96,7 @@ public partial class Form1
             tcs.SetResult(false);
         }
 
-        addCategories();
+
         await tcs.Task;
     }
 

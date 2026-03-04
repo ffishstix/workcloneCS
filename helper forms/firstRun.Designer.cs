@@ -212,7 +212,7 @@ partial class FirstRunWindow
         private void extraInitLogic()
         {
 
-            Logger.Log("first run window created (extraInitShit)");
+            Logger.Log("first run window created (extraInitLogic)");
             IPTextBox.GotFocus += RemoveTempTextIP;
             IPTextBox.LostFocus += AddTempTextIP;
         

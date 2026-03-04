@@ -131,7 +131,7 @@ namespace WorkCloneCS
                 //now we try the connection
                 string allPat =
                     @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
-                Logger.Log(connectionString + " to be removed in prod");
+
                 bool isAllCorrect = Regex.IsMatch(connectionString, allPat);
                 if (isAllCorrect)
                 {
@@ -146,13 +146,12 @@ namespace WorkCloneCS
                     else
                     {
                         InfoLabel.Text = "failed to connect to database";
-                        Logger.Log($"user inputted invalid string {errorMessage}, {connectionString}");
+                        Logger.Log($"user inputted invalid string {errorMessage}");
                         valid = false;
                         connectionString = "";
                         if (lastWorkingConnection != null)
                         {
-                            Logger.Log("last working connection string was: " + lastWorkingConnection +
-                                       "so gonna give option to return");
+                            Logger.Log("there was a previously working connection, will give the chance to revert now");
                             LastBtn.Visible = true;
                         }
                     }
@@ -165,8 +164,7 @@ namespace WorkCloneCS
                 InfoLabel.Text = anyErrors;
                 if (lastWorkingConnection != null)
                 {
-                    Logger.Log("last working connection string was: " + lastWorkingConnection +
-                               "so gonna give option to return");
+                    Logger.Log("there was a previously working connection, will give the chance to revert now");
                     LastBtn.Visible = true;
                 }
             }
@@ -183,7 +181,7 @@ namespace WorkCloneCS
             databaseTextBox.Text = lastWorkingConnection.Split(';')[1].Split('=')[1];
             UserNameTextBox.Text = lastWorkingConnection.Split(';')[2].Split('=')[1];
             PasswordTextBox.Text = lastWorkingConnection.Split(';')[3].Split('=')[1];
-            Logger.Log("replaced last known shit");
+            Logger.Log("replaced last known stuff");
             connectionString = lastWorkingConnection;
         }
     }
@@ -196,7 +194,6 @@ namespace WorkCloneCS
 
         public static bool ranBefore()
         {
-            Logger.Here();
             if (!Directory.Exists(basestr + "/sql"))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(basestr + "/sql"));
