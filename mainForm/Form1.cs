@@ -5,6 +5,7 @@ namespace WorkCloneCS;
 public partial class Form1 : Form
 {
     private List<string> alergies;
+    private List<string> availableAllergies;
     private int lineId = 1;
     public table tableSelected = new();
     private staff currentStaff = new();
@@ -13,15 +14,14 @@ public partial class Form1 : Form
     public Form1()
     {
         alergies = new List<string>();
+        availableAllergies = new List<string>();
         database.tryLoadLocalDatabase();
-        if (database.allergies != null)
-        {
-            foreach (allergy al in database.allergies.Values) alergies.Add(al.Name);
-        }
+        availableAllergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
 
         cat = database.getCategories();
         Logger.Log("inside the Form1 constructor");
         InitializeComponent();
+        textMsgBtn.Click += textMsgBtn_Click;
         Logger.Log("initialized components");
         InitFoodList();
         Logger.Log("initialized food list");
@@ -52,7 +52,8 @@ public partial class Form1 : Form
             ordered = false,
             hasSubItems = source.hasSubItems,
             allergies = source.allergies != null ? new List<allergy>(source.allergies) : new List<allergy>(),
-            subItems = source.subItems != null ? new List<dbSubCat>(source.subItems) : new List<dbSubCat>()
+            subItems = source.subItems != null ? new List<dbSubCat>(source.subItems) : new List<dbSubCat>(),
+            messages = source.messages != null ? new List<string>(source.messages) : new List<string>()
         };
     }
 
@@ -198,8 +199,15 @@ public partial class Form1 : Form
 
     private void AllergiesBtn_Click(object sender, EventArgs e)
     {
-        allergiesForm al = new allergiesForm();
+        allergiesForm al = new allergiesForm(availableAllergies, alergies);
         al.ShowDialog();
+        alergies = al.SelectedAllergies;
+        refreshVisibleItemAllergyStyles();
+    }
+
+    private void textMsgBtn_Click(object sender, EventArgs e)
+    {
+        textMsgBtn_Click_Code();
     }
 
     private void infoBtn_Click(object sender, EventArgs e)

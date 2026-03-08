@@ -16,6 +16,8 @@ static partial class SQL
     public static string dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
     public static string sqlDir = dir + "sql/";
     public static bool initStarted = false;
+    private static bool orderLineMessageColumnChecked = false;
+    private static bool orderLineHasMessageColumn = false;
 
     public static void initSQL()
     {
@@ -372,41 +374,140 @@ static partial class SQL
         }
     }
 
-    public static List<item> getTableItems(int tableId)
+    private static bool hasOrderLineMessageColumn()
     {
-        string sqlCommand = $"""
-                                  select
-                                      ai.itemid
-                                  from tables as tb
-                                           inner join tableorder as tor
-                                                      on tor.tableid = tb.tableid
-                                           inner join orders
-                                                      on tor.orderid = orders.id
-                                           inner join orderline as ol
-                                                      on orders.id = ol.orderid
-                                           inner join allitems as ai
-                                                      on ol.itemid = ai.itemid
-                                  where tb.tableid = {tableId}
-                             """;
-        List<item> items = new List<item>();
-        using SqlConnection con = new SqlConnection(connectionString);
-        con.Open();
-        using SqlCommand sql = new SqlCommand(sqlCommand, con);
-        using SqlDataReader reader = sql.ExecuteReader();
-        while (reader.Read())
-        {
-            if (reader.GetInt32(0) == null)
-            {
-                Logger.Log("table is null");
-                return null;
-            }
+        if (orderLineMessageColumnChecked) return orderLineHasMessageColumn;
+        if (string.IsNullOrWhiteSpace(connectionString)) return false;
 
-            item i = database.getItemFromId(reader.GetInt32(0));
-            if (i != null) items.Add(i);
-            Logger.Log("item added to list");
+        const string query = """
+                             select col_length('orderLine', 'lineMessage')
+                             """;
+        try
+        {
+            using SqlConnection con = new SqlConnection(connectionString);
+            using SqlCommand com = new SqlCommand(query, con);
+            con.Open();
+            object? result = com.ExecuteScalar();
+            orderLineHasMessageColumn = result != null && result != DBNull.Value;
+            orderLineMessageColumnChecked = true;
+            con.Close();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"failed to check lineMessage column in orderLine: {ex.Message}");
+            orderLineHasMessageColumn = false;
+            orderLineMessageColumnChecked = true;
         }
 
-        con.Close();
+        return orderLineHasMessageColumn;
+    }
+
+    private static void ensureOrderLineMessageColumn()
+    {
+        if (hasOrderLineMessageColumn()) return;
+        const string command = """
+                               if col_length('orderLine', 'lineMessage') is null
+                                   alter table orderLine add lineMessage nvarchar(1000) null
+                               """;
+        modifyTableSql(command, "ensureOrderLineMessageColumn");
+        orderLineMessageColumnChecked = false;
+        hasOrderLineMessageColumn();
+    }
+
+    private static string serialiseMessagesForSql(List<string>? messages)
+    {
+        if (messages == null || messages.Count == 0) return string.Empty;
+        string value = string.Join("\n", messages.Where(m => !string.IsNullOrWhiteSpace(m)).Select(m => m.Trim()));
+        if (value.Length > 1000) value = value[..1000];
+        return value.Replace("'", "''");
+    }
+
+    private static List<string> parseLineMessages(string? message)
+    {
+        List<string> messages = new();
+        if (string.IsNullOrWhiteSpace(message)) return messages;
+        string[] split = message.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        foreach (string part in split)
+        {
+            string trimmed = part.Trim();
+            if (trimmed.Length > 0) messages.Add(trimmed);
+        }
+
+        return messages;
+    }
+
+    public static List<item> getTableItems(int tableId)
+    {
+        return getOpenTableItemsFromDatabase(tableId);
+    }
+
+    public static List<item> getOpenTableItemsFromDatabase(int tableId)
+    {
+        bool hasMessageColumn = hasOrderLineMessageColumn();
+        string messageSelect = hasMessageColumn
+            ? "isnull(ol.lineMessage, '') as lineMessage"
+            : "'' as lineMessage";
+
+        string sqlCommand = $"""
+                             select
+                                 ol.Id as lineId,
+                                 ai.itemId,
+                                 ai.itemName,
+                                 ai.price,
+                                 isnull(ai.chosenColour, 'grey') as chosenColour,
+                                 isnull(ai.extraInfo, '') as extraInfo,
+                                 {messageSelect}
+                             from headers as h
+                                      inner join orders as o
+                                                 on o.headerId = h.Id
+                                      inner join orderline as ol
+                                                 on ol.orderId = o.Id
+                                      inner join allitems as ai
+                                                 on ai.itemId = ol.itemId
+                             where h.tableNumber = @tableId
+                               and h.finished = 0
+                             order by ol.Id asc
+                             """;
+
+        List<item> items = new();
+        try
+        {
+            using SqlConnection con = new SqlConnection(connectionString);
+            con.Open();
+            using SqlCommand sql = new SqlCommand(sqlCommand, con);
+            sql.Parameters.AddWithValue("@tableId", tableId);
+            using SqlDataReader reader = sql.ExecuteReader();
+            while (reader.Read())
+            {
+                int lineId = reader.GetInt32(0);
+                int itemId = reader.GetInt32(1);
+                string itemName = reader.GetString(2);
+                decimal itemPrice = reader.GetInt32(3) / 100m;
+                string chosenColour = reader.IsDBNull(4) ? "grey" : reader.GetString(4);
+                string extraInfo = reader.IsDBNull(5) ? "" : reader.GetString(5);
+                string lineMessage = reader.IsDBNull(6) ? "" : reader.GetString(6);
+
+                items.Add(new item
+                {
+                    Id = itemId,
+                    Name = itemName,
+                    price = itemPrice,
+                    chosenColour = chosenColour,
+                    extraInfo = extraInfo,
+                    lineId = lineId,
+                    itemCount = 1,
+                    ordered = true,
+                    messages = parseLineMessages(lineMessage)
+                });
+            }
+
+            con.Close();
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"error while getting open table items from database: {ex.Message}");
+        }
+
         return items;
     }
 
@@ -443,16 +544,40 @@ static partial class SQL
 
         foreach (string s in singleLineCommands) modifyTableSql(s, "pushItemsToTables");
 
+        ensureOrderLineMessageColumn();
+        bool hasMessageColumn = hasOrderLineMessageColumn();
 
         //orderLine table
         foreach (item item in table.itemsToOrder)
         {
-            string command = $"insert into orderLine(Id, orderId, itemId) values({lineId++}, {orderId}, {item.Id})";
+            string command;
+            if (hasMessageColumn)
+            {
+                string escapedMessage = serialiseMessagesForSql(item.messages);
+                command =
+                    $"insert into orderLine(Id, orderId, itemId, lineMessage) values({lineId++}, {orderId}, {item.Id}, N'{escapedMessage}')";
+            }
+            else
+            {
+                command = $"insert into orderLine(Id, orderId, itemId) values({lineId++}, {orderId}, {item.Id})";
+            }
+
             modifyTableSql(command, "pushItemsToTables later on");
             Logger.Log("added item");
         }
 
         Logger.Log("end of items being ordered");
+    }
+
+    public static void updateOrderLineMessage(int lineId, List<string> messages)
+    {
+        if (lineId <= 0) return;
+        ensureOrderLineMessageColumn();
+        if (!hasOrderLineMessageColumn()) return;
+
+        string escapedMessage = serialiseMessagesForSql(messages);
+        string command = $"update orderLine set lineMessage = N'{escapedMessage}' where Id = {lineId}";
+        modifyTableSql(command, "updateOrderLineMessage");
     }
 
 
@@ -703,11 +828,18 @@ static partial class SQL
     public static List<orderLine> getOrderLines()
     {
         List<orderLine> orderLines = new();
-        string query = """
-                       select Id, orderId, itemId
-                       from orderLine
-                       order by Id asc
-                       """;
+        bool hasMessageColumn = hasOrderLineMessageColumn();
+        string query = hasMessageColumn
+            ? """
+              select Id, orderId, itemId, isnull(lineMessage, '')
+              from orderLine
+              order by Id asc
+              """
+            : """
+              select Id, orderId, itemId
+              from orderLine
+              order by Id asc
+              """;
         using SqlConnection con = new SqlConnection(connectionString);
         con.Open();
         using SqlCommand com = new SqlCommand(query, con);
@@ -718,7 +850,8 @@ static partial class SQL
             {
                 Id = reader.GetInt32(0),
                 orderId = reader.GetInt32(1),
-                itemId = reader.GetInt32(2)
+                itemId = reader.GetInt32(2),
+                lineMessage = hasMessageColumn && !reader.IsDBNull(3) ? reader.GetString(3) : ""
             });
         }
 

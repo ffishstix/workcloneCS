@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Text.Json;
-using FluentValidation;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿namespace WorkCloneCS;
 
-namespace WorkCloneCS;
 public class table
 {
     public staff openStaff { get; set; }
     public int tableId { get; set; }
     public List<item> ordered { get; set; }
     public List<item> itemsToOrder { get; set; }
-    
+
     public int priceTotal { get; private set; }
-    
+
 
     public table()
     {
@@ -32,7 +25,7 @@ public class table
         List<item> tempItems = new List<item>();
         tempItems.AddRange(itemsToOrder);
         tempItems.AddRange(ordered);
-        
+
         foreach (item i in tempItems)
         {
             temp += (int)(i.price * 100);
@@ -42,10 +35,8 @@ public class table
     }
 }
 
-
 public class staff : baseItem
 {
-    
     public accessLevel staffAccess { get; set; }
 
     public staff()
@@ -75,20 +66,17 @@ class category
 
 public class item : baseItem
 {
-
     public string extraInfo { get; set; }
     public int itemCount { get; set; }
     public decimal price { get; set; }
     public string chosenColour { get; set; }
     public int lineId { get; set; }
     public bool ordered { get; set; }
-    public List<allergy> allergies  { get; set; }
+    public List<allergy> allergies { get; set; }
     public bool hasSubItems { get; set; }
 
     public List<dbSubCat> subItems { get; set; }
-    
-
-
+    public List<string> messages { get; set; } = new();
 }
 
 public class rowOfItem : item
@@ -96,16 +84,31 @@ public class rowOfItem : item
     private const char hoverChar = 'Ξ';
     private int rowHeight = 40;
     private Label left, middle, right;
-    private List<string> messages = new List<string>();
+    private readonly List<string> rowMessages = new();
+    private readonly ToolTip messageToolTip = new();
     private item Tag;
     public int lineId;
     public int maxWidth = 850;
     public FlowLayoutPanel rowPannel;
 
 
-    public Label Left { get { return left; } set { left = value; } }
-    public Label Right { get { return right; } set { right = value; } }
-    public Label Middle { get { return middle; } set { middle = value; } }
+    public Label Left
+    {
+        get { return left; }
+        set { left = value; }
+    }
+
+    public Label Right
+    {
+        get { return right; }
+        set { right = value; }
+    }
+
+    public Label Middle
+    {
+        get { return middle; }
+        set { middle = value; }
+    }
 
     public rowOfItem()
     {
@@ -116,7 +119,7 @@ public class rowOfItem : item
         lineId = 0;
         price = 0;
         itemCount = 1;
-        
+
         Tag = new item()
         {
             itemCount = itemCount,
@@ -125,10 +128,9 @@ public class rowOfItem : item
             Id = Id,
             lineId = lineId,
             ordered = ordered
-
         };
 
- 
+
         rowPannel = new()
         {
             Height = rowHeight,
@@ -154,7 +156,6 @@ public class rowOfItem : item
             Font = new Font("Segoe UI", 12, FontStyle.Regular),
             TextAlign = ContentAlignment.MiddleLeft,
             BackColor = Color.Yellow
-
         };
 
         middle = new Label
@@ -180,14 +181,13 @@ public class rowOfItem : item
             Font = new Font("Segoe UI", 12, FontStyle.Regular),
             Padding = new Padding(0),
             BackColor = Color.Red,
-
         };
 
         rowPannel.Controls.Add(left);
         rowPannel.Controls.Add(middle);
         rowPannel.Controls.Add(right);
-
     }
+
     public void SetHeight(int height)
     {
         rowHeight = height;
@@ -195,43 +195,33 @@ public class rowOfItem : item
         middle.Height = height;
         right.Height = height;
         rowPannel.Height = height;
-
-
-
     }
 
 
     public void updateText()
     {
         left.Text = itemCount.ToString();
-        middle.Text = Name;
+        middle.Text = rowMessages.Count > 0 ? $"{Name}{hoverChar}" : Name;
         right.Text = (itemCount * price).ToString("c");
     }
-    
-    
+
+
     public void addMessage(string m)
     {
-        messages.Append(m);
-        if (m.Trim().Length == 0) return;
-        if (messages.Count < 1)
+        if (string.IsNullOrWhiteSpace(m)) return;
+
+        rowMessages.Add(m.Trim());
+        if (rowMessages.Count == 1)
         {
             Logger.Log("adding first message");
             middle.Text += hoverChar;
         }
-        ToolTip t = new();
-        string tips = "";
-        foreach (string s in messages)
-        {
-            tips += "\n" + s;
-        }
-        t.SetToolTip(middle, tips);
-        
-        
+
+        string tips = string.Join(Environment.NewLine, rowMessages);
+        messageToolTip.SetToolTip(middle, tips);
     }
-    
-    
-    
-    
+
+
     public void Dispose()
     {
         foreach (Control control in rowPannel.Controls)
@@ -244,30 +234,24 @@ public class rowOfItem : item
                     control2.Dispose();
                 }
             }
+
             rowPannel.Controls.Remove(control);
             control.Dispose();
         }
     }
-    
-    
 }
-
 
 ///
 /// this will be where i put the daatabase class i am going to redo the waya i store my local database.
 /// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
 ///
-
 class dbSubParent
 {
-    public int Id { get; set;}
+    public int Id { get; set; }
     public string Name { get; set; }
     public int price { get; set; }
     public string chosenColour { get; set; }
     public int leadsToCategoryId { get; set; }
-    
-    
-    
 }
 
 class dbSubChild : dbSubParent
@@ -279,12 +263,8 @@ class dbSubChild : dbSubParent
     public bool isRequired { get; set; }
 }
 
-
-
-
 class dbCategory
 {
-    
     public List<int> itemIds { get; set; }
     public string catName { get; set; }
     public int catId { get; set; }
@@ -301,9 +281,9 @@ class dbCategory
 
 public class orderLine : baseItem
 {
-    public int orderId{ get; set; } 
-    public int itemId{ get; set; }
-
+    public int orderId { get; set; }
+    public int itemId { get; set; }
+    public string lineMessage { get; set; } = "";
 }
 
 public class baseItem
@@ -314,31 +294,26 @@ public class baseItem
 
 public class allergy : baseItem
 {
-    
 }
-
-
-
 
 public class dbSubCat : item
 {
-    public int parentId { get; set;}
+    public int parentId { get; set; }
     public bool isLeaf { get; set; }
     public bool isRequired { get; set; }
-    
 }
 
 public class basicJunctionTable
 {
-    public List<int> leftIds{ get; set; } 
-    public List<int> rightIds{ get; set; }
-    public Dictionary<int, HashSet<int>> combined{ get; set; }
-    public string tableName{ get; set; }
-    public string leftCol{ get; set; }
-    public string rightCol{ get; set; }
-    private bool hasPopulated{ get; set; }
-    private bool hasFinished{ get; set; }
-    
+    public List<int> leftIds { get; set; }
+    public List<int> rightIds { get; set; }
+    public Dictionary<int, HashSet<int>> combined { get; set; }
+    public string tableName { get; set; }
+    public string leftCol { get; set; }
+    public string rightCol { get; set; }
+    private bool hasPopulated { get; set; }
+    private bool hasFinished { get; set; }
+
     public basicJunctionTable(string TableName, string LeftCol, string RightCol)
     {
         tableName = TableName;
@@ -346,14 +321,14 @@ public class basicJunctionTable
         rightCol = RightCol;
         hasPopulated = false;
         hasFinished = false;
-        if(leftCol != "" && rightCol != "") populateTable();
+        if (leftCol != "" && rightCol != "") populateTable();
     }
 
     public void populateTable()
     {
         (leftIds, rightIds) = SQL.getJunctionTableValues(tableName, leftCol, rightCol);
         hasPopulated = true;
-        updateCombined();  
+        updateCombined();
     }
 
     private void updateCombined()
@@ -374,16 +349,15 @@ public class basicJunctionTable
             set.Add(allergyId);
         }
     }
-    
 }
 
 public class accessLevel : baseItem
 {
     // still has Id
-    public bool canSendThroughItems{ get; set; }
-    public bool canDelete{ get; set; }
-    public bool canNoSale{ get; set; }
-    public bool canViewTables{ get; set; }
+    public bool canSendThroughItems { get; set; }
+    public bool canDelete { get; set; }
+    public bool canNoSale { get; set; }
+    public bool canViewTables { get; set; }
 
     public accessLevel()
     {
@@ -396,10 +370,10 @@ public class accessLevel : baseItem
 
 public class header : baseItem
 {
-    public DateTime sentDateTime{ get; set; } 
-    public staff headerStaff{ get; set; }
-    public int tableId{ get; set; }
-    public int finished{ get; set; } // -1 not initialised, 0 not 1 finished 2 error
+    public DateTime sentDateTime { get; set; }
+    public staff headerStaff { get; set; }
+    public int tableId { get; set; }
+    public int finished { get; set; } // -1 not initialised, 0 not 1 finished 2 error
 
     public header()
     {
@@ -412,21 +386,17 @@ public class header : baseItem
         tableId = 0;
         finished = -1;
     }
-
 }
 
 public class order : baseItem
 {
-    public int headerId{ get; set; }
-    public header header{ get; set; }
-    public List<orderLine> orderLines{ get; set; }
+    public int headerId { get; set; }
+    public header header { get; set; }
+    public List<orderLine> orderLines { get; set; }
 }
-    
-
 
 class dbSnapShot
 {
-    
     // meta
     public int cloudVNum { get; set; }
     public bool DBExists { get; set; }
@@ -445,6 +415,4 @@ class dbSnapShot
     // link tables
     public Dictionary<int, HashSet<int>> catItemLinks { get; set; }
     public Dictionary<int, HashSet<int>> allergyItemLinks { get; set; }
-    
-
 }

@@ -188,6 +188,8 @@ static class database
                     if (!items.TryGetValue(line.itemId, out var it)) continue;
                     item copy = cloneItemForOrder(it);
                     copy.lineId = line.Id;
+                    copy.ordered = true;
+                    copy.messages = parseLineMessages(line.lineMessage);
                     result.Add(copy);
                 }
             }
@@ -200,6 +202,49 @@ static class database
             tableId = tableId
         };
         return table;
+    }
+
+    public static Dictionary<int, (int itemCount, decimal totalPrice)> getOpenTableSummaries()
+    {
+        ensureLocalDatabaseLoaded();
+        Dictionary<int, (int itemCount, decimal totalPrice)> summaries = new();
+
+        if (headers == null || orders == null || orderLines == null || items == null) return summaries;
+
+        Dictionary<int, int> openHeaderToTable = new();
+        foreach (header h in headers.Values)
+        {
+            if (h == null) continue;
+            if (h.tableId <= 0) continue;
+            if (h.finished != 0) continue;
+            openHeaderToTable[h.Id] = h.tableId;
+        }
+
+        if (openHeaderToTable.Count == 0) return summaries;
+
+        foreach (order o in orders.Values)
+        {
+            if (o == null) continue;
+            if (!openHeaderToTable.TryGetValue(o.headerId, out int tableId)) continue;
+            if (!orderLines.TryGetValue(o.Id, out var lines) || lines == null) continue;
+
+            foreach (orderLine line in lines)
+            {
+                if (line == null) continue;
+                if (!items.TryGetValue(line.itemId, out var orderedItem) || orderedItem == null) continue;
+
+                (int itemCount, decimal totalPrice) summary =
+                    summaries.TryGetValue(tableId, out var existing)
+                        ? existing
+                        : (0, 0m);
+
+                summary.itemCount += 1;
+                summary.totalPrice += orderedItem.price;
+                summaries[tableId] = summary;
+            }
+        }
+
+        return summaries;
     }
 
     public static void addTableOrder(table table, staff staffMember)
@@ -248,7 +293,8 @@ static class database
                 {
                     Id = lineId++,
                     orderId = orderId,
-                    itemId = it.Id
+                    itemId = it.Id,
+                    lineMessage = serialiseLineMessages(it.messages)
                 });
             }
         }
@@ -399,8 +445,30 @@ static class database
             ordered = source.ordered,
             allergies = source.allergies == null ? null : new List<allergy>(source.allergies),
             hasSubItems = source.hasSubItems,
-            subItems = source.subItems
+            subItems = source.subItems,
+            messages = source.messages == null ? new List<string>() : new List<string>(source.messages)
         };
+    }
+
+    private static string serialiseLineMessages(List<string>? messages)
+    {
+        if (messages == null || messages.Count == 0) return string.Empty;
+        string combined = string.Join("\n", messages.Where(m => !string.IsNullOrWhiteSpace(m)).Select(m => m.Trim()));
+        return combined.Length > 1000 ? combined[..1000] : combined;
+    }
+
+    private static List<string> parseLineMessages(string? lineMessage)
+    {
+        List<string> parsed = new();
+        if (string.IsNullOrWhiteSpace(lineMessage)) return parsed;
+        string[] split = lineMessage.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        foreach (string message in split)
+        {
+            string trimmed = message.Trim();
+            if (trimmed.Length > 0) parsed.Add(trimmed);
+        }
+
+        return parsed;
     }
 
     private static int getNextId<T>(Dictionary<int, T> dict)

@@ -83,8 +83,12 @@ public partial class Form1
 
         // Wait until categories are loaded or timeout
         cat = database.getCategories();
+        availableAllergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
+        alergies = alergies
+            .Where(a => availableAllergies.Contains(a, StringComparer.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
         Logger.Log("got categories");
-        alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
         if (cat != null && cat.Count > 0)
         {
             addCategories();
@@ -131,39 +135,19 @@ public partial class Form1
     {
         try
         {
-            Color colour = Color.Gray;
-            if (tag.chosenColour == "grey") colour = Color.Gray;
-            else if (tag.chosenColour != null) colour = Color.FromName(tag.chosenColour);
-            if (alergies != null && tag.allergies != null)
-            {
-                var tagAllergyNames = new HashSet<string>(
-                    tag.allergies.Select(a => a.Name),
-                    StringComparer.OrdinalIgnoreCase
-                );
-
-                foreach (string s in alergies)
-                {
-                    if (tagAllergyNames.Contains(s))
-                    {
-                        colour = Color.DarkRed;
-                        break;
-                    }
-                }
-            }
-
             Label item = new Label
             {
                 Text = tag.Name,
                 Tag = tag,
                 AutoSize = false,
-                BackColor = colour,
                 Width = (catPan.Width / 8) - 2,
                 Height = 50,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Font = new Font("Segoe UI", 12, FontStyle.Regular),
                 Margin = new Padding(1)
             };
-            allergyToolTip.SetToolTip(item, "item contains selected allergies");
+
+            applyAllergyDisplay(item, tag);
             item.Click += generalItem_Click;
 
             catPan.Controls.Add(item);
@@ -171,6 +155,43 @@ public partial class Form1
         catch (Exception ex)
         {
             Logger.Log($"got an error inside addLabel which is called by InitItemList: {ex.Message}");
+        }
+    }
+
+    private Color getBaseItemColour(item tag)
+    {
+        if (string.IsNullOrWhiteSpace(tag.chosenColour) ||
+            string.Equals(tag.chosenColour, "grey", StringComparison.OrdinalIgnoreCase))
+            return Color.Gray;
+
+        Color colour = Color.FromName(tag.chosenColour);
+        return colour.A == 0 ? Color.Gray : colour;
+    }
+
+    private bool itemContainsSelectedAllergy(item tag)
+    {
+        if (alergies == null || alergies.Count == 0) return false;
+        if (tag.allergies == null || tag.allergies.Count == 0) return false;
+
+        HashSet<string> selected = new(alergies, StringComparer.OrdinalIgnoreCase);
+        return tag.allergies.Any(a => a != null && !string.IsNullOrWhiteSpace(a.Name) && selected.Contains(a.Name));
+    }
+
+    private void applyAllergyDisplay(Label itemLabel, item tag)
+    {
+        bool hasSelectedAllergy = itemContainsSelectedAllergy(tag);
+        itemLabel.BackColor = hasSelectedAllergy ? Color.DarkRed : getBaseItemColour(tag);
+        allergyToolTip.SetToolTip(itemLabel, hasSelectedAllergy ? "item contains selected allergies" : null);
+    }
+
+    private void refreshVisibleItemAllergyStyles()
+    {
+        if (catPan == null || catPan.IsDisposed) return;
+
+        foreach (Control control in catPan.Controls)
+        {
+            if (control is not Label label || label.Tag is not item tag) continue;
+            applyAllergyDisplay(label, tag);
         }
     }
 
@@ -187,6 +208,8 @@ public partial class Form1
     }
 
     private rowOfItem selectedRow = null;
+    private readonly Dictionary<int, rowOfItem> rowsByLineId = new();
+    private readonly Dictionary<FlowLayoutPanel, rowOfItem> rowsByPanel = new();
 
     private void selectRow(rowOfItem row)
     {
@@ -224,9 +247,19 @@ public partial class Form1
         };
 
         row.updateText();
+        if (item.messages != null && item.messages.Count > 0)
+        {
+            foreach (string message in item.messages)
+            {
+                row.addMessage(message);
+            }
+        }
+
         if (!item.ordered) EnableSwipeToDelete(row);
         row.SetHeight(rowHeight);
         row.Middle.Click += (s, e) => selectRow(row);
+        rowsByLineId[row.lineId] = row;
+        rowsByPanel[row.rowPannel] = row;
         scrollPanel.SuspendLayout();
         scrollPanel.Controls.Add(row.rowPannel);
         if (autoScrollToBottom)
@@ -356,6 +389,10 @@ public partial class Form1
     {
         tableBtn.Text = "Table";
         tableSelected.itemsToOrder.Clear();
+        tableSelected.ordered.Clear();
+        selectedRow = null;
+        rowsByLineId.Clear();
+        rowsByPanel.Clear();
         scrollPanel.Controls.Clear();
         leftLabel.Tag = 0;
         leftLabel.Text = "Items: 0";
@@ -377,6 +414,9 @@ public partial class Form1
 
         FlowLayoutPanel currentScrollPanel = scrollPanel;
         currentScrollPanel.SuspendLayout();
+        selectedRow = null;
+        rowsByLineId.Clear();
+        rowsByPanel.Clear();
         currentScrollPanel.Controls.Clear();
 
         if (tableSelected.ordered.Count != 0 || tableSelected.itemsToOrder.Count != 0)
@@ -404,6 +444,79 @@ public partial class Form1
 
         currentScrollPanel.ResumeLayout();
         currentScrollPanel.PerformLayout();
+    }
+
+    private void textMsgBtn_Click_Code()
+    {
+        item? targetItem = getMessageTargetItem();
+        if (targetItem == null)
+        {
+            MessageBox.Show("No item available to attach a message to.");
+            return;
+        }
+
+        string existingText = targetItem.messages != null && targetItem.messages.Count > 0
+            ? targetItem.messages[^1]
+            : string.Empty;
+        using MessageForm messageForm = new MessageForm("Item Message", existingText);
+        if (messageForm.ShowDialog(this) != DialogResult.OK) return;
+
+        string newMessage = messageForm.MessageText.Trim();
+        if (string.IsNullOrWhiteSpace(newMessage)) return;
+
+        targetItem.messages ??= new List<string>();
+        targetItem.messages.Add(newMessage);
+
+        if (rowsByLineId.TryGetValue(targetItem.lineId, out rowOfItem? row))
+        {
+            row.addMessage(newMessage);
+        }
+
+        if (targetItem.ordered && targetItem.lineId > 0)
+        {
+            SQL.updateOrderLineMessage(targetItem.lineId, targetItem.messages);
+        }
+    }
+
+    private item? getMessageTargetItem()
+    {
+        if (selectedRow != null)
+        {
+            item? selectedItem = findItemByLineId(selectedRow.lineId);
+            if (selectedItem != null) return selectedItem;
+        }
+
+        rowOfItem? lastVisibleRow = getLastVisibleRow();
+        if (lastVisibleRow != null)
+        {
+            item? lastVisibleItem = findItemByLineId(lastVisibleRow.lineId);
+            if (lastVisibleItem != null) return lastVisibleItem;
+        }
+
+        if (tableSelected.itemsToOrder.Count > 0) return tableSelected.itemsToOrder[^1];
+        if (tableSelected.ordered.Count > 0) return tableSelected.ordered[^1];
+        return null;
+    }
+
+    private rowOfItem? getLastVisibleRow()
+    {
+        if (scrollPanel == null || scrollPanel.IsDisposed || scrollPanel.Controls.Count == 0) return null;
+
+        for (int i = scrollPanel.Controls.Count - 1; i >= 0; i--)
+        {
+            if (scrollPanel.Controls[i] is FlowLayoutPanel panel &&
+                rowsByPanel.TryGetValue(panel, out rowOfItem? row))
+                return row;
+        }
+
+        return null;
+    }
+
+    private item? findItemByLineId(int lineId)
+    {
+        item? queued = tableSelected.itemsToOrder.FirstOrDefault(x => x.lineId == lineId);
+        if (queued != null) return queued;
+        return tableSelected.ordered.FirstOrDefault(x => x.lineId == lineId);
     }
 
 
@@ -501,15 +614,11 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = database.getTableItems(tableSelected.tableId)
-                        .ordered; //pulls all items on a table
-                    if (items != null || items == new List<item>())
+                    List<item> items = SQL.getOpenTableItemsFromDatabase(tableSelected.tableId);
+                    if (items != null)
                     {
                         tableSelected.ordered = items;
-                        foreach (item item in items)
-                        {
-                            addItem(item);
-                        }
+                        refreshScrollPanel();
                     }
                     else Logger.Log("empty table loaded tableBtn_Click_Code");
                 }
@@ -606,7 +715,11 @@ public partial class Form1
                 {
                     database.tryLoadLocalDatabase();
                     cat = database.getCategories();
-                    alergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
+                    availableAllergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
+                    alergies = alergies
+                        .Where(a => availableAllergies.Contains(a, StringComparer.OrdinalIgnoreCase))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
                 });
 
 

@@ -3,14 +3,16 @@ namespace WorkCloneCS;
 public partial class TableForm : Form
 {
     public int tableSelected;
+
     public TableForm()
     {
         InitializeComponent();
         tableSelected = 0;
         clickSection();
+        initialiseOpenTables();
     }
 
-   
+
     private void tableBtn_DoubleClick(object sender, EventArgs e)
     {
         tableSelected = int.Parse(((Button)sender).Text);
@@ -20,8 +22,9 @@ public partial class TableForm : Form
     private void tableBtn_Click(object sender, EventArgs e)
     {
         tableSelected = int.Parse(((Button)sender).Text);
+        showTableSummaryPopup((Button)sender);
     }
-    
+
     private void escapeBtn_Click(object sender, EventArgs e)
     {
         tableSelected = 0;
@@ -44,7 +47,9 @@ public partial class TableForm : Form
     private void openTableBtn_Click(object sender, EventArgs e)
     {
         if (tableSelected != 0) Close();
-        else Logger.Log("openTableBtn clicked but there is no table actually selected so not closing :) openTableBtn_Click bad message");
+        else
+            Logger.Log(
+                "openTableBtn clicked but there is no table actually selected so not closing :) openTableBtn_Click bad message");
     }
 
     private void defaultTableBtn_Click(object sender, EventArgs e)
