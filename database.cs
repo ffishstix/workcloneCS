@@ -176,7 +176,7 @@ static class database
         staff openStaff = new staff();
         foreach (header h in headers.Values)
         {
-            if (h.tableId != tableId) continue;
+            if (h.tableId != tableId || h.finished == 2) continue;
             foreach (order o in orders.Values)
             {
                 if (o.headerId != h.Id) continue;
@@ -201,6 +201,44 @@ static class database
             tableId = tableId
         };
         return table;
+    }
+
+    public static int closeTableLocally(int tableId, int finishedValue = 2)
+    {
+        ensureLocalDatabaseLoaded();
+        if (tableId <= 0) return 0;
+        headers ??= new Dictionary<int, header>();
+        tables ??= new Dictionary<int, table>();
+
+        int headersUpdated = 0;
+        bool tableRemoved = false;
+
+        foreach (header hdr in headers.Values)
+        {
+            if (hdr.tableId != tableId) continue;
+            if (hdr.finished != finishedValue)
+            {
+                hdr.finished = finishedValue;
+                headersUpdated++;
+            }
+        }
+
+        if (headersUpdated > 0)
+        {
+            addHeadersAndOrderLinesToOrders();
+            updateOpenTablesFromLoadedData();
+        }
+        else
+        {
+            tableRemoved = tables.Remove(tableId);
+        }
+
+        if (headersUpdated > 0 || tableRemoved)
+        {
+            saveLocalDatabase(false);
+        }
+
+        return headersUpdated;
     }
 
     public static List<item> getOpenTableItemsFromSqlAndUpdateLocal(int tableId, staff fallbackStaff = null)

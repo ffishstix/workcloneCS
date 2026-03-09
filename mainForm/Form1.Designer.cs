@@ -343,6 +343,7 @@
             CardBtn.TabIndex = 2;
             CardBtn.Text = "Card";
             CardBtn.UseVisualStyleBackColor = true;
+            CardBtn.Click += paymentBtn_Click;
             // 
             // CashBtn
             // 
@@ -353,6 +354,7 @@
             CashBtn.TabIndex = 3;
             CashBtn.Text = "Cash";
             CashBtn.UseVisualStyleBackColor = true;
+            CashBtn.Click += paymentBtn_Click;
             // 
             // tablePanel
             // 

@@ -257,8 +257,22 @@ public partial class Form1 : Form
             return;
         }
 
-        int rowsAffected = SQL.updateHeadersFinishedForTable(tableSelected.tableId, 2);
+        int tableId = tableSelected.tableId;
+        int rowsAffected = SQL.updateHeadersFinishedForTable(tableId, 2);
         Logger.Log(
-            $"paymentBtn_Click updated finished=2 for table {tableSelected.tableId}. Rows affected: {rowsAffected}");
+            $"paymentBtn_Click updated finished=2 for table {tableId}. Rows affected: {rowsAffected}");
+
+        if (rowsAffected <= 0)
+        {
+            Logger.Log($"paymentBtn_Click did not clear table {tableId} locally because SQL update returned 0.");
+            MessageBox.Show("Payment update failed in the database. Table was not cleared locally.");
+            return;
+        }
+
+        int localHeadersUpdated = database.closeTableLocally(tableId, 2);
+        Logger.Log(
+            $"paymentBtn_Click closed local table cache for table {tableId}. Local headers updated: {localHeadersUpdated}");
+
+        SignOffBtn_Click(null, null);
     }
 }

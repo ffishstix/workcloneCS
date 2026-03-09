@@ -461,8 +461,16 @@ static partial class SQL
         }
 
         string command = $"""
-                          if col_length('{qualifiedOrderLine}', 'lineMessage') is null
+                          if object_id(N'{qualifiedOrderLine}') is not null
+                             and not exists (
+                                 select 1
+                                 from sys.columns
+                                 where object_id = object_id(N'{qualifiedOrderLine}')
+                                   and name = N'lineMessage'
+                             )
+                          begin
                               alter table {qualifiedOrderLine} add lineMessage nvarchar(1000) null
+                          end
                           """;
         bool migrationSucceeded = modifyTableSql(command, "ensureOrderLineMessageColumn");
         if (!migrationSucceeded)
