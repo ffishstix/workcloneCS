@@ -502,6 +502,34 @@ static partial class SQL
         return getOpenTableItemsFromDatabase(tableId);
     }
 
+    public static int updateHeadersFinishedForTable(int tableId, int finishedValue = 2)
+    {
+        const string query = """
+                             update headers
+                             set finished = @finishedValue
+                             where tableNumber = @tableId
+                             """;
+
+        try
+        {
+            using SqlConnection con = new SqlConnection(connectionString);
+            using SqlCommand sql = new SqlCommand(query, con);
+            sql.Parameters.AddWithValue("@finishedValue", finishedValue);
+            sql.Parameters.AddWithValue("@tableId", tableId);
+            con.Open();
+            int rowsAffected = sql.ExecuteNonQuery();
+            con.Close();
+            Logger.Log(
+                $"Updated headers.finished to {finishedValue} for table {tableId}. Rows affected: {rowsAffected}");
+            return rowsAffected;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"Error updating headers.finished for table {tableId}: {ex.Message}");
+            return 0;
+        }
+    }
+
     public static List<item> getOpenTableItemsFromDatabase(int tableId)
     {
         bool hasMessageColumn = hasOrderLineMessageColumn();

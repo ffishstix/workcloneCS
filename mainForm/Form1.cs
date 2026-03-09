@@ -243,4 +243,22 @@ public partial class Form1 : Form
             Logger.Log($"Error in syncBtn_Click: {ex.Message}");
         }
     }
+
+    private void paymentBtn_Click(object sender, EventArgs e)
+    {
+        bool payWithCard = ((Button)sender).Text.ToLower() == "card"; // not used
+        Logger.Log("user tried to send through a payment but this is not within scope" +
+                   "\nclearing items off table now");
+
+        if (tableSelected == null || tableSelected.tableId <= 0)
+        {
+            Logger.Log("paymentBtn_Click called with no table selected");
+            MessageBox.Show("Please select a table before taking payment.");
+            return;
+        }
+
+        int rowsAffected = SQL.updateHeadersFinishedForTable(tableSelected.tableId, 2);
+        Logger.Log(
+            $"paymentBtn_Click updated finished=2 for table {tableSelected.tableId}. Rows affected: {rowsAffected}");
+    }
 }
