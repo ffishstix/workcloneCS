@@ -235,7 +235,7 @@ public partial class Form1 : Form
     {
         try
         {
-            database.tryLoadLocalDatabase();
+            database.pullCloudDatabase();
             SignOffBtn_Click(null, null);
         }
         catch (Exception ex)

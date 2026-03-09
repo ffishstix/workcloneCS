@@ -614,7 +614,7 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = SQL.getOpenTableItemsFromDatabase(tableSelected.tableId);
+                    List<item> items = database.getOpenTableItemsFromSqlAndUpdateLocal(tableSelected.tableId, currentStaff);
                     if (items != null)
                     {
                         tableSelected.ordered = items;

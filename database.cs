@@ -37,8 +37,7 @@ static class database
     private static Dictionary<int, List<orderLine>> orderLines = new();
     private static Dictionary<int, order> orders = new();
     private static Dictionary<int, staff> staff = new();
-
-    private static Dictionary<int, table> tables = new(); //future shizzle
+    private static Dictionary<int, table> tables = new(); 
 
     //links
     private static Dictionary<int, HashSet<int>> catItemLinks = new();
@@ -106,10 +105,10 @@ static class database
 
         //links linear (access-->staff-->header-->orders<--orderLine<--item
         addHeadersAndOrderLinesToOrders();
+        updateOpenTablesFromLoadedData();
 
         // in theory this should be all of the data from the database
         //that you can grab and assign.
-
         pullCloudStarted = false;
         saveLocalDatabase();
         DBExists = true;
@@ -202,6 +201,45 @@ static class database
             tableId = tableId
         };
         return table;
+    }
+
+    public static List<item> getOpenTableItemsFromSqlAndUpdateLocal(int tableId, staff fallbackStaff = null)
+    {
+        ensureLocalDatabaseLoaded();
+
+        List<item> sqlItems = SQL.getOpenTableItemsFromDatabase(tableId) ?? new List<item>();
+        tables ??= new Dictionary<int, table>();
+
+        if (sqlItems.Count == 0)
+        {
+            tables.Remove(tableId);
+            saveLocalDatabase(false);
+            return new List<item>();
+        }
+
+        table updatedTable = new table
+        {
+            tableId = tableId,
+            openStaff = resolveOpenTableStaff(tableId, fallbackStaff)
+        };
+
+        foreach (item sqlItem in sqlItems)
+        {
+            item copy = cloneItemForOrder(sqlItem);
+            copy.ordered = true;
+            updatedTable.ordered.Add(copy);
+        }
+
+        tables[tableId] = updatedTable;
+        saveLocalDatabase(false);
+
+        List<item> response = new();
+        foreach (item localItem in updatedTable.ordered)
+        {
+            response.Add(cloneItemForOrder(localItem));
+        }
+
+        return response;
     }
 
     public static Dictionary<int, (int itemCount, decimal totalPrice)> getOpenTableSummaries()
@@ -442,12 +480,30 @@ static class database
             itemCount = 1,
             price = source.price,
             chosenColour = source.chosenColour,
+            lineId = source.lineId,
             ordered = source.ordered,
             allergies = source.allergies == null ? null : new List<allergy>(source.allergies),
             hasSubItems = source.hasSubItems,
             subItems = source.subItems,
             messages = source.messages == null ? new List<string>() : new List<string>(source.messages)
         };
+    }
+
+    private static staff resolveOpenTableStaff(int tableId, staff fallbackStaff = null)
+    {
+        foreach (header hdr in headers.Values)
+        {
+            if (hdr.tableId != tableId || hdr.finished != 0) continue;
+            if (staff.TryGetValue(hdr.headerStaff.Id, out var assignedStaff)) return assignedStaff;
+            if (hdr.headerStaff != null && hdr.headerStaff.Id != 0) return hdr.headerStaff;
+        }
+
+        if (tables.TryGetValue(tableId, out var existingTable) &&
+            existingTable?.openStaff != null &&
+            existingTable.openStaff.Id != 0)
+            return existingTable.openStaff;
+
+        return fallbackStaff ?? new staff();
     }
 
     private static string serialiseLineMessages(List<string>? messages)
@@ -493,11 +549,37 @@ static class database
     }
 
 
-    private static void getTables()
+    private static void updateOpenTablesFromLoadedData()
     {
-        var x = SQL.getTables();
-        List<int> orderIds = x.orderId;
-        List<int> tableIds = x.tableId;
+        tables = new Dictionary<int, table>();
+
+        foreach (order ord in orders.Values)
+        {
+            if (!headers.TryGetValue(ord.headerId, out var hdr)) continue;
+            if (hdr.finished != 0 || hdr.tableId <= 0) continue;
+
+            if (!tables.TryGetValue(hdr.tableId, out var openTable))
+            {
+                openTable = new table
+                {
+                    tableId = hdr.tableId,
+                    openStaff = staff.TryGetValue(hdr.headerStaff.Id, out var s) ? s : hdr.headerStaff
+                };
+                tables[hdr.tableId] = openTable;
+            }
+
+            if (!orderLines.TryGetValue(ord.Id, out var lines) || lines == null) continue;
+            foreach (orderLine line in lines)
+            {
+                if (!items.TryGetValue(line.itemId, out var orderedItem)) continue;
+
+                item copy = cloneItemForOrder(orderedItem);
+                copy.lineId = line.Id;
+                copy.ordered = true;
+                copy.messages = parseLineMessages(line.lineMessage);
+                openTable.ordered.Add(copy);
+            }
+        }
     }
 
     private static void addHeadersAndOrderLinesToOrders()

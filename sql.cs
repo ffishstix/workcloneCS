@@ -18,6 +18,8 @@ static partial class SQL
     public static bool initStarted = false;
     private static bool orderLineMessageColumnChecked = false;
     private static bool orderLineHasMessageColumn = false;
+    private static bool orderLineMessageMigrationAttempted = false;
+    private static string cachedOrderLineQualifiedName = "";
 
     public static void initSQL()
     {
@@ -357,7 +359,7 @@ static partial class SQL
         return x;
     }
 
-    private static void modifyTableSql(string sqlCommand, string functionCalling = "null")
+    private static bool modifyTableSql(string sqlCommand, string functionCalling = "null")
     {
         using SqlConnection con = new SqlConnection(connectionString);
         using SqlCommand sql = new SqlCommand(sqlCommand, con);
@@ -367,11 +369,45 @@ static partial class SQL
             sql.ExecuteNonQuery();
             con.Close();
             Logger.Log($"Executed {sqlCommand} successfully");
+            return true;
         }
         catch (Exception ex)
         {
-            Logger.Log($"error in modifyTableSql called by {functionCalling} with {sqlCommand} {ex}");
+            Logger.Log($"error in modifyTableSql called by {functionCalling}: {ex.Message}");
+            return false;
         }
+    }
+
+    private static string resolveOrderLineQualifiedName()
+    {
+        if (!string.IsNullOrWhiteSpace(cachedOrderLineQualifiedName)) return cachedOrderLineQualifiedName;
+        if (string.IsNullOrWhiteSpace(connectionString)) return string.Empty;
+
+        const string query = """
+                             select top (1) quotename(s.name) + '.' + quotename(t.name)
+                             from sys.tables t
+                                      inner join sys.schemas s
+                                                 on s.schema_id = t.schema_id
+                             where lower(t.name) = N'orderline'
+                             order by case when t.name = N'orderLine' then 0 else 1 end
+                             """;
+        try
+        {
+            using SqlConnection con = new SqlConnection(connectionString);
+            using SqlCommand com = new SqlCommand(query, con);
+            con.Open();
+            object? result = com.ExecuteScalar();
+            con.Close();
+            cachedOrderLineQualifiedName =
+                result != null && result != DBNull.Value ? result.ToString() ?? string.Empty : string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"failed to resolve orderLine table name: {ex.Message}");
+            cachedOrderLineQualifiedName = string.Empty;
+        }
+
+        return cachedOrderLineQualifiedName;
     }
 
     private static bool hasOrderLineMessageColumn()
@@ -380,7 +416,14 @@ static partial class SQL
         if (string.IsNullOrWhiteSpace(connectionString)) return false;
 
         const string query = """
-                             select col_length('orderLine', 'lineMessage')
+                             select case when exists (
+                                 select 1
+                                 from sys.columns c
+                                          inner join sys.tables t
+                                                     on t.object_id = c.object_id
+                                 where lower(t.name) = N'orderline'
+                                   and c.name = N'lineMessage'
+                             ) then 1 else 0 end
                              """;
         try
         {
@@ -388,7 +431,9 @@ static partial class SQL
             using SqlCommand com = new SqlCommand(query, con);
             con.Open();
             object? result = com.ExecuteScalar();
-            orderLineHasMessageColumn = result != null && result != DBNull.Value;
+            orderLineHasMessageColumn = result != null &&
+                                        result != DBNull.Value &&
+                                        Convert.ToInt32(result) == 1;
             orderLineMessageColumnChecked = true;
             con.Close();
         }
@@ -405,11 +450,27 @@ static partial class SQL
     private static void ensureOrderLineMessageColumn()
     {
         if (hasOrderLineMessageColumn()) return;
-        const string command = """
-                               if col_length('orderLine', 'lineMessage') is null
-                                   alter table orderLine add lineMessage nvarchar(1000) null
-                               """;
-        modifyTableSql(command, "ensureOrderLineMessageColumn");
+        if (orderLineMessageMigrationAttempted) return;
+        orderLineMessageMigrationAttempted = true;
+
+        string qualifiedOrderLine = resolveOrderLineQualifiedName();
+        if (string.IsNullOrWhiteSpace(qualifiedOrderLine))
+        {
+            Logger.Log("ensureOrderLineMessageColumn: orderLine table not found, skipping migration.");
+            return;
+        }
+
+        string command = $"""
+                          if col_length('{qualifiedOrderLine}', 'lineMessage') is null
+                              alter table {qualifiedOrderLine} add lineMessage nvarchar(1000) null
+                          """;
+        bool migrationSucceeded = modifyTableSql(command, "ensureOrderLineMessageColumn");
+        if (!migrationSucceeded)
+        {
+            Logger.Log("ensureOrderLineMessageColumn: unable to add lineMessage; continuing without message column.");
+            return;
+        }
+
         orderLineMessageColumnChecked = false;
         hasOrderLineMessageColumn();
     }
@@ -493,7 +554,7 @@ static partial class SQL
                                       inner join allitems as ai
                                                  on ai.itemId = ol.itemId
                              where h.tableNumber = @tableId
-                               and h.finished = 0
+                               and h.finished != 2
                              order by ol.Id asc
                              """;
 
