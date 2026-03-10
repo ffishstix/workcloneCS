@@ -499,7 +499,8 @@ static partial class SQL
         if (headerId == 0 || orderId == 0 || lineId == 0)
         {
             Logger.Log(
-                "one of the ids was 0 so it errored the fuck out ngl cheieve this shouldnt happen but fuck me ig");
+                "one of the ids was 0 so it errored");
+            return;
         }
 
         if (table.tableId < 1)
@@ -852,7 +853,7 @@ static partial class SQL
 
         if (tables.tableId.Count != tables.orderId.Count)
             Logger.Log("the amount of tableId's and orderId's dont " +
-                       "match which means something went aabsolutely fucky wucky but oh well");
+                       "match which means something went aabsolutely wrong but oh well");
         return tables;
     }
 
