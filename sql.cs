@@ -16,10 +16,6 @@ static partial class SQL
     public static string dir = @$"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\workclonecs\";
     public static string sqlDir = dir + "sql/";
     public static bool initStarted = false;
-    private static bool orderLineMessageColumnChecked = false;
-    private static bool orderLineHasMessageColumn = false;
-    private static bool orderLineMessageMigrationAttempted = false;
-    private static string cachedOrderLineQualifiedName = "";
 
     public static void initSQL()
     {
@@ -378,111 +374,6 @@ static partial class SQL
         }
     }
 
-    private static string resolveOrderLineQualifiedName()
-    {
-        if (!string.IsNullOrWhiteSpace(cachedOrderLineQualifiedName)) return cachedOrderLineQualifiedName;
-        if (string.IsNullOrWhiteSpace(connectionString)) return string.Empty;
-
-        const string query = """
-                             select top (1) quotename(s.name) + '.' + quotename(t.name)
-                             from sys.tables t
-                                      inner join sys.schemas s
-                                                 on s.schema_id = t.schema_id
-                             where lower(t.name) = N'orderline'
-                             order by case when t.name = N'orderLine' then 0 else 1 end
-                             """;
-        try
-        {
-            using SqlConnection con = new SqlConnection(connectionString);
-            using SqlCommand com = new SqlCommand(query, con);
-            con.Open();
-            object? result = com.ExecuteScalar();
-            con.Close();
-            cachedOrderLineQualifiedName =
-                result != null && result != DBNull.Value ? result.ToString() ?? string.Empty : string.Empty;
-        }
-        catch (Exception ex)
-        {
-            Logger.Log($"failed to resolve orderLine table name: {ex.Message}");
-            cachedOrderLineQualifiedName = string.Empty;
-        }
-
-        return cachedOrderLineQualifiedName;
-    }
-
-    private static bool hasOrderLineMessageColumn()
-    {
-        if (orderLineMessageColumnChecked) return orderLineHasMessageColumn;
-        if (string.IsNullOrWhiteSpace(connectionString)) return false;
-
-        const string query = """
-                             select case when exists (
-                                 select 1
-                                 from sys.columns c
-                                          inner join sys.tables t
-                                                     on t.object_id = c.object_id
-                                 where lower(t.name) = N'orderline'
-                                   and c.name = N'lineMessage'
-                             ) then 1 else 0 end
-                             """;
-        try
-        {
-            using SqlConnection con = new SqlConnection(connectionString);
-            using SqlCommand com = new SqlCommand(query, con);
-            con.Open();
-            object? result = com.ExecuteScalar();
-            orderLineHasMessageColumn = result != null &&
-                                        result != DBNull.Value &&
-                                        Convert.ToInt32(result) == 1;
-            orderLineMessageColumnChecked = true;
-            con.Close();
-        }
-        catch (Exception ex)
-        {
-            Logger.Log($"failed to check lineMessage column in orderLine: {ex.Message}");
-            orderLineHasMessageColumn = false;
-            orderLineMessageColumnChecked = true;
-        }
-
-        return orderLineHasMessageColumn;
-    }
-
-    private static void ensureOrderLineMessageColumn()
-    {
-        if (hasOrderLineMessageColumn()) return;
-        if (orderLineMessageMigrationAttempted) return;
-        orderLineMessageMigrationAttempted = true;
-
-        string qualifiedOrderLine = resolveOrderLineQualifiedName();
-        if (string.IsNullOrWhiteSpace(qualifiedOrderLine))
-        {
-            Logger.Log("ensureOrderLineMessageColumn: orderLine table not found, skipping migration.");
-            return;
-        }
-
-        string command = $"""
-                          if object_id(N'{qualifiedOrderLine}') is not null
-                             and not exists (
-                                 select 1
-                                 from sys.columns
-                                 where object_id = object_id(N'{qualifiedOrderLine}')
-                                   and name = N'lineMessage'
-                             )
-                          begin
-                              alter table {qualifiedOrderLine} add lineMessage nvarchar(1000) null
-                          end
-                          """;
-        bool migrationSucceeded = modifyTableSql(command, "ensureOrderLineMessageColumn");
-        if (!migrationSucceeded)
-        {
-            Logger.Log("ensureOrderLineMessageColumn: unable to add lineMessage; continuing without message column.");
-            return;
-        }
-
-        orderLineMessageColumnChecked = false;
-        hasOrderLineMessageColumn();
-    }
-
     private static string serialiseMessagesForSql(List<string>? messages)
     {
         if (messages == null || messages.Count == 0) return string.Empty;
@@ -540,11 +431,6 @@ static partial class SQL
 
     public static List<item> getOpenTableItemsFromDatabase(int tableId)
     {
-        bool hasMessageColumn = hasOrderLineMessageColumn();
-        string messageSelect = hasMessageColumn
-            ? "isnull(ol.lineMessage, '') as lineMessage"
-            : "'' as lineMessage";
-
         string sqlCommand = $"""
                              select
                                  ol.Id as lineId,
@@ -553,7 +439,7 @@ static partial class SQL
                                  ai.price,
                                  isnull(ai.chosenColour, 'grey') as chosenColour,
                                  isnull(ai.extraInfo, '') as extraInfo,
-                                 {messageSelect}
+                                 isnull(ol.lineMessage, '') as lineMessage
                              from headers as h
                                       inner join orders as o
                                                  on o.headerId = h.Id
@@ -641,23 +527,12 @@ static partial class SQL
 
         foreach (string s in singleLineCommands) modifyTableSql(s, "pushItemsToTables");
 
-        ensureOrderLineMessageColumn();
-        bool hasMessageColumn = hasOrderLineMessageColumn();
-
         //orderLine table
         foreach (item item in table.itemsToOrder)
         {
-            string command;
-            if (hasMessageColumn)
-            {
-                string escapedMessage = serialiseMessagesForSql(item.messages);
-                command =
-                    $"insert into orderLine(Id, orderId, itemId, lineMessage) values({lineId++}, {orderId}, {item.Id}, N'{escapedMessage}')";
-            }
-            else
-            {
-                command = $"insert into orderLine(Id, orderId, itemId) values({lineId++}, {orderId}, {item.Id})";
-            }
+            string escapedMessage = serialiseMessagesForSql(item.messages);
+            string command =
+                $"insert into orderLine(Id, orderId, itemId, lineMessage) values({lineId++}, {orderId}, {item.Id}, N'{escapedMessage}')";
 
             modifyTableSql(command, "pushItemsToTables later on");
             Logger.Log("added item");
@@ -669,8 +544,6 @@ static partial class SQL
     public static void updateOrderLineMessage(int lineId, List<string> messages)
     {
         if (lineId <= 0) return;
-        ensureOrderLineMessageColumn();
-        if (!hasOrderLineMessageColumn()) return;
 
         string escapedMessage = serialiseMessagesForSql(messages);
         string command = $"update orderLine set lineMessage = N'{escapedMessage}' where Id = {lineId}";
@@ -925,18 +798,11 @@ static partial class SQL
     public static List<orderLine> getOrderLines()
     {
         List<orderLine> orderLines = new();
-        bool hasMessageColumn = hasOrderLineMessageColumn();
-        string query = hasMessageColumn
-            ? """
-              select Id, orderId, itemId, isnull(lineMessage, '')
-              from orderLine
-              order by Id asc
-              """
-            : """
-              select Id, orderId, itemId
-              from orderLine
-              order by Id asc
-              """;
+        string query = """
+                       select Id, orderId, itemId, isnull(lineMessage, '')
+                       from orderLine
+                       order by Id asc
+                       """;
         using SqlConnection con = new SqlConnection(connectionString);
         con.Open();
         using SqlCommand com = new SqlCommand(query, con);
@@ -948,7 +814,7 @@ static partial class SQL
                 Id = reader.GetInt32(0),
                 orderId = reader.GetInt32(1),
                 itemId = reader.GetInt32(2),
-                lineMessage = hasMessageColumn && !reader.IsDBNull(3) ? reader.GetString(3) : ""
+                lineMessage = reader.IsDBNull(3) ? "" : reader.GetString(3)
             });
         }
 
