@@ -36,16 +36,10 @@ put simply a clone of a very popular pos system...
     - [x] add responsive errors to the first run form so the user knows what to change
     - [x] add tab so i can easily input data
     - [x] add ability for users to go back to last successsful login data
-    - [ ] when tableForm is ran it should get all of the data for the table and then highlight tables that table
-
-- a couple packages that might be nice to integrate:
-  - [ ] MaterialSkin - recomended for nicer visuals
-  - [x] FluentValidation - sped up validation significantly (ai written)
-  - [ ] dependency injection - it was suggested and its probs a good idea tbf
-
+    - [x] when tableForm is ran it should get all of the data for the table and then highlight tables that table
 
 - bit far out:
-  - [ ] add the ordering system
+  - [x] add the ordering system
   - [ ] add a way to push orders to the table
   - [x] including the databases to go along with it
   - [x] add a quick website to view the ordering system
@@ -55,4 +49,4 @@ put simply a clone of a very popular pos system...
 
 
 ---
-please help me with this page i am absolutely useless at markdown (and everything else tbh) and if you have absolutely any ideas or help for it i would appreciate it so much i dont think you understand but yeah contact me with a quick dm i am open for any ideas ;)
+This project is proprietary. No redistribution or derivative works are permitted without written permission
