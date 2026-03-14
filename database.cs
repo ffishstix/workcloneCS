@@ -37,7 +37,7 @@ static class database
     private static Dictionary<int, List<orderLine>> orderLines = new();
     private static Dictionary<int, order> orders = new();
     private static Dictionary<int, staff> staff = new();
-    private static Dictionary<int, table> tables = new(); 
+    private static Dictionary<int, table> tables = new();
 
     //links
     private static Dictionary<int, HashSet<int>> catItemLinks = new();
@@ -476,17 +476,7 @@ static class database
             dbSnapShot snap = getDatabaseSnapShot();
             string json = JsonSerializer.Serialize(snap, SnapshotJsonOptions);
             File.WriteAllText(SQL.sqlDir + "database.json", json);
-
-            if (extraSafe)
-            {
-                // we now do a solid test to see if the written json is = to the one we just made:
-                string json2 = File.ReadAllText(SQL.sqlDir + "database.json");
-                if (json == json2) Logger.Log("database saved successfully");
-                else Logger.Log("database failed to save");
-                return;
-            }
-
-            Logger.Log("extrasafe not enabled so we arent going to check if it saved correctly");
+            return;
         }
 
         Logger.Log("database failed to save a variable isnt initialised correctly");
