@@ -3,7 +3,7 @@ Copyright (c) 2026 ffishstix
 ALL RIGHTS RESERVED.
 
 This repository and all associated source code, data, documentation, and other contents
-the “Materials”) are proprietary and confidential.
+(the “Materials”) are proprietary and confidential.
 
 NO LICENSE GRANTED. Except as expressly permitted in writing by the copyright holder,
 no permission is granted to any person to use, copy, modify, merge, publish, distribute,
