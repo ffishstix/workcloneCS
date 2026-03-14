@@ -49,4 +49,8 @@ put simply a clone of a very popular pos system...
 
 
 ---
-This project is proprietary. No redistribution or derivative works are permitted without written permission
+## License
+
+This project is proprietary. No redistribution or derivative works are permitted without written permission.
+
+See [LICENSE.md](LICENSE.md).
