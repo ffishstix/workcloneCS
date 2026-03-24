@@ -22,7 +22,13 @@ public partial class Form1
 
     private void addCategories()
     {
-        if (!IsHandleCreated) return;
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(addCategories));
+            return;
+        }
+
+        if (!IsHandleCreated || IsDisposed) return;
         deleteChildbox();
 
 
@@ -66,7 +72,13 @@ public partial class Form1
 
     private void deleteChildbox()
     {
-        if (catPan != null) catPan.Controls.Clear();
+        if (InvokeRequired)
+        {
+            BeginInvoke(new Action(deleteChildbox));
+            return;
+        }
+
+        if (catPan != null && !catPan.IsDisposed) catPan.Controls.Clear();
     }
 
     private void catClick(object sender, EventArgs e)
@@ -614,7 +626,8 @@ public partial class Form1
                     tableSelected.tableId = table.tableSelected;
                     tableSelected.openStaff = currentStaff;
                     tableBtn.Text = $"Table {tableSelected.tableId}";
-                    List<item> items = database.getOpenTableItemsFromSqlAndUpdateLocal(tableSelected.tableId, currentStaff);
+                    List<item> items =
+                        database.getOpenTableItemsFromSqlAndUpdateLocal(tableSelected.tableId, currentStaff);
                     if (items != null)
                     {
                         tableSelected.ordered = items;

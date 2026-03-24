@@ -255,7 +255,7 @@ static partial class SQL
             string Name = reader.GetString(1);
             string allergyString = reader.IsDBNull(2) ? "" : reader.GetString(2);
             string extraInfo = reader.IsDBNull(3) ? "" : reader.GetString(3);
-            decimal price = reader.GetInt32(4);
+            decimal price = reader.GetInt32(4) / 100m;
             string chosenColour = reader.GetString(5);
             string catName = reader.GetString(6);
             int catId = reader.GetInt32(7);
@@ -617,7 +617,7 @@ static partial class SQL
             {
                 Id = reader.GetInt32(0),
                 Name = reader.GetString(1),
-                price = reader.GetInt32(2) / 100,
+                price = reader.GetInt32(2) / 100m,
                 chosenColour = reader.GetString(3),
                 extraInfo = reader.GetString(4),
                 itemCount = 1,
