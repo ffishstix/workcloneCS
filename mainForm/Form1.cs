@@ -11,6 +11,7 @@ public partial class Form1 : Form
     private staff currentStaff = new();
     private List<dbCategory> cat = new();
 
+    // Loads local data, initializes UI, then starts async category rendering.
     public Form1()
     {
         alergies = new List<string>();
@@ -60,6 +61,7 @@ public partial class Form1 : Form
 
     private void generalItem_Click(object sender, EventArgs e)
     {
+        // Queues the clicked item for the current table and updates totals immediately.
         if (currentStaff == new staff() || currentStaff.Id == 0)
         {
             NameForm name = new();
@@ -95,7 +97,6 @@ public partial class Form1 : Form
         updateTotalPrice(queuedItem.price);
     }
 
-    //in the bottom right
     private void backBtn_Click(object sender, EventArgs e)
     {
         deleteChildbox();
@@ -104,18 +105,6 @@ public partial class Form1 : Form
     }
 
 
-    //<summary>
-    //called when category clicked on, gets items from file called "{categoryName}".txt -
-    //should probs change for an api call icl but you never know yk 
-    // then just goes through each and adds each value and what not
-    //
-    //
-    //for the config panels should always be called before toggling the visibility of a panel
-    //probably useful for me to explain that this is a requirement else we could run into multiple 
-    //click issues and other annoying stuff
-    //
-    //the following 5 functions are to bring up user specific panels
-    //</summary>
     private void ConfigBtn_Click(object sender, EventArgs e)
     {
         if (catPan.Height < 10)
@@ -133,7 +122,7 @@ public partial class Form1 : Form
 
     private void SignOffBtn_Click(object sender, EventArgs e)
     {
-        tableSelected = new table(); // currently not working and i honestly dont know why good luck future me ;0
+        tableSelected = new table();
         updateCurrentStaff(new staff());
         deleteAllItemsOrdered();
         allPannelsBlank();
@@ -246,6 +235,7 @@ public partial class Form1 : Form
 
     private void paymentBtn_Click(object sender, EventArgs e)
     {
+        // Marks the table as paid in SQL, mirrors closure locally, then signs off.
         bool payWithCard = ((Button)sender).Text.ToLower() == "card"; // not used
         Logger.Log("user tried to send through a payment but this is not within scope" +
                    "\nclearing items off table now");

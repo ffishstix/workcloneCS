@@ -4,9 +4,6 @@ public partial class Form1
 {
     #region default code
 
-    // <summary>
-    // this is the default generated code with each form and is not important
-    // </summary>
     private void Form1_Load(object sender, EventArgs e)
     {
     }
@@ -20,6 +17,7 @@ public partial class Form1
 
     #region displayed categories code
 
+    // Rebuilds category buttons in the category panel.
     private void addCategories()
     {
         if (InvokeRequired)
@@ -40,7 +38,6 @@ public partial class Form1
 
         try
         {
-            // sort the categories using a specific sort to get exta marks...... there is a column in the table that tells you which order they want to be displayed in, sort the categories based on that. /////
             foreach (var category in cat)
             {
                 if (category != null)
@@ -88,12 +85,11 @@ public partial class Form1
     }
 
 
+    // Loads categories/allergies and updates category buttons on screen.
     private async Task LoadCategories()
     {
-        // Create a TaskCompletionSource to wait for categories
         var tcs = new TaskCompletionSource<bool>();
 
-        // Wait until categories are loaded or timeout
         cat = database.getCategories();
         availableAllergies = database.allergies?.Values.Select(a => a.Name).ToList() ?? new List<string>();
         alergies = alergies
@@ -118,6 +114,7 @@ public partial class Form1
 
     private void InitItemList(int e)
     {
+        // Loads all items for the selected category and appends them to the UI.
         if (cat == null || e < 0 || e >= cat.Count)
         {
             Logger.Log("InitItemList called with invalid category index");
@@ -241,6 +238,7 @@ public partial class Form1
 
     private int globalLineId = 0;
 
+    // Adds one item row to the order list and wires selection/delete behavior.
     private void addItem(item item, bool autoScrollToBottom = true)
     {
         priceTotal += item.price;
@@ -283,6 +281,7 @@ public partial class Form1
     }
 
 
+    // Enables horizontal drag gestures to decrement or increment a row quantity.
     private void EnableSwipeToDelete(rowOfItem row)
     {
         Point mouseDownLocation = Point.Empty;
@@ -339,7 +338,6 @@ public partial class Form1
                     row.updateText();
                     tableSelected.itemsToOrder[tableSelected.itemsToOrder.FindIndex(x => x.lineId == row.lineId)]
                         .itemCount = row.itemCount;
-                    //used to have refresh scoll pannel here lol absolutely no need
                     updateTotalItems(1);
                     updateTotalPrice(row.price);
                 }
@@ -387,8 +385,6 @@ public partial class Form1
     {
         createScrollPanel();
 
-
-        // Sample data - to be changed
         leftLabel.Tag = 0;
         rightLabel.Tag = 0m;
         leftLabel.Dock = DockStyle.Left;
@@ -412,6 +408,7 @@ public partial class Form1
         rightLabel.Text = "Price: 0.00";
     }
 
+    // Rebuilds the visible order list from ordered and queued table items.
     private void refreshScrollPanel()
     {
         if (scrollPanel == null || scrollPanel.IsDisposed)
@@ -460,6 +457,7 @@ public partial class Form1
 
     private void textMsgBtn_Click_Code()
     {
+        // Adds a message to the selected/latest item and persists it for ordered lines.
         item? targetItem = getMessageTargetItem();
         if (targetItem == null)
         {
@@ -490,6 +488,7 @@ public partial class Form1
         }
     }
 
+    // Chooses the best item target for message entry based on selection and recency.
     private item? getMessageTargetItem()
     {
         if (selectedRow != null)
@@ -531,16 +530,13 @@ public partial class Form1
         return tableSelected.ordered.FirstOrDefault(x => x.lineId == lineId);
     }
 
-
-    //add all of the items made clickeable that all take them to the gereralItem_Click()
-
-
     private int maximiseSelectPanel()
     {
+        // Expands item-row labels when collapsing category panel space.
         int panel1Height = 279;
         foreach (Control ctrl in scrollPanel.Controls)
         {
-            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null)
             {
                 foreach (Control ctrl2 in panel.Controls)
                 {
@@ -557,10 +553,11 @@ public partial class Form1
 
     private int minimiseSelectPanel()
     {
+        // Restores category panel space while keeping row label widths aligned.
         int panel1Height = 0;
         foreach (Control ctrl in scrollPanel.Controls)
         {
-            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null) // or check Name, Tag, etc.
+            if (ctrl is FlowLayoutPanel panel && panel.Tag is item t && t != null)
             {
                 foreach (Control ctrl2 in panel.Controls)
                 {
@@ -600,6 +597,7 @@ public partial class Form1
         finallyPanelCode(panel1Height);
     }
 
+    // Opens table selection or sends queued items depending on current table state.
     private void tableBtn_Click_Code(object sender, EventArgs e)
     {
         if (currentStaff == null || currentStaff.Id == new staff().Id)
@@ -616,9 +614,6 @@ public partial class Form1
         {
             if (tableSelected.tableId == 0)
             {
-                //select table logic displaying if it is open currently
-                //probs sql db of currently open tables with the items stored on it
-
                 TableForm table = new TableForm();
                 table.ShowDialog();
                 if (table.tableSelected != 0)
@@ -658,6 +653,7 @@ public partial class Form1
 
     private void updateCurrentStaff(staff staff)
     {
+        // Sets current user context and refreshes name button state.
         if (staff == new staff())
         {
             nameBtn.Text = "Name";
@@ -671,6 +667,7 @@ public partial class Form1
         nameBtn.Tag = staff;
     }
 
+    // Sends queued items to SQL, mirrors them locally, then resets the current table draft.
     private void sendToTable()
     {
         if (tableSelected == null || tableSelected.itemsToOrder == null || tableSelected.itemsToOrder.Count == 0)
@@ -713,6 +710,7 @@ public partial class Form1
         Logger.Log($"user: {currentStaff.Name} just logged in with id: {currentStaff.Id}");
     }
 
+    // Reopens setup and reloads local category/allergy state after config changes.
     private void ConfigSideBtn_Click_Code(object sender, EventArgs e)
     {
         FirstRunWindow reLoad = new FirstRunWindow(true);

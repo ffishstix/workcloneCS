@@ -19,6 +19,7 @@ public class table
         updatePriceTotal();
     }
 
+    // Recalculates total price in pence from queued and ordered items.
     public void updatePriceTotal()
     {
         int temp = 0;
@@ -53,8 +54,7 @@ public class staff : baseItem
 
 class category
 {
-    // this is purely for purposes such as how in the locally saved files 
-    // there might not be certain properties from the database so i am just putting this here so i can 
+    // Used for locally cached category data.
     public bool connected { get; set; }
     public string catName { get; set; }
     public int categoryId { get; set; }
@@ -110,6 +110,7 @@ public class rowOfItem : item
         set { middle = value; }
     }
 
+    // Builds one visual order row with count, name, and price labels.
     public rowOfItem()
     {
         Name = "litterallly anythingelse";
@@ -208,6 +209,7 @@ public class rowOfItem : item
 
     public void addMessage(string m)
     {
+        // Appends a message and updates tooltip/marker state for the row.
         if (string.IsNullOrWhiteSpace(m)) return;
 
         rowMessages.Add(m.Trim());
@@ -224,6 +226,7 @@ public class rowOfItem : item
 
     public void Dispose()
     {
+        // Disposes row controls to release UI resources.
         foreach (Control control in rowPannel.Controls)
         {
             if (control == Left || control == Right || control == middle)
@@ -241,10 +244,6 @@ public class rowOfItem : item
     }
 }
 
-///
-/// this will be where i put the daatabase class i am going to redo the waya i store my local database.
-/// this will make it unbelieably more efficient in the long run but gonna need to cook for a few hours
-///
 class dbSubParent
 {
     public int Id { get; set; }
@@ -316,6 +315,7 @@ public class basicJunctionTable
 
     public basicJunctionTable(string TableName, string LeftCol, string RightCol)
     {
+        // Stores junction table metadata and optionally loads initial pairs.
         tableName = TableName;
         leftCol = LeftCol;
         rightCol = RightCol;
@@ -326,11 +326,13 @@ public class basicJunctionTable
 
     public void populateTable()
     {
+        // Loads left/right ids from SQL and rebuilds grouped link mappings.
         (leftIds, rightIds) = SQL.getJunctionTableValues(tableName, leftCol, rightCol);
         hasPopulated = true;
         updateCombined();
     }
 
+    // Groups right-side ids by each left-side id from the junction lists.
     private void updateCombined()
     {
         combined = new Dictionary<int, HashSet<int>>();
@@ -353,7 +355,6 @@ public class basicJunctionTable
 
 public class accessLevel : baseItem
 {
-    // still has Id
     public bool canSendThroughItems { get; set; }
     public bool canDelete { get; set; }
     public bool canNoSale { get; set; }

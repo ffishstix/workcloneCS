@@ -17,6 +17,7 @@ static partial class SQL
     public static string sqlDir = dir + "sql/";
     public static bool initStarted = false;
 
+    // Initialises SQL paths, connection state, and cached category/staff data.
     public static void initSQL()
     {
         if (initStarted) return;
@@ -206,6 +207,7 @@ static partial class SQL
         return null;
     }
 
+    // Loads one category and its items, then updates the local category cache file.
     public static category getCategory(int categoryChosen)
     {
         category currentCategory = new category();
@@ -429,6 +431,7 @@ static partial class SQL
         }
     }
 
+    // Reads open items for a table and maps each row into an item model.
     public static List<item> getOpenTableItemsFromDatabase(int tableId)
     {
         string sqlCommand = $"""
@@ -494,6 +497,7 @@ static partial class SQL
         return items;
     }
 
+    // Inserts a header, order, and related order lines for queued table items.
     public static void pushItemsToTables(table table, staff staff, int headerId, int orderId, int lineId)
     {
         if (headerId == 0 || orderId == 0 || lineId == 0)

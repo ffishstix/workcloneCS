@@ -28,24 +28,24 @@ put simply a clone of a very popular pos system...
 ---
 ## todo
 
-- a lot more realistic:
-    - [x] items displayed properly - that was very difficult, full refactor 
-    - [x] reformat how items are stored in variables when clicked on (food items)
-    - [x] give functionality for sign on and sign off buttons
-    - [x] add first run form to initialize database connections
-    - [x] add responsive errors to the first run form so the user knows what to change
-    - [x] add tab so i can easily input data
-    - [x] add ability for users to go back to last successsful login data
-    - [x] when tableForm is ran it should get all of the data for the table and then highlight tables that table
-
-- bit far out:
+  - [x] items displayed properly - that was very difficult, full refactor 
+  - [x] reformat how items are stored in variables when clicked on (food items)
+  - [x] give functionality for sign on and sign off buttons
+  - [x] add first run form to initialize database connections
+  - [x] add responsive errors to the first run form so the user knows what to change
+  - [x] add tab so i can easily input data
+  - [x] add ability for users to go back to last successsful login data
+  - [x] when tableForm is ran it should get all of the data for the table and then highlight tables that table
   - [x] add the ordering system
-  - [ ] add a way to push orders to the table
+  - [x] add a way to push orders to the table
   - [x] including the databases to go along with it
   - [x] add a quick website to view the ordering system
   - [x] add allergies database with a connected info button to each item with an allergy connected 
-  - [ ] make an admin form where you can set prices for different products this could be by pulling all items from the database looking at it through a list then selecting the one you want and at the backend it makes the SQL code tbf could be an idea 
-  - [ ] with the last option add standard deviation and mean of prices so that you can get extra marks for it 
+  - [x] make an admin form where you can set prices for different products this could be by pulling all items from the database looking at it through a list
+  - [ ] when an allergy is selected and an item is clicked with the allergy it then removes the allergy 
+  and forces an allergy note, which should be its own section
+  - [ ]
+
 
 
 ---

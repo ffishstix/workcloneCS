@@ -8,6 +8,7 @@ namespace WorkCloneCS
 {
     public partial class FirstRunWindow : Form
     {
+        // Saves the validated connection string and triggers initial cloud sync.
         private void Apply_Click_Code(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(lastWorkingConnection))
@@ -45,6 +46,7 @@ namespace WorkCloneCS
 
         private async void CheckBtn_Click_Code(object obj, EventArgs e)
         {
+            // Validates input fields, builds a connection string, and tests SQL connectivity.
             InfoLabel.Text = "Checking connection string";
             string anyErrors = "";
             bool valid = true;
@@ -128,7 +130,7 @@ namespace WorkCloneCS
                                    $"User Id={settings.Username};" +
                                    $"Password={settings.Password};" +
                                    $"Encrypt=False";
-                //now we try the connection
+                // Test the connection string against SQL Server.
                 string allPat =
                     @"Server=((?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})*(\.[A-Za-z]{2,})),((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}));Database=(\w*);User Id=([a-zA-Z0-9][a-zA-Z0-9_-]{0,127});Password=(\w{8,128});Encrypt=False";
 
@@ -176,6 +178,7 @@ namespace WorkCloneCS
 
         private void LastBtn_Click_Code(object sender, EventArgs e)
         {
+            // Restores textbox values from the last known working connection string.
             IPTextBox.Text = lastWorkingConnection.Split(';')[0].Split('=')[1].Split(',')[0];
             PortTextBox.Text = lastWorkingConnection.Split(';')[0].Split('=')[1].Split(',')[1];
             databaseTextBox.Text = lastWorkingConnection.Split(';')[1].Split('=')[1];
@@ -194,6 +197,7 @@ namespace WorkCloneCS
 
         public static bool ranBefore()
         {
+            // Checks first-run marker and connection config file under the app data folder.
             if (!Directory.Exists(basestr + "/sql"))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(basestr + "/sql"));

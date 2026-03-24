@@ -59,6 +59,7 @@ static class database
     }
 
 
+    // Loads a full snapshot from SQL and refreshes local cache state.
     public static bool pullCloudDatabase()
     {
         if (!SQL.checkDBConnection())
@@ -165,6 +166,7 @@ static class database
 
     public static table getTableItems(int tableId)
     {
+        // Builds one table view by joining open headers, orders, lines, and item definitions.
         ensureLocalDatabaseLoaded();
         List<item> result = new();
         if (headers == new Dictionary<int, header>() ||
@@ -203,6 +205,7 @@ static class database
         return table;
     }
 
+    // Marks all matching headers as closed and refreshes local open-table cache.
     public static int closeTableLocally(int tableId, int finishedValue = 2)
     {
         ensureLocalDatabaseLoaded();
@@ -241,6 +244,7 @@ static class database
         return headersUpdated;
     }
 
+    // Pulls current open items for a table from SQL and mirrors them locally.
     public static List<item> getOpenTableItemsFromSqlAndUpdateLocal(int tableId, staff fallbackStaff = null)
     {
         ensureLocalDatabaseLoaded();
@@ -282,6 +286,7 @@ static class database
 
     public static Dictionary<int, (int itemCount, decimal totalPrice)> getOpenTableSummaries()
     {
+        // Aggregates open-table counts and totals from cached headers, orders, and order lines.
         ensureLocalDatabaseLoaded();
         Dictionary<int, (int itemCount, decimal totalPrice)> summaries = new();
 
@@ -323,6 +328,7 @@ static class database
         return summaries;
     }
 
+    // Creates local header, order, and order lines for queued table items.
     public static void addTableOrder(table table, staff staffMember)
     {
         if (table == new table() || staffMember == new staff())
@@ -402,6 +408,7 @@ static class database
 
     public static bool tryLoadLocalDatabase()
     {
+        // Loads snapshot from disk when available, otherwise falls back to a cloud pull.
         string path = SQL.sqlDir + "database.json";
         if (!File.Exists(path))
         {
@@ -448,11 +455,7 @@ static class database
     }
 
 
-    //<summary>
-    // checks all variables are not null then stores them. 
-    // specifically in json format.
-    // </summary>
-
+    // Persists the current in-memory snapshot when required state is loaded.
     public static void saveLocalDatabase(bool allowCloudRefresh = true)
     {
         if (!DBExists) Logger.Log("db file doesnt exist however i am creating one");
@@ -484,6 +487,7 @@ static class database
 
     private static bool ensureLocalDatabaseLoaded()
     {
+        // Ensures cache dictionaries are ready before any read/write operation.
         if (allergies != new Dictionary<int, allergy>() &&
             items != new Dictionary<int, item>() &&
             categories != new Dictionary<int, dbCategory>() &&
@@ -519,6 +523,7 @@ static class database
 
     private static staff resolveOpenTableStaff(int tableId, staff fallbackStaff = null)
     {
+        // Resolves table staff using open headers first, then existing table cache, then fallback.
         foreach (header hdr in headers.Values)
         {
             if (hdr.tableId != tableId || hdr.finished != 0) continue;
@@ -577,6 +582,7 @@ static class database
     }
 
 
+    // Rebuilds open tables from header/order/order-line links.
     private static void updateOpenTablesFromLoadedData()
     {
         tables = new Dictionary<int, table>();
@@ -632,6 +638,7 @@ static class database
 
     private static void checkDBVNum()
     {
+        // Syncs local snapshot when local and remote database versions differ.
         cloudVNum = SQL.getDatabaseVNum();
         localVNum = SQL.getLocalDBVNum();
         int syncCount = 0;
@@ -648,6 +655,7 @@ static class database
         }
     }
 
+    // Rebuilds category-to-item lists from the category junction table.
     private static void updateCategories()
     {
         if (items == new Dictionary<int, item>())
@@ -710,7 +718,7 @@ static class database
     {
     }
 
-    //function to be called after all allergies and items have been initialised.
+    // Rebuilds item-to-allergy lists from the allergy junction table.
     private static void updateItems()
     {
         basicJunctionTable t = new basicJunctionTable(
@@ -747,6 +755,7 @@ static class database
 
     private static dbSnapShot getDatabaseSnapShot()
     {
+        // Captures all in-memory dictionaries into one serializable snapshot model.
         return new dbSnapShot
         {
             cloudVNum = cloudVNum,
@@ -768,6 +777,7 @@ static class database
     }
 
 
+    // Loads the local JSON snapshot into the in-memory dictionaries.
     public static void loadLocalDatabase()
     {
         dbSnapShot snap = JsonSerializer.Deserialize<dbSnapShot>(
